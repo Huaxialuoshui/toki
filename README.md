@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 5（通知提醒）已完成**：日程 / 倒计时的增删改、排序、通知提醒都已落地；
-> AI 助手尚未接入（Phase 6 起）。
+> 当前状态：**Phase 6（AI Provider）已完成**：日程 / 倒计时 / 通知之外，AI 助手已经能真实调用
+> OpenAI Compatible 服务并逐字流式回复；人设管理（Phase 7）与工具调用（Phase 8）待做。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 95/95 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递与"进程结束后系统闹钟仍在" |
-| Windows | ✅ | ✅ 95/95 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 的可见性待你在空闲时确认（见下） |
+| Android | ✅ | ✅ 118/118 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、"进程结束后系统闹钟仍在"、AI 真实流式聊天 |
+| Windows | ✅ | ✅ 118/118 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 可见性待你空闲时确认 |
 
 ## 项目介绍
 
@@ -36,6 +36,9 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
   两种显示样式（大数字 / 完整文本）、颜色与目标时间选择器，每秒实时刷新
 - **通知提醒**：`NotificationService` 抽象 + Android 本地通知 / Windows Toast（同一插件两端实现）、
   提醒自动排期与取消、通知权限与"精确提醒"入口、测试通知，设置页可视状态
+- **AI Provider**：`AiProvider` 抽象 + OpenAI Compatible 实现（含 SSE 流式）、服务商配置界面
+  （预设 / Base URL / API Key 脱敏 / 模型 / 温度 / 最大 token / 流式开关 / 测试连接）、
+  真实聊天与逐字输出，会话与消息落库
 
 计划中（尚未实现，按阶段推进）
 
@@ -47,6 +50,7 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 3 | 日历增删改、全天 / 时间选择器、颜色、周 / 日视图 | ✅ |
 | Phase 4 | 倒计时 CRUD、置顶、拖动排序、跨天/跨月/跨年/时区/夏令时测试 | ✅ |
 | Phase 5 | Android 本地通知 / Windows Toast、提醒排期 | ✅ |
+| Phase 6 | AI Provider（OpenAI Compatible）+ 流式聊天 | ✅ |
 | Phase 6-8 | AI Provider、Persona、Tool Calling + 权限 | ⏳ |
 | Phase 9-13 | Context、聊天自定义、主题编辑器、备份、质量优化 | ⏳ |
 
@@ -94,11 +98,14 @@ lib/
 ├── application/
 │   ├── countdown/                # CountdownController（唯一 1Hz 节拍）
 │   ├── calendar/                 # 数据库 StreamProvider + 写操作（CalendarActions）
-│   ├── ai/                       # 人设 / 服务商 Provider
+│   ├── ai/                       # 人设 / 服务商 Provider + ChatController（流式聊天）
+│   ├── notification/             # ReminderScheduler：提醒 → 系统通知
 │   ├── theme/                    # 预设、ThemeConfig → ThemeData、主题控制器
 │   └── settings/                 # 语言、首次启动、启动初始化
 ├── infrastructure/
 │   ├── database/                 # Drift 表定义、AppDatabase、连接、转换器
+│   ├── ai/                       # OpenAI Compatible 实现（Dio + SSE）
+│   ├── notification/             # Android 通知 / Windows Toast 实现
 │   ├── storage/                  # shared_preferences 封装
 │   └── mock/                     # 仅剩 AI 演示会话 + 兜底人设
 ├── presentation/
@@ -236,6 +243,43 @@ flutter test test/data/migration_test.dart
   因此时区、夏令时都不会让它多算/少算一小时（`test/domain/countdown_time_zones_test.dart` 覆盖：
   跨天、跨月、跨年、UTC/本地混用、春季拨快（当天 23 小时）、秋季拨回（当天 25 小时）、目标时间已过去）。
 
+## AI 助手说明（Phase 6）
+
+### 配置 AI 服务商
+
+设置 → AI 与服务商 → 添加服务商。可以点「快速填充」选常见服务商（DeepSeek / OpenAI / Qwen /
+Moonshot / 智谱 / Ollama），也可以手填：
+
+| 字段 | 说明 |
+| --- | --- |
+| Base URL | 例如 `https://api.deepseek.com`、`https://api.deepseek.com/v1`、`http://127.0.0.1:11434/v1`；末尾会自动补 `/chat/completions` |
+| API Key | 只保存本机数据库，界面默认隐藏、列表里只显示 `sk-x****abcd`，日志与异常里都不带原文 |
+| 模型 | 例如 `deepseek-chat`、`gpt-4o-mini`、`qwen2.5:7b` |
+| 温度 / 最大 Token / 流式输出 | 可选 |
+
+「测试连接」会用当前表单发一条最小请求（非流式），成功时把模型回复的前 40 字显示出来，
+失败时显示可读原因（HTTP 状态 + 提示，例如 401 → Key 可能无效、404 → 检查 Base URL）。
+
+### 聊天与流式输出
+
+* AI 页调用当前生效的服务商（默认项优先，否则列表第一个），逐块渲染回复——**用户能看到逐字输出**；
+* 发送中按钮变成「停止」，中止后已收到的部分会保留并落库；
+* 用户消息与助手回复都写入 `chat_messages`，会话写入 `chat_sessions`；
+* 请求里会带上人设的 system prompt（来自 `ai_personas`）与历史消息；
+* 出错时显示可读错误横幅，不会伪造助手回复。
+
+### 没有 API Key 也能验证
+
+仓库自带一个最小 OpenAI 兼容 mock 服务：
+
+```powershell
+python tool/mock_openai_server.py 11434
+adb reverse tcp:11434 tcp:11434          # Android 模拟器/真机：把端口转发进设备
+# 然后在 App 里添加服务商：Base URL http://127.0.0.1:11434/v1，模型随便填（如 qwen2.5:7b）
+```
+
+它支持非流式与 SSE 流式两种响应，用来验证整条链路（网络 → 解析 → 逐字渲染 → 落库）。
+
 ## 通知说明（Phase 5）
 
 * **抽象**：业务层只依赖 `NotificationService`（`initialize` / `requestPermission` /
@@ -271,7 +315,7 @@ flutter analyze
 flutter test
 ```
 
-当前 95 个测试，覆盖：
+当前 118 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
@@ -285,6 +329,11 @@ flutter test
   倒计时卡片秒级刷新、空数据库的空状态、日历新建 / 编辑 / 删除 / 校验 / 全天开关 / 月周日视图切换
 * 界面·倒计时：新建 / 编辑（含样式切换）/ 删除二次确认 / 置顶分组 / 拖动排序
 * 界面·通知：权限状态展示、请求权限、发送测试通知
+* AI 层：Base URL 规范化、请求体字段、Authorization 头（有/无 Key）、SSE 解析（含 keep-alive 注释、
+  `data:` 无空格、UTF-8 跨分片）、`[DONE]` 与无 `[DONE]` 收尾、错误映射（401/404/连接失败）且不含 Key
+* AI 应用层：发送后用户 + 助手消息落库、流式状态逐块更新、system prompt 与历史顺序、
+  出错不写助手消息、中止保留已收到内容、清空对话
+* 界面·AI：未配置时的提示与入口、发送后逐字显示回复、错误横幅、清空对话
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

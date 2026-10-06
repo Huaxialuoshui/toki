@@ -169,6 +169,49 @@
   "aiMockUser": "What's on my schedule next week?",
   "aiMockToolSummary": "Found 4 events",
   "aiMockAssistant": "You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.",
+  "aiNoProvider": "No AI provider configured yet",
+  "aiNoProviderHint": "Add a Base URL and model in Settings to start chatting.",
+  "aiOpenSettings": "Open settings",
+  "aiStop": "Stop",
+  "aiThinking": "Thinking…",
+  "aiEmptyConversation": "Say hello to {personaName}",
+  "@aiEmptyConversation": {
+    "placeholders": {
+      "personaName": {
+        "type": "String"
+      }
+    }
+  },
+  "aiClearConversation": "Clear conversation",
+  "aiClearConfirm": "Clear this conversation?",
+  "aiStreamingHint": "Replying…",
+  "aiProviderName": "Name",
+  "aiBaseUrl": "Base URL",
+  "aiApiKey": "API Key",
+  "aiModel": "Model",
+  "aiTemperature": "Temperature",
+  "aiMaxTokens": "Max tokens",
+  "aiStreamingEnabled": "Streaming output",
+  "aiSetDefault": "Set as default",
+  "aiDefaultBadge": "Default",
+  "aiAddProvider": "Add provider",
+  "aiEditProvider": "Edit provider",
+  "aiNoProviders": "No providers configured",
+  "aiPresets": "Quick fill",
+  "aiTestConnection": "Test connection",
+  "aiTestOk": "Connected: {reply}",
+  "@aiTestOk": {
+    "placeholders": {
+      "reply": {
+        "type": "String"
+      }
+    }
+  },
+  "aiFieldRequired": "Required",
+  "aiInvalidUrl": "URL must start with http:// or https://",
+  "aiShowKey": "Show",
+  "aiHideKey": "Hide",
+  "aiKeyStoredLocally": "Stored only on this device, never written to logs.",
 
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",

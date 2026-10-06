@@ -701,6 +701,180 @@ abstract class AppLocalizations {
   /// **'You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.'**
   String get aiMockAssistant;
 
+  /// No description provided for @aiNoProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'No AI provider configured yet'**
+  String get aiNoProvider;
+
+  /// No description provided for @aiNoProviderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a Base URL and model in Settings to start chatting.'**
+  String get aiNoProviderHint;
+
+  /// No description provided for @aiOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get aiOpenSettings;
+
+  /// No description provided for @aiStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get aiStop;
+
+  /// No description provided for @aiThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking…'**
+  String get aiThinking;
+
+  /// No description provided for @aiEmptyConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hello to {personaName}'**
+  String aiEmptyConversation(String personaName);
+
+  /// No description provided for @aiClearConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear conversation'**
+  String get aiClearConversation;
+
+  /// No description provided for @aiClearConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear this conversation?'**
+  String get aiClearConfirm;
+
+  /// No description provided for @aiStreamingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Replying…'**
+  String get aiStreamingHint;
+
+  /// No description provided for @aiProviderName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get aiProviderName;
+
+  /// No description provided for @aiBaseUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL'**
+  String get aiBaseUrl;
+
+  /// No description provided for @aiApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get aiApiKey;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get aiModel;
+
+  /// No description provided for @aiTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get aiTemperature;
+
+  /// No description provided for @aiMaxTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'Max tokens'**
+  String get aiMaxTokens;
+
+  /// No description provided for @aiStreamingEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming output'**
+  String get aiStreamingEnabled;
+
+  /// No description provided for @aiSetDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as default'**
+  String get aiSetDefault;
+
+  /// No description provided for @aiDefaultBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get aiDefaultBadge;
+
+  /// No description provided for @aiAddProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Add provider'**
+  String get aiAddProvider;
+
+  /// No description provided for @aiEditProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit provider'**
+  String get aiEditProvider;
+
+  /// No description provided for @aiNoProviders.
+  ///
+  /// In en, this message translates to:
+  /// **'No providers configured'**
+  String get aiNoProviders;
+
+  /// No description provided for @aiPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick fill'**
+  String get aiPresets;
+
+  /// No description provided for @aiTestConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get aiTestConnection;
+
+  /// No description provided for @aiTestOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected: {reply}'**
+  String aiTestOk(String reply);
+
+  /// No description provided for @aiFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get aiFieldRequired;
+
+  /// No description provided for @aiInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'URL must start with http:// or https://'**
+  String get aiInvalidUrl;
+
+  /// No description provided for @aiShowKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get aiShowKey;
+
+  /// No description provided for @aiHideKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get aiHideKey;
+
+  /// No description provided for @aiKeyStoredLocally.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored only on this device, never written to logs.'**
+  String get aiKeyStoredLocally;
+
   /// No description provided for @settingsAppearance.
   ///
   /// In en, this message translates to:

@@ -8,12 +8,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toki/app/app.dart';
 import 'package:toki/application/app_startup.dart';
 import 'package:toki/application/notification/notification_providers.dart';
+import 'package:toki/application/ai/chat_controller.dart';
 import 'package:toki/core/clock.dart';
 import 'package:toki/data/demo/demo_seed.dart';
 import 'package:toki/data/repositories/repository_providers.dart';
 import 'package:toki/infrastructure/clock_provider.dart';
 import 'package:toki/infrastructure/database/app_database.dart';
 import 'package:toki/infrastructure/storage/app_settings_store.dart';
+import 'package:toki/domain/services/ai_provider.dart';
+import 'package:toki/domain/entities/ai_provider_config.dart';
+import 'package:toki/data/repositories/drift_ai_repository.dart';
 
 import 'sqlite_bootstrap.dart';
 import 'fake_notification_service.dart';
@@ -73,6 +77,8 @@ Future<ProviderContainer> createTestContainer({
   Map<String, Object> initialPreferences = const <String, Object>{},
   bool seedDatabase = false,
   FakeNotificationService? notifications,
+  AiProvider? aiProvider,
+  AiProviderConfig? aiConfig,
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -82,6 +88,9 @@ Future<ProviderContainer> createTestContainer({
   final effectiveClock = clock ?? FixedClock(kTestNow);
   if (seedDatabase) {
     await seedDemoDataIfEmpty(database, now: effectiveClock.now());
+  }
+  if (aiConfig != null) {
+    await DriftAiProviderRepository(database).upsert(aiConfig);
   }
   final container = ProviderContainer(
     overrides: <Override>[
@@ -93,6 +102,8 @@ Future<ProviderContainer> createTestContainer({
       notificationServiceProvider.overrideWithValue(
         notifications ?? FakeNotificationService(),
       ),
+      if (aiProvider != null)
+        aiProviderFactoryProvider.overrideWithValue(() => aiProvider),
     ],
   );
   addTearDown(() async {
@@ -110,6 +121,8 @@ Future<void> pumpTokiApp(
   Map<String, Object> initialPreferences = const <String, Object>{},
   bool seedDatabase = true,
   FakeNotificationService? notifications,
+  AiProvider? aiProvider,
+  AiProviderConfig? aiConfig,
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -119,6 +132,9 @@ Future<void> pumpTokiApp(
   final effectiveClock = clock ?? FixedClock(kTestNow);
   if (seedDatabase) {
     await seedDemoDataIfEmpty(database, now: effectiveClock.now());
+  }
+  if (aiConfig != null) {
+    await DriftAiProviderRepository(database).upsert(aiConfig);
   }
   _activeDatabase = database;
 
@@ -135,6 +151,8 @@ Future<void> pumpTokiApp(
         notificationServiceProvider.overrideWithValue(
           notifications ?? FakeNotificationService(),
         ),
+        if (aiProvider != null)
+          aiProviderFactoryProvider.overrideWithValue(() => aiProvider),
       ],
       child: const TokiApp(),
     ),

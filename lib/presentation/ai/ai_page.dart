@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../application/ai/chat_controller.dart';
 import '../../application/ai/ai_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
@@ -11,44 +13,147 @@ import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
 
-/// AI 页面。
-///
-/// Phase 2 之后人设可以来自数据库（debug 构建会写入示例人设）；
-/// 会话内容仍然是演示数据——Provider / Tool Calling 分别在 Phase 6-8 接入。
-class AiPage extends ConsumerWidget {
+/// AI 聊天页：真实调用已配置的 AI 服务商，逐字流式输出并落库。
+class AiPage extends ConsumerStatefulWidget {
   const AiPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AiPage> createState() => _AiPageState();
+}
+
+class _AiPageState extends ConsumerState<AiPage> {
+  final TextEditingController _composer = TextEditingController();
+  final ScrollController _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _composer.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (!_scroll.hasClients) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scroll.hasClients) return;
+      _scroll.jumpTo(_scroll.position.maxScrollExtent);
+    });
+  }
+
+  Future<void> _send() async {
+    final text = _composer.text;
+    if (text.trim().isEmpty) return;
+    _composer.clear();
+    final controller = ref.read(chatControllerProvider.notifier);
+    unawaitedSend(controller, text);
+    _scrollToBottom();
+  }
+
+  void unawaitedSend(ChatController controller, String text) {
+    controller.send(text).then((_) {
+      if (mounted) _scrollToBottom();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
     final now = ref.watch(clockProvider).now();
     final persona = ref.watch(activePersonaProvider) ??
         buildFallbackPersona(now: now, l10n: l10n);
-    final messages = buildMockConversation(now: now, l10n: l10n);
+    final sessionAsync = ref.watch(chatSessionProvider);
+    final session = sessionAsync.valueOrNull;
+    final messages = session == null
+        ? const <ChatMessage>[]
+        : ref.watch(chatMessagesProvider(session.id)).valueOrNull ??
+            const <ChatMessage>[];
+    final stream = ref.watch(chatControllerProvider);
+    final config = ref.watch(activeAiConfigProvider);
 
     return PageScaffold(
       title: l10n.navAi,
       subtitle: '${persona.name} · ${persona.description ?? ''}',
-      actions: <Widget>[_PersonaChip(persona: persona)],
+      actions: <Widget>[
+        _PersonaChip(persona: persona),
+        const SizedBox(width: 8),
+        IconButton(
+          onPressed: messages.isEmpty && !stream.isStreaming
+              ? null
+              : () => _confirmClear(context, ref),
+          icon: const Icon(Icons.delete_sweep_outlined),
+          tooltip: l10n.aiClearConversation,
+        ),
+      ],
       scrollable: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const _MockNotice(),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              itemCount: messages.length,
-              itemBuilder: (context, index) =>
-                  _MessageView(message: messages[index]),
+          if (config == null) const _NoProviderNotice(),
+          if (stream.error != null)
+            _ErrorBanner(
+              message: stream.error == 'no-provider'
+                  ? l10n.aiNoProvider
+                  : (stream.error == 'empty' ? l10n.aiThinking : stream.error!),
+              onDismiss: () =>
+                  ref.read(chatControllerProvider.notifier).clearError(),
             ),
+          Expanded(
+            child: messages.isEmpty && !stream.isStreaming
+                ? _EmptyConversation(persona: persona)
+                : ListView.builder(
+                    controller: _scroll,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    itemCount: messages.length + (stream.isStreaming ? 1 : 0),
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index >= messages.length) {
+                        return _StreamingBubble(
+                          text: stream.streamingText,
+                          persona: persona,
+                        );
+                      }
+                      return _MessageView(
+                        message: messages[index],
+                        persona: persona,
+                      );
+                    },
+                  ),
           ),
           const SizedBox(height: 8),
-          _Composer(personaName: persona.name),
+          _Composer(
+            controller: _composer,
+            personaName: persona.name,
+            isStreaming: stream.isStreaming,
+            enabled: config != null,
+            onSend: _send,
+            onStop: () => ref.read(chatControllerProvider.notifier).cancel(),
+            onOpenSettings: () => context.go('/settings'),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.aiClearConfirm),
+        content: Text(l10n.calendarDeleteConfirmBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.calendarCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.calendarDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(chatControllerProvider.notifier).clearConversation();
   }
 }
 
@@ -83,11 +188,53 @@ class _PersonaChip extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(persona.name, style: theme.textTheme.labelLarge),
-            const SizedBox(width: 6),
-            Icon(
-              Icons.lock_outline,
-              size: 14,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NoProviderNotice extends StatelessWidget {
+  const _NoProviderNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.info_outline, size: 18, color: theme.colorScheme.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    l10n.aiNoProvider,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.aiNoProviderHint,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.66),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () => context.go('/settings'),
+              child: Text(l10n.aiOpenSettings),
             ),
           ],
         ),
@@ -96,30 +243,70 @@ class _PersonaChip extends StatelessWidget {
   }
 }
 
-class _MockNotice extends StatelessWidget {
-  const _MockNotice();
+class _ErrorBanner extends StatelessWidget {
+  const _ErrorBanner({required this.message, required this.onDismiss});
+
+  final String message;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.error_outline, size: 18, color: theme.colorScheme.error),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: onDismiss,
+              icon: const Icon(Icons.close, size: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyConversation extends StatelessWidget {
+  const _EmptyConversation({required this.persona});
+
+  final AiPersona persona;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Row(
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(
-            Icons.info_outline,
-            size: 18,
-            color: theme.colorScheme.primary,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.14),
             child: Text(
-              l10n.aiMockNotice,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+              persona.avatarInitial,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.primary,
               ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.aiEmptyConversation(persona.name),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
             ),
           ),
         ],
@@ -129,9 +316,10 @@ class _MockNotice extends StatelessWidget {
 }
 
 class _MessageView extends StatelessWidget {
-  const _MessageView({required this.message});
+  const _MessageView({required this.message, required this.persona});
 
   final ChatMessage message;
+  final AiPersona persona;
 
   @override
   Widget build(BuildContext context) {
@@ -146,28 +334,122 @@ class _MessageView extends StatelessWidget {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
+        constraints: const BoxConstraints(maxWidth: 560),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            color: isUser
-                ? theme.colorScheme.primary.withValues(alpha: 0.16)
-                : null,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(message.content, style: theme.textTheme.bodyMedium),
-                const SizedBox(height: 4),
-                Text(
-                  DateFormats.time(message.createdAt, locale),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (!isUser) ...<Widget>[
+                _AssistantAvatar(persona: persona),
+                const SizedBox(width: 8),
+              ],
+              Flexible(
+                child: GlassCard(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                  color: isUser
+                      ? theme.colorScheme.primary.withValues(alpha: 0.16)
+                      : null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SelectableText(
+                        message.content,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormats.time(message.createdAt, locale),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.55),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 正在逐字输出的助手气泡。
+class _StreamingBubble extends StatelessWidget {
+  const _StreamingBubble({required this.text, required this.persona});
+
+  final String text;
+  final AiPersona persona;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final hasText = text.isNotEmpty;
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _AssistantAvatar(persona: persona),
+              const SizedBox(width: 8),
+              Flexible(
+                child: GlassCard(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      if (hasText)
+                        SelectableText(
+                          text,
+                          style: theme.textTheme.bodyMedium,
+                        )
+                      else
+                        Text(
+                          l10n.aiStreamingHint,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AssistantAvatar extends StatelessWidget {
+  const _AssistantAvatar({required this.persona});
+
+  final AiPersona persona;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return CircleAvatar(
+      radius: 14,
+      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.14),
+      child: Text(
+        persona.avatarInitial,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -224,30 +506,24 @@ class _ToolCallView extends StatelessWidget {
   }
 }
 
-class _Composer extends StatefulWidget {
-  const _Composer({required this.personaName});
+class _Composer extends StatelessWidget {
+  const _Composer({
+    required this.controller,
+    required this.personaName,
+    required this.isStreaming,
+    required this.enabled,
+    required this.onSend,
+    required this.onStop,
+    required this.onOpenSettings,
+  });
 
+  final TextEditingController controller;
   final String personaName;
-
-  @override
-  State<_Composer> createState() => _ComposerState();
-}
-
-class _ComposerState extends State<_Composer> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onSend() {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    messenger?.showSnackBar(
-      SnackBar(content: Text(context.l10n.aiMockNotice)),
-    );
-  }
+  final bool isStreaming;
+  final bool enabled;
+  final VoidCallback onSend;
+  final VoidCallback onStop;
+  final VoidCallback onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -257,22 +533,32 @@ class _ComposerState extends State<_Composer> {
       children: <Widget>[
         Expanded(
           child: TextField(
-            controller: _controller,
+            controller: controller,
             minLines: 1,
             maxLines: 4,
+            enabled: enabled,
             textInputAction: TextInputAction.send,
-            onSubmitted: (_) => _onSend(),
+            onSubmitted: (_) => onSend(),
             decoration: InputDecoration(
-              hintText: l10n.aiComposerHint(widget.personaName),
+              hintText: enabled
+                  ? l10n.aiComposerHint(personaName)
+                  : l10n.aiNoProviderHint,
             ),
           ),
         ),
         const SizedBox(width: 10),
-        IconButton.filled(
-          onPressed: _onSend,
-          icon: const Icon(Icons.send),
-          tooltip: l10n.aiSend,
-        ),
+        if (isStreaming)
+          IconButton.filledTonal(
+            onPressed: onStop,
+            icon: const Icon(Icons.stop),
+            tooltip: l10n.aiStop,
+          )
+        else
+          IconButton.filled(
+            onPressed: enabled ? onSend : onOpenSettings,
+            icon: Icon(enabled ? Icons.send : Icons.settings),
+            tooltip: enabled ? l10n.aiSend : l10n.aiOpenSettings,
+          ),
       ],
     );
   }

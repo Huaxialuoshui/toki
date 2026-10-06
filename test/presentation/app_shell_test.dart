@@ -62,7 +62,9 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/ai')));
       await tester.pumpAndSettle();
-      expect(find.byTooltip('Send'), findsOneWidget);
+      // 测试环境没有配置 AI 服务商，AI 页显示配置提示与入口。
+      expect(find.text('No AI provider configured yet'), findsOneWidget);
+      expect(find.text('Open settings'), findsWidgets);
 
       await tester
           .tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));

@@ -12,6 +12,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
+import 'ai_provider_section.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
@@ -144,7 +145,7 @@ class SettingsPage extends ConsumerWidget {
             title: l10n.settingsAiSection,
             icon: Icons.smart_toy_outlined,
           ),
-          _ComingSoonCard(subtitle: l10n.settingsAiSectionSubtitle),
+          const AiProviderSection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsNotificationSection,

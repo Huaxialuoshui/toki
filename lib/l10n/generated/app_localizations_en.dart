@@ -328,6 +328,97 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiMockAssistant => 'You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.';
 
   @override
+  String get aiNoProvider => 'No AI provider configured yet';
+
+  @override
+  String get aiNoProviderHint => 'Add a Base URL and model in Settings to start chatting.';
+
+  @override
+  String get aiOpenSettings => 'Open settings';
+
+  @override
+  String get aiStop => 'Stop';
+
+  @override
+  String get aiThinking => 'Thinking…';
+
+  @override
+  String aiEmptyConversation(String personaName) {
+    return 'Say hello to $personaName';
+  }
+
+  @override
+  String get aiClearConversation => 'Clear conversation';
+
+  @override
+  String get aiClearConfirm => 'Clear this conversation?';
+
+  @override
+  String get aiStreamingHint => 'Replying…';
+
+  @override
+  String get aiProviderName => 'Name';
+
+  @override
+  String get aiBaseUrl => 'Base URL';
+
+  @override
+  String get aiApiKey => 'API Key';
+
+  @override
+  String get aiModel => 'Model';
+
+  @override
+  String get aiTemperature => 'Temperature';
+
+  @override
+  String get aiMaxTokens => 'Max tokens';
+
+  @override
+  String get aiStreamingEnabled => 'Streaming output';
+
+  @override
+  String get aiSetDefault => 'Set as default';
+
+  @override
+  String get aiDefaultBadge => 'Default';
+
+  @override
+  String get aiAddProvider => 'Add provider';
+
+  @override
+  String get aiEditProvider => 'Edit provider';
+
+  @override
+  String get aiNoProviders => 'No providers configured';
+
+  @override
+  String get aiPresets => 'Quick fill';
+
+  @override
+  String get aiTestConnection => 'Test connection';
+
+  @override
+  String aiTestOk(String reply) {
+    return 'Connected: $reply';
+  }
+
+  @override
+  String get aiFieldRequired => 'Required';
+
+  @override
+  String get aiInvalidUrl => 'URL must start with http:// or https://';
+
+  @override
+  String get aiShowKey => 'Show';
+
+  @override
+  String get aiHideKey => 'Hide';
+
+  @override
+  String get aiKeyStoredLocally => 'Stored only on this device, never written to logs.';
+
+  @override
   String get settingsAppearance => 'Appearance';
 
   @override

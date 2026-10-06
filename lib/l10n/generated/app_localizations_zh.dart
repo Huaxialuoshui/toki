@@ -328,6 +328,97 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiMockAssistant => '下周你有 4 条安排。周三 15:00 的毕业答辩最需要提前准备。';
 
   @override
+  String get aiNoProvider => '还没有配置 AI 服务商';
+
+  @override
+  String get aiNoProviderHint => '在设置里填上 Base URL 与模型就能开始聊天。';
+
+  @override
+  String get aiOpenSettings => '去设置';
+
+  @override
+  String get aiStop => '停止';
+
+  @override
+  String get aiThinking => '正在思考…';
+
+  @override
+  String aiEmptyConversation(String personaName) {
+    return '和$personaName打个招呼吧';
+  }
+
+  @override
+  String get aiClearConversation => '清空对话';
+
+  @override
+  String get aiClearConfirm => '清空这段对话？';
+
+  @override
+  String get aiStreamingHint => '正在回复…';
+
+  @override
+  String get aiProviderName => '名称';
+
+  @override
+  String get aiBaseUrl => 'Base URL';
+
+  @override
+  String get aiApiKey => 'API Key';
+
+  @override
+  String get aiModel => '模型';
+
+  @override
+  String get aiTemperature => '温度';
+
+  @override
+  String get aiMaxTokens => '最大 Token';
+
+  @override
+  String get aiStreamingEnabled => '流式输出';
+
+  @override
+  String get aiSetDefault => '设为默认';
+
+  @override
+  String get aiDefaultBadge => '默认';
+
+  @override
+  String get aiAddProvider => '添加服务商';
+
+  @override
+  String get aiEditProvider => '编辑服务商';
+
+  @override
+  String get aiNoProviders => '还没有服务商';
+
+  @override
+  String get aiPresets => '快速填充';
+
+  @override
+  String get aiTestConnection => '测试连接';
+
+  @override
+  String aiTestOk(String reply) {
+    return '连接成功：$reply';
+  }
+
+  @override
+  String get aiFieldRequired => '必填';
+
+  @override
+  String get aiInvalidUrl => 'URL 需要以 http:// 或 https:// 开头';
+
+  @override
+  String get aiShowKey => '显示';
+
+  @override
+  String get aiHideKey => '隐藏';
+
+  @override
+  String get aiKeyStoredLocally => '只保存在本机，不会写入日志。';
+
+  @override
   String get settingsAppearance => '外观';
 
   @override
