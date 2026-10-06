@@ -6,14 +6,14 @@ import '../helpers/test_app.dart';
 
 void main() {
   group('响应式断点', () {
-    testWidgets('< 600 使用手机布局（底部导航）', (tester) async {
+    tokiWidgetTest('< 600 使用手机布局（底部导航）', (tester) async {
       await pumpTokiApp(tester, size: const Size(599, 900));
       expect(find.byKey(kMobileShellKey), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(find.byType(NavigationDestination), findsNWidgets(5));
     });
 
-    testWidgets('600 - 999 使用平板布局（Rail）', (tester) async {
+    tokiWidgetTest('600 - 999 使用平板布局（Rail）', (tester) async {
       await pumpTokiApp(tester, size: const Size(600, 900));
       expect(find.byKey(kTabletShellKey), findsOneWidget);
       expect(find.byType(NavigationRail), findsOneWidget);
@@ -25,14 +25,14 @@ void main() {
       expect(find.byKey(kTabletShellKey), findsOneWidget);
     });
 
-    testWidgets('>= 1000 使用桌面布局（Sidebar）', (tester) async {
+    tokiWidgetTest('>= 1000 使用桌面布局（Sidebar）', (tester) async {
       await pumpTokiApp(tester, size: const Size(1000, 900));
       expect(find.byKey(kDesktopShellKey), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
       expect(find.text('Toki'), findsOneWidget);
     });
 
-    testWidgets('桌面 Sidebar 可以折叠', (tester) async {
+    tokiWidgetTest('桌面 Sidebar 可以折叠', (tester) async {
       await pumpTokiApp(tester, size: const Size(1280, 900));
       expect(find.text('Toki'), findsOneWidget);
 
@@ -45,7 +45,7 @@ void main() {
   });
 
   group('导航', () {
-    testWidgets('五个目的地都可以到达（桌面）', (tester) async {
+    tokiWidgetTest('五个目的地都可以到达（桌面）', (tester) async {
       await pumpTokiApp(tester, size: const Size(1280, 900));
 
       expect(find.text("Today's schedule"), findsOneWidget);
@@ -71,7 +71,7 @@ void main() {
       expect(find.text("Today's schedule"), findsOneWidget);
     });
 
-    testWidgets('手机端底部导航可以切换页面', (tester) async {
+    tokiWidgetTest('手机端底部导航可以切换页面', (tester) async {
       await pumpTokiApp(tester, size: const Size(420, 900));
       expect(find.text("Today's schedule"), findsOneWidget);
 

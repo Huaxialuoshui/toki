@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/clock.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/countdown_remaining.dart';
+import '../../infrastructure/clock_provider.dart';
 
 /// 全应用共享的倒计时控制器。
 ///
@@ -74,9 +75,6 @@ class CountdownController {
     }
   }
 }
-
-/// 时间来源。测试中通过 override 注入 `FixedClock`。
-final clockProvider = Provider<Clock>((ref) => const SystemClock());
 
 /// 应用级生命周期：最后一个监听者离开后自动释放节拍 Timer。
 final countdownControllerProvider =

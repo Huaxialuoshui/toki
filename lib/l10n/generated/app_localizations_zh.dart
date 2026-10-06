@@ -66,10 +66,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeOpenAi => '打开助手';
 
   @override
-  String get homePhaseBannerTitle => 'Phase 1 骨架';
+  String get homePhaseBannerTitle => 'Phase 2 · 本地数据库';
 
   @override
-  String get homePhaseBannerBody => '布局、主题与中英双语已就绪。下面的数据都是 mock，Phase 2 接入数据库后替换。';
+  String get homePhaseBannerBody => '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
 
   @override
   String get homePhaseBannerDismiss => '知道了';
@@ -91,6 +91,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get countdownPinned => '已置顶';
+
+  @override
+  String get countdownEmpty => '还没有倒计时';
 
   @override
   String get countdownReadOnlyHint => '倒计时的创建、编辑与拖动排序将在 Phase 4 提供';
@@ -276,7 +279,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsProjectPath => '项目路径';
 
   @override
-  String get settingsPhaseNote => 'Phase 1 — 环境、App Shell、响应式布局、主题与中英双语。';
+  String get settingsPhaseNote => 'Phase 2 — 本地数据库（Drift + SQLite）、仓储层与迁移测试。';
 
   @override
   String get mockEventDefense => '毕业设计答辩';

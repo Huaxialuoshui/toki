@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/test_app.dart';
 
 void main() {
-  testWidgets('系统语言为英文时界面是英文', (tester) async {
+  tokiWidgetTest('系统语言为英文时界面是英文', (tester) async {
     tester.binding.platformDispatcher.localesTestValue =
         const <Locale>[Locale('en', 'US')];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
@@ -16,7 +16,7 @@ void main() {
     expect(find.text('首页'), findsNothing);
   });
 
-  testWidgets('系统语言不受支持时回退中文', (tester) async {
+  tokiWidgetTest('系统语言不受支持时回退中文', (tester) async {
     tester.binding.platformDispatcher.localesTestValue =
         const <Locale>[Locale('ja', 'JP')];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
@@ -27,7 +27,7 @@ void main() {
     expect(find.text('Home'), findsNothing);
   });
 
-  testWidgets('设置页切换语言后界面立即变化且被持久化', (tester) async {
+  tokiWidgetTest('设置页切换语言后界面立即变化且被持久化', (tester) async {
     tester.binding.platformDispatcher.localesTestValue =
         const <Locale>[Locale('en', 'US')];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);

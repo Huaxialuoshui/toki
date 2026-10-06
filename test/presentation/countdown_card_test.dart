@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:toki/application/countdown/countdown_controller.dart';
 import 'package:toki/core/clock.dart';
+import 'package:toki/infrastructure/clock_provider.dart';
 import 'package:toki/domain/entities/countdown_item.dart';
 import 'package:toki/l10n/generated/app_localizations.dart';
 import 'package:toki/presentation/widgets/countdown_card.dart';

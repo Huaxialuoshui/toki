@@ -212,13 +212,13 @@ abstract class AppLocalizations {
   /// No description provided for @homePhaseBannerTitle.
   ///
   /// In en, this message translates to:
-  /// **'Phase 1 skeleton'**
+  /// **'Phase 2 · local database'**
   String get homePhaseBannerTitle;
 
   /// No description provided for @homePhaseBannerBody.
   ///
   /// In en, this message translates to:
-  /// **'Layout, theming and both languages are wired up. All data below is mock content until the database lands in Phase 2.'**
+  /// **'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.'**
   String get homePhaseBannerBody;
 
   /// No description provided for @homePhaseBannerDismiss.
@@ -250,6 +250,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pinned'**
   String get countdownPinned;
+
+  /// No description provided for @countdownEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No countdowns yet'**
+  String get countdownEmpty;
 
   /// No description provided for @countdownReadOnlyHint.
   ///
@@ -608,7 +614,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPhaseNote.
   ///
   /// In en, this message translates to:
-  /// **'Phase 1 — environment, app shell, responsive layout, theming and i18n.'**
+  /// **'Phase 2 — local database (Drift + SQLite), repositories and migration tests.'**
   String get settingsPhaseNote;
 
   /// No description provided for @mockEventDefense.

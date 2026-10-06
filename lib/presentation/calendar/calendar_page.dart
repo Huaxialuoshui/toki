@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../application/countdown/countdown_controller.dart';
+import '../../application/calendar/calendar_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/calendar_event.dart';
-import '../../infrastructure/mock/mock_data.dart';
+import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../widgets/async_hint.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
 /// 日历页：月视图 + 当日日程列表。
 ///
-/// 第一版按规格只做月视图（周 / 日视图在 Phase 3），点击日期切换列表，点击事件
-/// 打开只读详情；创建 / 编辑 / 删除同样属于 Phase 3。
+/// 数据来自数据库。第一版按规格只做月视图（周 / 日视图在 Phase 3），
+/// 点击日期切换列表、点击事件打开只读详情。
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
 
@@ -31,7 +32,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     super.initState();
     final now = ref.read(clockProvider).now();
     _visibleMonth = DateTime(now.year, now.month);
-    _selectedDay = DateTime(now.year, now.month, now.day);
+    _selectedDay = DateUtils.dateOnly(now);
   }
 
   void _shiftMonth(int delta) {
@@ -44,7 +45,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final now = ref.read(clockProvider).now();
     setState(() {
       _visibleMonth = DateTime(now.year, now.month);
-      _selectedDay = DateTime(now.year, now.month, now.day);
+      _selectedDay = DateUtils.dateOnly(now);
     });
   }
 
@@ -53,9 +54,16 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final l10n = context.l10n;
     final locale = context.localeCode;
     final now = ref.watch(clockProvider).now();
-    final events = buildMockEvents(now: now, l10n: l10n);
-    final dayEvents = events.where((event) => event.occursOn(_selectedDay)).toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    final range = DateTimeRange(
+      start: DateTime(_visibleMonth.year, _visibleMonth.month),
+      end: DateTime(_visibleMonth.year, _visibleMonth.month + 1),
+    );
+    final eventsAsync = ref.watch(eventsForRangeProvider(range));
+    final events = eventsAsync.valueOrNull ?? const <CalendarEvent>[];
+    final dayEvents = events
+        .where((CalendarEvent event) => event.occursOn(_selectedDay))
+        .toList(growable: false);
 
     return PageScaffold(
       title: l10n.navCalendar,
@@ -91,7 +99,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             selectedDay: _selectedDay,
             today: now,
             events: events,
-            onSelectDay: (day) => setState(() => _selectedDay = day),
+            onSelectDay: (DateTime day) =>
+                setState(() => _selectedDay = day),
           ),
           const SizedBox(height: 24),
           SectionHeader(
@@ -100,8 +109,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             ),
             icon: Icons.event_note_outlined,
           ),
-          if (dayEvents.isEmpty)
-            _CalendarEmptyHint(text: l10n.calendarNoEvents)
+          if (eventsAsync.isLoading && events.isEmpty)
+            const LoadingHint()
+          else if (dayEvents.isEmpty)
+            EmptyHint(
+              text: l10n.calendarNoEvents,
+              icon: Icons.event_busy_outlined,
+            )
           else
             for (final event in dayEvents)
               Padding(
@@ -209,8 +223,8 @@ class _MonthGrid extends StatelessWidget {
                     child: Text(
                       label,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -279,14 +293,11 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(12);
-    final foreground = isSelected
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurface;
+    final foreground =
+        isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
 
     return Material(
-      color: isSelected
-          ? theme.colorScheme.primary
-          : Colors.transparent,
+      color: isSelected ? theme.colorScheme.primary : Colors.transparent,
       borderRadius: radius,
       child: InkWell(
         onTap: onTap,
@@ -334,35 +345,6 @@ class _DayCell extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _CalendarEmptyHint extends StatelessWidget {
-  const _CalendarEmptyHint({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GlassCard(
-      child: Row(
-        children: <Widget>[
-          Icon(
-            Icons.event_busy_outlined,
-            size: 18,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
-            ),
-          ),
-        ],
       ),
     );
   }

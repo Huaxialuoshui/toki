@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeOpenAi => 'Open assistant';
 
   @override
-  String get homePhaseBannerTitle => 'Phase 1 skeleton';
+  String get homePhaseBannerTitle => 'Phase 2 · local database';
 
   @override
-  String get homePhaseBannerBody => 'Layout, theming and both languages are wired up. All data below is mock content until the database lands in Phase 2.';
+  String get homePhaseBannerBody => 'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.';
 
   @override
   String get homePhaseBannerDismiss => 'Got it';
@@ -91,6 +91,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countdownPinned => 'Pinned';
+
+  @override
+  String get countdownEmpty => 'No countdowns yet';
 
   @override
   String get countdownReadOnlyHint => 'Creating, editing and reordering countdowns arrives in Phase 4';
@@ -276,7 +279,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsProjectPath => 'Project path';
 
   @override
-  String get settingsPhaseNote => 'Phase 1 — environment, app shell, responsive layout, theming and i18n.';
+  String get settingsPhaseNote => 'Phase 2 — local database (Drift + SQLite), repositories and migration tests.';
 
   @override
   String get mockEventDefense => 'Thesis defense';

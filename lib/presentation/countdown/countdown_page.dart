@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../application/countdown/countdown_controller.dart';
+import '../../application/countdown/countdown_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/countdown_item.dart';
-import '../../infrastructure/mock/mock_data.dart';
+import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
 /// 倒计时页。
 ///
-/// Phase 1 只做展示（含实时刷新与两种样式）；创建 / 编辑 / 拖动排序在 Phase 4。
+/// 数据来自数据库；创建 / 编辑 / 拖动排序在 Phase 4（仓储层的写方法已就绪）。
 class CountdownPage extends ConsumerWidget {
   const CountdownPage({super.key});
 
@@ -19,12 +19,12 @@ class CountdownPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    final now = ref.watch(clockProvider).now();
-    final items = buildMockCountdowns(now: now, l10n: l10n);
-    final pinned = items.where((item) => item.isPinned).toList()
-      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
-    final others = items.where((item) => !item.isPinned).toList()
-      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    final countdownsAsync = ref.watch(countdownsProvider);
+    final items = countdownsAsync.valueOrNull ?? const <CountdownItem>[];
+    final pinned =
+        items.where((CountdownItem item) => item.isPinned).toList(growable: false);
+    final others =
+        items.where((CountdownItem item) => !item.isPinned).toList(growable: false);
 
     return PageScaffold(
       title: l10n.navCountdown,
@@ -38,8 +38,7 @@ class CountdownPage extends ConsumerWidget {
                   ? 2
                   : 1;
           const spacing = 12.0;
-          final cardWidth =
-              (width - spacing * (columns - 1)) / columns;
+          final cardWidth = (width - spacing * (columns - 1)) / columns;
 
           Widget grid(List<CountdownItem> list) => Wrap(
                 spacing: spacing,
@@ -56,19 +55,38 @@ class CountdownPage extends ConsumerWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (pinned.isNotEmpty) ...<Widget>[
+              if (countdownsAsync.isLoading && items.isEmpty) ...<Widget>[
                 SectionHeader(
-                  title: l10n.countdownPinned,
-                  icon: Icons.push_pin_outlined,
+                  title: l10n.navCountdown,
+                  icon: Icons.timelapse_outlined,
                 ),
-                grid(pinned),
-                const SizedBox(height: 24),
+                const LoadingHint(),
+              ] else if (items.isEmpty) ...<Widget>[
+                SectionHeader(
+                  title: l10n.navCountdown,
+                  icon: Icons.timelapse_outlined,
+                ),
+                EmptyHint(
+                  text: l10n.countdownEmpty,
+                  icon: Icons.timelapse_outlined,
+                ),
+              ] else ...<Widget>[
+                if (pinned.isNotEmpty) ...<Widget>[
+                  SectionHeader(
+                    title: l10n.countdownPinned,
+                    icon: Icons.push_pin_outlined,
+                  ),
+                  grid(pinned),
+                  const SizedBox(height: 24),
+                ],
+                if (others.isNotEmpty) ...<Widget>[
+                  SectionHeader(
+                    title: l10n.navCountdown,
+                    icon: Icons.timelapse_outlined,
+                  ),
+                  grid(others),
+                ],
               ],
-              SectionHeader(
-                title: l10n.navCountdown,
-                icon: Icons.timelapse_outlined,
-              ),
-              grid(others),
               const SizedBox(height: 20),
               Text(
                 l10n.countdownReadOnlyHint,

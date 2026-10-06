@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../application/countdown/countdown_controller.dart';
+import '../../application/ai/ai_providers.dart';
+import '../../application/calendar/calendar_providers.dart';
+import '../../application/countdown/countdown_providers.dart';
 import '../../application/settings/settings_controller.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
+import '../../domain/entities/calendar_event.dart';
 import '../../domain/entities/countdown_item.dart';
+import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
 /// 首页：日期 / 天气占位、今日事项、倒计时、AI 快捷入口、未来事件。
+///
+/// 数据来自本地数据库（Drift）；数据库为空时展示空状态。
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
@@ -24,20 +31,18 @@ class HomePage extends ConsumerWidget {
     final l10n = context.l10n;
     final locale = context.localeCode;
     final now = ref.watch(clockProvider).now();
+    final today = DateUtils.dateOnly(now);
 
-    final events = buildMockEvents(now: now, l10n: l10n);
-    final countdowns = buildMockCountdowns(now: now, l10n: l10n);
-    final persona = buildMockPersona(now: now, l10n: l10n);
+    final todayAsync = ref.watch(eventsForDayProvider(today));
+    final upcomingAsync = ref.watch(upcomingEventsProvider);
+    final countdownsAsync = ref.watch(pinnedCountdownsProvider);
     final showPhaseBanner = ref.watch(firstLaunchProvider);
 
-    final todayEvents = events.where((event) => event.occursOn(now)).toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
-    final upcoming = events
-        .where((event) => event.startTime.isAfter(now))
-        .toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
-    final pinned = countdowns.where((item) => item.isPinned).toList()
-      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    final todayEvents = todayAsync.valueOrNull ?? const <CalendarEvent>[];
+    final upcoming = upcomingAsync.valueOrNull ?? const <CalendarEvent>[];
+    final pinned = countdownsAsync.valueOrNull ?? const <CountdownItem>[];
+    final persona = ref.watch(activePersonaProvider) ??
+        buildFallbackPersona(now: now, l10n: l10n);
 
     return PageScaffold(
       title: DateFormats.fullDate(now, locale),
@@ -59,8 +64,10 @@ class HomePage extends ConsumerWidget {
             title: l10n.homeTodayEvents,
             icon: Icons.today_outlined,
           ),
-          if (todayEvents.isEmpty)
-            _EmptyHint(text: l10n.homeNoEvents)
+          if (todayAsync.isLoading && todayEvents.isEmpty)
+            const LoadingHint()
+          else if (todayEvents.isEmpty)
+            EmptyHint(text: l10n.homeNoEvents)
           else
             for (final event in todayEvents)
               Padding(
@@ -79,13 +86,23 @@ class HomePage extends ConsumerWidget {
               child: Text(l10n.commonViewAll),
             ),
           ),
-          _CountdownStrip(countdowns: pinned),
+          if (countdownsAsync.isLoading && pinned.isEmpty)
+            const LoadingHint()
+          else if (pinned.isEmpty)
+            EmptyHint(
+              text: l10n.countdownEmpty,
+              icon: Icons.timelapse_outlined,
+            )
+          else
+            _CountdownStrip(countdowns: pinned),
           const SizedBox(height: 24),
           SectionHeader(title: l10n.homeUpcoming, icon: Icons.event_outlined),
-          if (upcoming.isEmpty)
-            _EmptyHint(text: l10n.homeNoEvents)
+          if (upcomingAsync.isLoading && upcoming.isEmpty)
+            const LoadingHint()
+          else if (upcoming.isEmpty)
+            EmptyHint(text: l10n.homeNoEvents)
           else
-            for (final event in upcoming.take(4))
+            for (final event in upcoming)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: EventTile(
@@ -138,7 +155,10 @@ class _PhaseBanner extends StatelessWidget {
               ],
             ),
           ),
-          TextButton(onPressed: onDismiss, child: Text(l10n.homePhaseBannerDismiss)),
+          TextButton(
+            onPressed: onDismiss,
+            child: Text(l10n.homePhaseBannerDismiss),
+          ),
         ],
       ),
     );
@@ -259,35 +279,6 @@ class _AiShortcut extends StatelessWidget {
           FilledButton.tonal(
             onPressed: () => context.go('/ai'),
             child: Text(l10n.homeOpenAi),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyHint extends StatelessWidget {
-  const _EmptyHint({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GlassCard(
-      child: Row(
-        children: <Widget>[
-          Icon(
-            Icons.check_circle_outline,
-            size: 18,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
-            ),
           ),
         ],
       ),

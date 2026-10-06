@@ -99,7 +99,7 @@ void main() {
       );
     });
 
-    testWidgets('字号缩放通过 MediaQuery.textScaler 生效', (tester) async {
+    tokiWidgetTest('字号缩放通过 MediaQuery.textScaler 生效', (tester) async {
       await pumpTokiApp(
         tester,
         size: const Size(1280, 900),

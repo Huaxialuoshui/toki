@@ -28,8 +28,8 @@
   },
   "homeAskAiHint": "Chat, query your schedule, create reminders",
   "homeOpenAi": "Open assistant",
-  "homePhaseBannerTitle": "Phase 1 skeleton",
-  "homePhaseBannerBody": "Layout, theming and both languages are wired up. All data below is mock content until the database lands in Phase 2.",
+  "homePhaseBannerTitle": "Phase 2 · local database",
+  "homePhaseBannerBody": "Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.",
   "homePhaseBannerDismiss": "Got it",
 
   "countdownTimeUntil": "Time until {title}",
@@ -57,6 +57,7 @@
     }
   },
   "countdownPinned": "Pinned",
+  "countdownEmpty": "No countdowns yet",
   "countdownReadOnlyHint": "Creating, editing and reordering countdowns arrives in Phase 4",
   "unitDay": "d",
   "unitHour": "h",
@@ -140,7 +141,7 @@
   "settingsFlutterVersion": "Flutter",
   "settingsDartVersion": "Dart",
   "settingsProjectPath": "Project path",
-  "settingsPhaseNote": "Phase 1 — environment, app shell, responsive layout, theming and i18n.",
+  "settingsPhaseNote": "Phase 2 — local database (Drift + SQLite), repositories and migration tests.",
 
   "mockEventDefense": "Thesis defense",
   "mockEventProjectDeadline": "Course project deadline",

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../application/countdown/countdown_controller.dart';
+import '../../application/ai/ai_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/chat_message.dart';
+import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
 
 /// AI 页面。
 ///
-/// Phase 1 只有界面骨架与 mock 会话：输入框可用，但不会发出任何网络请求，
-/// 也不会改动任何数据。Provider / Persona / Tool Calling 分别在 Phase 6-8 接入。
+/// Phase 2 之后人设可以来自数据库（debug 构建会写入示例人设）；
+/// 会话内容仍然是演示数据——Provider / Tool Calling 分别在 Phase 6-8 接入。
 class AiPage extends ConsumerWidget {
   const AiPage({super.key});
 
@@ -21,7 +22,8 @@ class AiPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final now = ref.watch(clockProvider).now();
-    final persona = buildMockPersona(now: now, l10n: l10n);
+    final persona = ref.watch(activePersonaProvider) ??
+        buildFallbackPersona(now: now, l10n: l10n);
     final messages = buildMockConversation(now: now, l10n: l10n);
 
     return PageScaffold(
@@ -80,10 +82,7 @@ class _PersonaChip extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              persona.name,
-              style: theme.textTheme.labelLarge,
-            ),
+            Text(persona.name, style: theme.textTheme.labelLarge),
             const SizedBox(width: 6),
             Icon(
               Icons.lock_outline,
