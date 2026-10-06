@@ -28,6 +28,7 @@ void main() {
     blurAmount: 18,
     fontScale: 1.1,
     animationEnabled: false,
+    shadowStrength: 0.6,
   );
 
   setUp(() {
@@ -46,6 +47,7 @@ void main() {
     expect(loaded.cardOpacity, 0.78);
     expect(loaded.blurAmount, 18);
     expect(loaded.animationEnabled, isFalse);
+    expect(loaded.shadowStrength, 0.6);
   });
 
   test('再次保存时保留 createdAt，只更新 updatedAt', () async {

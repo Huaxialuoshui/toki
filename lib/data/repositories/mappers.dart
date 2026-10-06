@@ -303,6 +303,7 @@ extension ThemeConfigRowMapper on ThemeConfigRow {
         blurAmount: blurAmount,
         fontScale: fontScale,
         animationEnabled: animationEnabled,
+        shadowStrength: shadowStrength,
       );
 }
 
@@ -325,6 +326,7 @@ ThemeConfigsCompanion themeConfigToCompanion(
       blurAmount: Value<double>(config.blurAmount),
       fontScale: Value<double>(config.fontScale),
       animationEnabled: Value<bool>(config.animationEnabled),
+      shadowStrength: Value<double>(config.shadowStrength),
       createdAt: Value<DateTime>(createdAt),
       updatedAt: Value<DateTime>(updatedAt),
     );

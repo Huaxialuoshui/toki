@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../application/settings/settings_controller.dart';
 import '../../application/notification/notification_providers.dart';
@@ -10,6 +11,8 @@ import '../../application/theme/theme_controller.dart';
 import '../../application/theme/theme_presets.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/extensions/l10n_extension.dart';
+import '../../data/repositories/repository_providers.dart';
+import '../../domain/entities/theme_config.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
@@ -32,6 +35,10 @@ class SettingsPage extends ConsumerWidget {
     final themeState = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
     final controllers = ref.read(themeControllerProvider.notifier);
+    final userThemes =
+        ref.watch(userThemesProvider).valueOrNull ?? const <ThemeConfig>[];
+    final currentIsUserTheme =
+        userThemes.any((ThemeConfig item) => item.id == themeState.themeId);
     final effectiveRadius =
         themeState.borderRadius ?? themeState.preset.borderRadius;
 
@@ -63,10 +70,83 @@ class SettingsPage extends ConsumerWidget {
                         label: Text(_themeLabel(l10n, preset.id)),
                         selected: !themeState.followSystem &&
                             themeState.themeId == preset.id,
-                        onSelected: (_) => controllers.selectPreset(preset.id),
+                        onSelected: (_) => controllers.selectTheme(preset.id),
+                      ),
+                    // 用户自建 / 导入的主题（存在数据库里）。
+                    for (final userTheme in userThemes)
+                      ChoiceChip(
+                        avatar: Icon(
+                          Icons.bookmark_outline,
+                          size: 16,
+                          color: !themeState.followSystem &&
+                                  themeState.themeId == userTheme.id
+                              ? theme.colorScheme.primary
+                              : null,
+                        ),
+                        label: Text(userTheme.name),
+                        selected: !themeState.followSystem &&
+                            themeState.themeId == userTheme.id,
+                        onSelected: (_) =>
+                            controllers.selectTheme(userTheme.id),
                       ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
+                  children: <Widget>[
+                    OutlinedButton.icon(
+                      onPressed: () => _openThemeEditor(
+                        context,
+                        editingId:
+                            currentIsUserTheme ? themeState.themeId : null,
+                      ),
+                      icon: const Icon(Icons.tune_outlined, size: 18),
+                      label: Text(l10n.themeEditCurrent),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _openThemeEditor(context),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.themeNew),
+                    ),
+                  ],
+                ),
+                // 用户主题列表：逐条删除（内置预设不可删除）。
+                if (userThemes.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 16),
+                  _FieldLabel(text: l10n.themeMyThemes),
+                  for (final userTheme in userThemes)
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.bookmark_outline,
+                          size: 16,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            userTheme.name,
+                            style: theme.textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          key: ValueKey<String>('delete-theme-${userTheme.id}'),
+                          tooltip: l10n.calendarDelete,
+                          onPressed: () =>
+                              _confirmDeleteTheme(context, ref, userTheme),
+                          icon: Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
                 const SizedBox(height: 20),
                 _FieldLabel(
                   text:
@@ -228,6 +308,52 @@ class SettingsPage extends ConsumerWidget {
       default:
         return l10n.settingsThemeDefault;
     }
+  }
+
+  /// 打开主题编辑器；[editingId] 为空表示"基于当前主题新建"。
+  void _openThemeEditor(BuildContext context, {String? editingId}) {
+    final String query = editingId == null
+        ? ''
+        : '?editingId=${Uri.encodeQueryComponent(editingId)}';
+    context.push('/settings/theme-editor$query');
+  }
+
+  /// 删除一个用户主题；若当前正选中它，回落到默认预设。
+  Future<void> _confirmDeleteTheme(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeConfig themeConfig,
+  ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final selected = ref.read(themeControllerProvider).themeId;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.calendarDeleteConfirmTitle),
+        content: Text(l10n.themeDeleteConfirmBody(themeConfig.name)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.calendarCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.calendarDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await ref.read(themeRepositoryProvider).deleteById(themeConfig.id);
+    if (selected == themeConfig.id) {
+      ref.read(themeControllerProvider.notifier).selectTheme(
+            ThemePresets.defaultId,
+          );
+    }
+    messenger?.showSnackBar(SnackBar(content: Text(l10n.themeDeleted)));
   }
 }
 

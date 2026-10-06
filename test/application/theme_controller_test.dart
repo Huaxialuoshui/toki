@@ -31,7 +31,7 @@ void main() {
       final container = await createTestContainer(clock: FixedClock(kTestNow));
       final controller = container.read(themeControllerProvider.notifier);
 
-      controller.selectPreset(ThemePresets.darkId);
+      controller.selectTheme(ThemePresets.darkId);
       final resolution = container.read(themeResolutionProvider);
 
       expect(controller.state.followSystem, isFalse);
@@ -59,15 +59,16 @@ void main() {
       );
     });
 
-    test('未知主题 id 回落到 Default', () async {
+    test('未知主题 id（比如主题已被删除）在解析时回落到 Default', () async {
       final container = await createTestContainer(
         clock: FixedClock(kTestNow),
         initialPreferences: <String, Object>{'settings.themeId': 'nope'},
       );
-      expect(
-        container.read(themeControllerProvider).themeId,
-        ThemePresets.defaultId,
-      );
+      // 存的是原始 id（用户主题在数据库里，启动时无法同步校验），
+      // 但真正生效的主题必须回落到 Default，不能白屏。
+      final resolution = container.read(themeResolutionProvider);
+      expect(resolution.light.id, ThemePresets.defaultId);
+      expect(resolution.dark.brightness, Brightness.dark);
     });
   });
 

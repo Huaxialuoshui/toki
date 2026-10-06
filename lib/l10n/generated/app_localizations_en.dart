@@ -608,6 +608,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatGradientColors => 'Gradient colours';
 
   @override
+  String get themeEditorTitle => 'Theme editor';
+
+  @override
+  String get themeEditorColors => 'Colours';
+
+  @override
+  String get themeColorPrimary => 'Primary';
+
+  @override
+  String get themeColorSecondary => 'Secondary';
+
+  @override
+  String get themeColorBackground => 'Background';
+
+  @override
+  String get themeColorSurface => 'Cards';
+
+  @override
+  String get themeColorText => 'Text';
+
+  @override
+  String get themeEditorShape => 'Shape & effects';
+
+  @override
+  String get themeFieldCardOpacity => 'Card opacity';
+
+  @override
+  String get themeFieldBlur => 'Blur';
+
+  @override
+  String get themeFieldShadow => 'Shadow';
+
+  @override
+  String get themeFieldAnimation => 'Transitions';
+
+  @override
+  String get themeBrightness => 'Brightness';
+
+  @override
+  String get themeBrightnessLight => 'Light';
+
+  @override
+  String get themeBrightnessDark => 'Dark';
+
+  @override
+  String get themeEditorPreview => 'Live preview';
+
+  @override
+  String get themeSave => 'Save theme';
+
+  @override
+  String get themeSaveAs => 'Save as new';
+
+  @override
+  String get themeSaveName => 'Theme name';
+
+  @override
+  String get themeExport => 'Export JSON';
+
+  @override
+  String get themeImport => 'Import JSON';
+
+  @override
+  String get themeImportHint => 'Paste theme JSON here';
+
+  @override
+  String themeImported(String name) {
+    return 'Imported theme: $name';
+  }
+
+  @override
+  String themeExported(String path) {
+    return 'Exported to $path (also copied to clipboard)';
+  }
+
+  @override
+  String themeExportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get themeImportFailed => 'Import failed — please check the JSON';
+
+  @override
+  String get themeSaved => 'Theme saved';
+
+  @override
+  String get themeDeleted => 'Theme deleted';
+
+  @override
+  String themeDeleteConfirmBody(String name) {
+    return 'Delete the theme \"$name\"? This cannot be undone.';
+  }
+
+  @override
+  String get themeNew => 'New theme';
+
+  @override
+  String get themeEditCurrent => 'Edit current theme';
+
+  @override
+  String get themeMyThemes => 'My themes';
+
+  @override
+  String get themeBuiltIn => 'Built-in';
+
+  @override
+  String get themePreviewCardTitle => 'Sample card';
+
+  @override
+  String get themePreviewCardBody => 'This is how cards, buttons and text will look.';
+
+  @override
+  String get themePreviewAction => 'Primary action';
+
+  @override
   String get settingsAppearance => 'Appearance';
 
   @override

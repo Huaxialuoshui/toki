@@ -295,6 +295,70 @@
   "chatPreviewMessage": "This is a preview bubble",
   "chatBackgroundColor": "Colour",
   "chatGradientColors": "Gradient colours",
+  "themeEditorTitle": "Theme editor",
+  "themeEditorColors": "Colours",
+  "themeColorPrimary": "Primary",
+  "themeColorSecondary": "Secondary",
+  "themeColorBackground": "Background",
+  "themeColorSurface": "Cards",
+  "themeColorText": "Text",
+  "themeEditorShape": "Shape & effects",
+  "themeFieldCardOpacity": "Card opacity",
+  "themeFieldBlur": "Blur",
+  "themeFieldShadow": "Shadow",
+  "themeFieldAnimation": "Transitions",
+  "themeBrightness": "Brightness",
+  "themeBrightnessLight": "Light",
+  "themeBrightnessDark": "Dark",
+  "themeEditorPreview": "Live preview",
+  "themeSave": "Save theme",
+  "themeSaveAs": "Save as new",
+  "themeSaveName": "Theme name",
+  "themeExport": "Export JSON",
+  "themeImport": "Import JSON",
+  "themeImportHint": "Paste theme JSON here",
+  "themeImported": "Imported theme: {name}",
+  "@themeImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "themeExported": "Exported to {path} (also copied to clipboard)",
+  "@themeExported": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "themeExportFailed": "Export failed: {error}",
+  "@themeExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "themeImportFailed": "Import failed — please check the JSON",
+  "themeSaved": "Theme saved",
+  "themeDeleted": "Theme deleted",
+  "themeDeleteConfirmBody": "Delete the theme \"{name}\"? This cannot be undone.",
+  "@themeDeleteConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "themeNew": "New theme",
+  "themeEditCurrent": "Edit current theme",
+  "themeMyThemes": "My themes",
+  "themeBuiltIn": "Built-in",
+  "themePreviewCardTitle": "Sample card",
+  "themePreviewCardBody": "This is how cards, buttons and text will look.",
+  "themePreviewAction": "Primary action",
 
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",

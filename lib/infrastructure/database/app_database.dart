@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -52,6 +52,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             // v2：聊天消息增加 tool_call_id（AI 工具调用需要）。
             await m.addColumn(chatMessages, chatMessages.toolCallId);
+          }
+          if (from < 3) {
+            // v3：用户主题增加阴影强度（主题编辑器可调）。
+            await m.addColumn(themeConfigs, themeConfigs.shadowStrength);
           }
         },
         beforeOpen: (OpeningDetails details) async {

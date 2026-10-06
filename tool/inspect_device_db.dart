@@ -32,6 +32,7 @@ void main(List<String> args) {
     'ai_providers',
     'chat_sessions',
     'chat_messages',
+    'theme_configs',
   ];
   for (final table in tables) {
     final count = database.select('SELECT COUNT(*) AS c FROM $table').first['c'];
@@ -55,6 +56,18 @@ void main(List<String> args) {
     'FROM chat_messages ORDER BY created_at DESC LIMIT 6',
   )) {
     stdout.writeln('${row['role']} | ${row['tool_name']} | ${row['content']}');
+  }
+
+  stdout.writeln('--- user themes ---');
+  for (final row in database.select(
+    'SELECT id, name, brightness, primary_color, card_opacity, blur_amount, '
+    'shadow_strength FROM theme_configs ORDER BY name',
+  )) {
+    stdout.writeln(
+      '${row['id']} | ${row['name']} | ${row['brightness']} | '
+      'primary=${row['primary_color']} | opacity=${row['card_opacity']} | '
+      'blur=${row['blur_amount']} | shadow=${row['shadow_strength']}',
+    );
   }
   database.dispose();
 }

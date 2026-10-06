@@ -1241,6 +1241,222 @@ abstract class AppLocalizations {
   /// **'Gradient colours'**
   String get chatGradientColors;
 
+  /// No description provided for @themeEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme editor'**
+  String get themeEditorTitle;
+
+  /// No description provided for @themeEditorColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colours'**
+  String get themeEditorColors;
+
+  /// No description provided for @themeColorPrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary'**
+  String get themeColorPrimary;
+
+  /// No description provided for @themeColorSecondary.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary'**
+  String get themeColorSecondary;
+
+  /// No description provided for @themeColorBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get themeColorBackground;
+
+  /// No description provided for @themeColorSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get themeColorSurface;
+
+  /// No description provided for @themeColorText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get themeColorText;
+
+  /// No description provided for @themeEditorShape.
+  ///
+  /// In en, this message translates to:
+  /// **'Shape & effects'**
+  String get themeEditorShape;
+
+  /// No description provided for @themeFieldCardOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Card opacity'**
+  String get themeFieldCardOpacity;
+
+  /// No description provided for @themeFieldBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get themeFieldBlur;
+
+  /// No description provided for @themeFieldShadow.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow'**
+  String get themeFieldShadow;
+
+  /// No description provided for @themeFieldAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Transitions'**
+  String get themeFieldAnimation;
+
+  /// No description provided for @themeBrightness.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get themeBrightness;
+
+  /// No description provided for @themeBrightnessLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeBrightnessLight;
+
+  /// No description provided for @themeBrightnessDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeBrightnessDark;
+
+  /// No description provided for @themeEditorPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Live preview'**
+  String get themeEditorPreview;
+
+  /// No description provided for @themeSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save theme'**
+  String get themeSave;
+
+  /// No description provided for @themeSaveAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as new'**
+  String get themeSaveAs;
+
+  /// No description provided for @themeSaveName.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme name'**
+  String get themeSaveName;
+
+  /// No description provided for @themeExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export JSON'**
+  String get themeExport;
+
+  /// No description provided for @themeImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import JSON'**
+  String get themeImport;
+
+  /// No description provided for @themeImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste theme JSON here'**
+  String get themeImportHint;
+
+  /// No description provided for @themeImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported theme: {name}'**
+  String themeImported(String name);
+
+  /// No description provided for @themeExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported to {path} (also copied to clipboard)'**
+  String themeExported(String path);
+
+  /// No description provided for @themeExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String themeExportFailed(String error);
+
+  /// No description provided for @themeImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed — please check the JSON'**
+  String get themeImportFailed;
+
+  /// No description provided for @themeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme saved'**
+  String get themeSaved;
+
+  /// No description provided for @themeDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme deleted'**
+  String get themeDeleted;
+
+  /// No description provided for @themeDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the theme \"{name}\"? This cannot be undone.'**
+  String themeDeleteConfirmBody(String name);
+
+  /// No description provided for @themeNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New theme'**
+  String get themeNew;
+
+  /// No description provided for @themeEditCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit current theme'**
+  String get themeEditCurrent;
+
+  /// No description provided for @themeMyThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'My themes'**
+  String get themeMyThemes;
+
+  /// No description provided for @themeBuiltIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in'**
+  String get themeBuiltIn;
+
+  /// No description provided for @themePreviewCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample card'**
+  String get themePreviewCardTitle;
+
+  /// No description provided for @themePreviewCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how cards, buttons and text will look.'**
+  String get themePreviewCardBody;
+
+  /// No description provided for @themePreviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary action'**
+  String get themePreviewAction;
+
   /// No description provided for @settingsAppearance.
   ///
   /// In en, this message translates to:

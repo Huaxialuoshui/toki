@@ -21,6 +21,7 @@ class ThemeConfig {
     this.blurAmount = 0,
     this.fontScale = 1,
     this.animationEnabled = true,
+    this.shadowStrength = 0.35,
   });
 
   final String id;
@@ -47,6 +48,9 @@ class ThemeConfig {
   /// 是否启用过渡动画。
   final bool animationEnabled;
 
+  /// 阴影强度（0-1）：0 表示完全扁平，1 表示最明显的投影。
+  final double shadowStrength;
+
   bool get isLight => brightness == Brightness.light;
 
   bool get isDark => brightness == Brightness.dark;
@@ -67,6 +71,7 @@ class ThemeConfig {
     double? blurAmount,
     double? fontScale,
     bool? animationEnabled,
+    double? shadowStrength,
   }) {
     return ThemeConfig(
       id: id ?? this.id,
@@ -82,6 +87,7 @@ class ThemeConfig {
       blurAmount: blurAmount ?? this.blurAmount,
       fontScale: fontScale ?? this.fontScale,
       animationEnabled: animationEnabled ?? this.animationEnabled,
+      shadowStrength: shadowStrength ?? this.shadowStrength,
     );
   }
 
@@ -101,7 +107,8 @@ class ThemeConfig {
         other.cardOpacity == cardOpacity &&
         other.blurAmount == blurAmount &&
         other.fontScale == fontScale &&
-        other.animationEnabled == animationEnabled;
+        other.animationEnabled == animationEnabled &&
+        other.shadowStrength == shadowStrength;
   }
 
   @override
@@ -119,6 +126,7 @@ class ThemeConfig {
         blurAmount,
         fontScale,
         animationEnabled,
+        shadowStrength,
       );
 
   @override

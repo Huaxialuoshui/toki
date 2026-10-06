@@ -4105,6 +4105,14 @@ class $ThemeConfigsTable extends ThemeConfigs
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("animation_enabled" IN (0, 1))'),
       defaultValue: const Constant(true));
+  static const VerificationMeta _shadowStrengthMeta =
+      const VerificationMeta('shadowStrength');
+  @override
+  late final GeneratedColumn<double> shadowStrength = GeneratedColumn<double>(
+      'shadow_strength', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0.35));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -4132,6 +4140,7 @@ class $ThemeConfigsTable extends ThemeConfigs
         blurAmount,
         fontScale,
         animationEnabled,
+        shadowStrength,
         createdAt,
         updatedAt
       ];
@@ -4230,6 +4239,12 @@ class $ThemeConfigsTable extends ThemeConfigs
           animationEnabled.isAcceptableOrUnknown(
               data['animation_enabled']!, _animationEnabledMeta));
     }
+    if (data.containsKey('shadow_strength')) {
+      context.handle(
+          _shadowStrengthMeta,
+          shadowStrength.isAcceptableOrUnknown(
+              data['shadow_strength']!, _shadowStrengthMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -4277,6 +4292,8 @@ class $ThemeConfigsTable extends ThemeConfigs
           .read(DriftSqlType.double, data['${effectivePrefix}font_scale'])!,
       animationEnabled: attachedDatabase.typeMapping.read(
           DriftSqlType.bool, data['${effectivePrefix}animation_enabled'])!,
+      shadowStrength: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}shadow_strength'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -4306,6 +4323,9 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
   final double blurAmount;
   final double fontScale;
   final bool animationEnabled;
+
+  /// 阴影强度（0-1）。
+  final double shadowStrength;
   final DateTime createdAt;
   final DateTime updatedAt;
   const ThemeConfigRow(
@@ -4322,6 +4342,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       required this.blurAmount,
       required this.fontScale,
       required this.animationEnabled,
+      required this.shadowStrength,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -4340,6 +4361,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
     map['blur_amount'] = Variable<double>(blurAmount);
     map['font_scale'] = Variable<double>(fontScale);
     map['animation_enabled'] = Variable<bool>(animationEnabled);
+    map['shadow_strength'] = Variable<double>(shadowStrength);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -4360,6 +4382,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       blurAmount: Value(blurAmount),
       fontScale: Value(fontScale),
       animationEnabled: Value(animationEnabled),
+      shadowStrength: Value(shadowStrength),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -4382,6 +4405,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       blurAmount: serializer.fromJson<double>(json['blurAmount']),
       fontScale: serializer.fromJson<double>(json['fontScale']),
       animationEnabled: serializer.fromJson<bool>(json['animationEnabled']),
+      shadowStrength: serializer.fromJson<double>(json['shadowStrength']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -4403,6 +4427,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       'blurAmount': serializer.toJson<double>(blurAmount),
       'fontScale': serializer.toJson<double>(fontScale),
       'animationEnabled': serializer.toJson<bool>(animationEnabled),
+      'shadowStrength': serializer.toJson<double>(shadowStrength),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -4422,6 +4447,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           double? blurAmount,
           double? fontScale,
           bool? animationEnabled,
+          double? shadowStrength,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       ThemeConfigRow(
@@ -4438,6 +4464,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
         blurAmount: blurAmount ?? this.blurAmount,
         fontScale: fontScale ?? this.fontScale,
         animationEnabled: animationEnabled ?? this.animationEnabled,
+        shadowStrength: shadowStrength ?? this.shadowStrength,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -4471,6 +4498,9 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       animationEnabled: data.animationEnabled.present
           ? data.animationEnabled.value
           : this.animationEnabled,
+      shadowStrength: data.shadowStrength.present
+          ? data.shadowStrength.value
+          : this.shadowStrength,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4492,6 +4522,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           ..write('blurAmount: $blurAmount, ')
           ..write('fontScale: $fontScale, ')
           ..write('animationEnabled: $animationEnabled, ')
+          ..write('shadowStrength: $shadowStrength, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4513,6 +4544,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       blurAmount,
       fontScale,
       animationEnabled,
+      shadowStrength,
       createdAt,
       updatedAt);
   @override
@@ -4532,6 +4564,7 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           other.blurAmount == this.blurAmount &&
           other.fontScale == this.fontScale &&
           other.animationEnabled == this.animationEnabled &&
+          other.shadowStrength == this.shadowStrength &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4550,6 +4583,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
   final Value<double> blurAmount;
   final Value<double> fontScale;
   final Value<bool> animationEnabled;
+  final Value<double> shadowStrength;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -4567,6 +4601,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     this.blurAmount = const Value.absent(),
     this.fontScale = const Value.absent(),
     this.animationEnabled = const Value.absent(),
+    this.shadowStrength = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4585,6 +4620,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     this.blurAmount = const Value.absent(),
     this.fontScale = const Value.absent(),
     this.animationEnabled = const Value.absent(),
+    this.shadowStrength = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -4612,6 +4648,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     Expression<double>? blurAmount,
     Expression<double>? fontScale,
     Expression<bool>? animationEnabled,
+    Expression<double>? shadowStrength,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -4630,6 +4667,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       if (blurAmount != null) 'blur_amount': blurAmount,
       if (fontScale != null) 'font_scale': fontScale,
       if (animationEnabled != null) 'animation_enabled': animationEnabled,
+      if (shadowStrength != null) 'shadow_strength': shadowStrength,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -4650,6 +4688,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       Value<double>? blurAmount,
       Value<double>? fontScale,
       Value<bool>? animationEnabled,
+      Value<double>? shadowStrength,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -4667,6 +4706,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       blurAmount: blurAmount ?? this.blurAmount,
       fontScale: fontScale ?? this.fontScale,
       animationEnabled: animationEnabled ?? this.animationEnabled,
+      shadowStrength: shadowStrength ?? this.shadowStrength,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -4715,6 +4755,9 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     if (animationEnabled.present) {
       map['animation_enabled'] = Variable<bool>(animationEnabled.value);
     }
+    if (shadowStrength.present) {
+      map['shadow_strength'] = Variable<double>(shadowStrength.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -4743,6 +4786,7 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
           ..write('blurAmount: $blurAmount, ')
           ..write('fontScale: $fontScale, ')
           ..write('animationEnabled: $animationEnabled, ')
+          ..write('shadowStrength: $shadowStrength, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -7471,6 +7515,7 @@ typedef $$ThemeConfigsTableCreateCompanionBuilder = ThemeConfigsCompanion
   Value<double> blurAmount,
   Value<double> fontScale,
   Value<bool> animationEnabled,
+  Value<double> shadowStrength,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -7490,6 +7535,7 @@ typedef $$ThemeConfigsTableUpdateCompanionBuilder = ThemeConfigsCompanion
   Value<double> blurAmount,
   Value<double> fontScale,
   Value<bool> animationEnabled,
+  Value<double> shadowStrength,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -7544,6 +7590,10 @@ class $$ThemeConfigsTableFilterComposer
 
   ColumnFilters<bool> get animationEnabled => $composableBuilder(
       column: $table.animationEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get shadowStrength => $composableBuilder(
+      column: $table.shadowStrength,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -7607,6 +7657,10 @@ class $$ThemeConfigsTableOrderingComposer
       column: $table.animationEnabled,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get shadowStrength => $composableBuilder(
+      column: $table.shadowStrength,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -7662,6 +7716,9 @@ class $$ThemeConfigsTableAnnotationComposer
   GeneratedColumn<bool> get animationEnabled => $composableBuilder(
       column: $table.animationEnabled, builder: (column) => column);
 
+  GeneratedColumn<double> get shadowStrength => $composableBuilder(
+      column: $table.shadowStrength, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -7708,6 +7765,7 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             Value<double> blurAmount = const Value.absent(),
             Value<double> fontScale = const Value.absent(),
             Value<bool> animationEnabled = const Value.absent(),
+            Value<double> shadowStrength = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -7726,6 +7784,7 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             blurAmount: blurAmount,
             fontScale: fontScale,
             animationEnabled: animationEnabled,
+            shadowStrength: shadowStrength,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -7744,6 +7803,7 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             Value<double> blurAmount = const Value.absent(),
             Value<double> fontScale = const Value.absent(),
             Value<bool> animationEnabled = const Value.absent(),
+            Value<double> shadowStrength = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -7762,6 +7822,7 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             blurAmount: blurAmount,
             fontScale: fontScale,
             animationEnabled: animationEnabled,
+            shadowStrength: shadowStrength,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,

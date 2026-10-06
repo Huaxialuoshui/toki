@@ -22,6 +22,9 @@ class ThemeConfigs extends Table {
   RealColumn get fontScale => real().withDefault(const Constant(1))();
   BoolColumn get animationEnabled =>
       boolean().withDefault(const Constant(true))();
+
+  /// 阴影强度（0-1）。
+  RealColumn get shadowStrength => real().withDefault(const Constant(0.35))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

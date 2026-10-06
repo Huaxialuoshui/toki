@@ -7,6 +7,7 @@ import '../presentation/calendar/calendar_page.dart';
 import '../presentation/countdown/countdown_page.dart';
 import '../presentation/home/home_page.dart';
 import '../presentation/settings/settings_page.dart';
+import '../presentation/settings/theme_editor_page.dart';
 import '../presentation/shell/app_shell.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -63,6 +64,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: '/settings',
                 name: 'settings',
                 builder: (context, state) => const SettingsPage(),
+                routes: <RouteBase>[
+                  // 主题编辑器作为设置分支的子路由：手机端保留底部导航，
+                  // 桌面端保留侧边栏，方便在编辑时观察整个应用的实时预览。
+                  GoRoute(
+                    path: 'theme-editor',
+                    name: 'theme-editor',
+                    builder: (context, state) => ThemeEditorPage(
+                      editingId: state.uri.queryParameters['editingId'],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

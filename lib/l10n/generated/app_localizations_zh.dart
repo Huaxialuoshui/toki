@@ -608,6 +608,122 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatGradientColors => '渐变颜色';
 
   @override
+  String get themeEditorTitle => '主题编辑器';
+
+  @override
+  String get themeEditorColors => '颜色';
+
+  @override
+  String get themeColorPrimary => '主色';
+
+  @override
+  String get themeColorSecondary => '次要色';
+
+  @override
+  String get themeColorBackground => '背景';
+
+  @override
+  String get themeColorSurface => '卡片';
+
+  @override
+  String get themeColorText => '文字';
+
+  @override
+  String get themeEditorShape => '形状与效果';
+
+  @override
+  String get themeFieldCardOpacity => '卡片透明度';
+
+  @override
+  String get themeFieldBlur => '背景模糊';
+
+  @override
+  String get themeFieldShadow => '阴影强度';
+
+  @override
+  String get themeFieldAnimation => '过渡动画';
+
+  @override
+  String get themeBrightness => '明暗';
+
+  @override
+  String get themeBrightnessLight => '浅色';
+
+  @override
+  String get themeBrightnessDark => '深色';
+
+  @override
+  String get themeEditorPreview => '实时预览';
+
+  @override
+  String get themeSave => '保存主题';
+
+  @override
+  String get themeSaveAs => '另存为新主题';
+
+  @override
+  String get themeSaveName => '主题名称';
+
+  @override
+  String get themeExport => '导出 JSON';
+
+  @override
+  String get themeImport => '导入 JSON';
+
+  @override
+  String get themeImportHint => '把主题 JSON 粘贴到这里';
+
+  @override
+  String themeImported(String name) {
+    return '已导入主题：$name';
+  }
+
+  @override
+  String themeExported(String path) {
+    return '已导出到 $path（同时复制到剪贴板）';
+  }
+
+  @override
+  String themeExportFailed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
+  String get themeImportFailed => '导入失败，请检查 JSON';
+
+  @override
+  String get themeSaved => '主题已保存';
+
+  @override
+  String get themeDeleted => '主题已删除';
+
+  @override
+  String themeDeleteConfirmBody(String name) {
+    return '删除主题「$name」？删除后无法恢复。';
+  }
+
+  @override
+  String get themeNew => '新建主题';
+
+  @override
+  String get themeEditCurrent => '编辑当前主题';
+
+  @override
+  String get themeMyThemes => '我的主题';
+
+  @override
+  String get themeBuiltIn => '内置主题';
+
+  @override
+  String get themePreviewCardTitle => '示例卡片';
+
+  @override
+  String get themePreviewCardBody => '卡片、按钮和文字大概就是这个样子。';
+
+  @override
+  String get themePreviewAction => '主要操作';
+
+  @override
   String get settingsAppearance => '外观';
 
   @override

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/theme_config.dart';
+import '../../data/repositories/repository_providers.dart';
 import '../../infrastructure/storage/app_settings_store.dart';
 import 'theme_presets.dart';
 
@@ -28,6 +29,14 @@ class ThemeState {
 
   ThemeConfig get preset => ThemePresets.byId(themeId);
 
+  /// 在"内置预设 + 用户主题"里按 id 查找；未知 id 回落到默认预设。
+  ThemeConfig lookupPreset(List<ThemeConfig> userThemes) {
+    for (final theme in userThemes) {
+      if (theme.id == themeId) return theme;
+    }
+    return ThemePresets.byId(themeId);
+  }
+
   /// 把微调叠加到某个预设上。
   ThemeConfig configFor(ThemeConfig base) => base.copyWith(
         fontScale: fontScale,
@@ -39,8 +48,10 @@ class ThemeState {
   /// * 不跟随系统：`ThemeMode` 由所选预设的明暗决定；
   /// * 跟随系统：浅色用所选预设（若它是浅色预设）否则用 Default，深色用所选
   ///   预设（若它是深色预设）否则用 Dark。
-  ThemeResolution resolve() {
-    final selected = preset;
+  ThemeResolution resolve({
+    List<ThemeConfig> userThemes = const <ThemeConfig>[],
+  }) {
+    final selected = lookupPreset(userThemes);
     if (!followSystem) {
       final config = configFor(selected);
       return ThemeResolution(
@@ -130,19 +141,19 @@ class ThemeController extends Notifier<ThemeState> {
     final store = ref.watch(appSettingsStoreProvider);
     final storedId = store.readThemeId();
     return ThemeState(
-      themeId: storedId != null && ThemePresets.isKnownId(storedId)
-          ? storedId
-          : ThemePresets.defaultId,
+      // 用户主题存在数据库里，这里只做非空校验；查不到会回落到默认预设。
+      themeId: (storedId == null || storedId.isEmpty)
+          ? ThemePresets.defaultId
+          : storedId,
       followSystem: store.readFollowSystem() ?? true,
       fontScale: store.readFontScale() ?? 1,
       borderRadius: store.readBorderRadius(),
     );
   }
 
-  /// 选择某个预设；显式选择预设意味着不再跟随系统。
-  void selectPreset(String id) {
-    if (!ThemePresets.isKnownId(id) ||
-        id == state.themeId && !state.followSystem) {
+  /// 选择内置预设或用户主题；显式选择意味着不再跟随系统。
+  void selectTheme(String id) {
+    if (id.isEmpty || (id == state.themeId && !state.followSystem)) {
       return;
     }
     state = state.copyWith(themeId: id, followSystem: false);
@@ -188,5 +199,27 @@ final themeControllerProvider =
     NotifierProvider<ThemeController, ThemeState>(ThemeController.new);
 
 final themeResolutionProvider = Provider<ThemeResolution>(
-  (ref) => ref.watch(themeControllerProvider).resolve(),
+  (ref) {
+    // 主题编辑器里的草稿：打开编辑器时让整个应用实时跟随预览。
+    final draft = ref.watch(themeDraftProvider);
+    if (draft != null) {
+      return ThemeResolution(
+        mode: draft.isLight ? ThemeMode.light : ThemeMode.dark,
+        light: draft,
+        dark: draft,
+      );
+    }
+    return ref.watch(themeControllerProvider).resolve(
+          userThemes: ref.watch(userThemesProvider).valueOrNull ??
+              const <ThemeConfig>[],
+        );
+  },
+);
+
+/// 主题编辑器实时预览用的草稿；为空表示跟随已保存的主题。
+final themeDraftProvider = StateProvider<ThemeConfig?>((ref) => null);
+
+/// 数据库里的用户自建主题（Phase 11 主题编辑器保存的主题）。
+final userThemesProvider = StreamProvider<List<ThemeConfig>>(
+  (ref) => ref.watch(themeRepositoryProvider).watchAll(),
 );
