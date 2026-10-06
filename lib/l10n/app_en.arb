@@ -479,7 +479,7 @@
   "settingsFlutterVersion": "Flutter",
   "settingsDartVersion": "Dart",
   "settingsProjectPath": "Project path",
-  "settingsPhaseNote": "Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.",
+  "settingsPhaseNote": "Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.",
 
   "mockEventDefense": "Thesis defense",
   "mockEventProjectDeadline": "Course project deadline",

@@ -1844,7 +1844,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPhaseNote.
   ///
   /// In en, this message translates to:
-  /// **'Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.'**
+  /// **'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.'**
   String get settingsPhaseNote;
 
   /// No description provided for @mockEventDefense.

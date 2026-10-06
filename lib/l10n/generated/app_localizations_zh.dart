@@ -930,7 +930,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsProjectPath => '项目路径';
 
   @override
-  String get settingsPhaseNote => 'Phase 5 — 日历、倒计时与系统通知已可用；接下来接入 AI 助手。';
+  String get settingsPhaseNote => 'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
 
   @override
   String get mockEventDefense => '毕业设计答辩';

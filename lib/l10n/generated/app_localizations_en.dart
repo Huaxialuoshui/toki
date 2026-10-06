@@ -930,7 +930,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsProjectPath => 'Project path';
 
   @override
-  String get settingsPhaseNote => 'Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.';
+  String get settingsPhaseNote => 'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.';
 
   @override
   String get mockEventDefense => 'Thesis defense';
