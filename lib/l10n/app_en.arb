@@ -72,7 +72,48 @@
   "calendarMonthView": "Month",
   "calendarWeekView": "Week",
   "calendarDayView": "Day",
-  "calendarWeekDayComingSoon": "Week and day views arrive in Phase 3",
+  "calendarNewEvent": "New event",
+  "calendarEditEvent": "Edit event",
+  "calendarSave": "Save",
+  "calendarCancel": "Cancel",
+  "calendarDelete": "Delete",
+  "calendarEdit": "Edit",
+  "calendarDeleteConfirmTitle": "Delete this event?",
+  "calendarDeleteConfirmBody": "This cannot be undone.",
+  "calendarFieldTitle": "Title",
+  "calendarFieldTitleRequired": "Please enter a title",
+  "calendarFieldDescription": "Description",
+  "calendarFieldLocation": "Location",
+  "calendarFieldCategory": "Category",
+  "calendarCategoryNone": "No category",
+  "calendarFieldColor": "Color",
+  "calendarColorDefault": "Default",
+  "calendarFieldReminder": "Reminder",
+  "calendarReminderAtTime": "At start time",
+  "calendarReminderHours": "{hours} hours before",
+  "@calendarReminderHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarReminderDays": "{days} days before",
+  "@calendarReminderDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarAllDayEvent": "All day",
+  "calendarFieldStart": "Starts",
+  "calendarFieldEnd": "Ends",
+  "calendarEndBeforeStart": "End time must be after start time",
+  "calendarEventSaved": "Event saved",
+  "calendarEventDeleted": "Event deleted",
+  "calendarEventsThisWeek": "This week",
+  "calendarNoEventsThisWeek": "Nothing scheduled this week",
   "calendarEventsOn": "Events on {date}",
   "@calendarEventsOn": {
     "placeholders": {

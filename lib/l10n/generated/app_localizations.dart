@@ -335,11 +335,173 @@ abstract class AppLocalizations {
   /// **'Day'**
   String get calendarDayView;
 
-  /// No description provided for @calendarWeekDayComingSoon.
+  /// No description provided for @calendarNewEvent.
   ///
   /// In en, this message translates to:
-  /// **'Week and day views arrive in Phase 3'**
-  String get calendarWeekDayComingSoon;
+  /// **'New event'**
+  String get calendarNewEvent;
+
+  /// No description provided for @calendarEditEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit event'**
+  String get calendarEditEvent;
+
+  /// No description provided for @calendarSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get calendarSave;
+
+  /// No description provided for @calendarCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get calendarCancel;
+
+  /// No description provided for @calendarDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get calendarDelete;
+
+  /// No description provided for @calendarEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get calendarEdit;
+
+  /// No description provided for @calendarDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this event?'**
+  String get calendarDeleteConfirmTitle;
+
+  /// No description provided for @calendarDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get calendarDeleteConfirmBody;
+
+  /// No description provided for @calendarFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get calendarFieldTitle;
+
+  /// No description provided for @calendarFieldTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a title'**
+  String get calendarFieldTitleRequired;
+
+  /// No description provided for @calendarFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get calendarFieldDescription;
+
+  /// No description provided for @calendarFieldLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get calendarFieldLocation;
+
+  /// No description provided for @calendarFieldCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get calendarFieldCategory;
+
+  /// No description provided for @calendarCategoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No category'**
+  String get calendarCategoryNone;
+
+  /// No description provided for @calendarFieldColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get calendarFieldColor;
+
+  /// No description provided for @calendarColorDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get calendarColorDefault;
+
+  /// No description provided for @calendarFieldReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get calendarFieldReminder;
+
+  /// No description provided for @calendarReminderAtTime.
+  ///
+  /// In en, this message translates to:
+  /// **'At start time'**
+  String get calendarReminderAtTime;
+
+  /// No description provided for @calendarReminderHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours before'**
+  String calendarReminderHours(int hours);
+
+  /// No description provided for @calendarReminderDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days before'**
+  String calendarReminderDays(int days);
+
+  /// No description provided for @calendarAllDayEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'All day'**
+  String get calendarAllDayEvent;
+
+  /// No description provided for @calendarFieldStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get calendarFieldStart;
+
+  /// No description provided for @calendarFieldEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends'**
+  String get calendarFieldEnd;
+
+  /// No description provided for @calendarEndBeforeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'End time must be after start time'**
+  String get calendarEndBeforeStart;
+
+  /// No description provided for @calendarEventSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Event saved'**
+  String get calendarEventSaved;
+
+  /// No description provided for @calendarEventDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Event deleted'**
+  String get calendarEventDeleted;
+
+  /// No description provided for @calendarEventsThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get calendarEventsThisWeek;
+
+  /// No description provided for @calendarNoEventsThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing scheduled this week'**
+  String get calendarNoEventsThisWeek;
 
   /// No description provided for @calendarEventsOn.
   ///

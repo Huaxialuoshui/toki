@@ -135,7 +135,92 @@ class AppLocalizationsZh extends AppLocalizations {
   String get calendarDayView => '日';
 
   @override
-  String get calendarWeekDayComingSoon => '周视图与日视图将在 Phase 3 提供';
+  String get calendarNewEvent => '新建日程';
+
+  @override
+  String get calendarEditEvent => '编辑日程';
+
+  @override
+  String get calendarSave => '保存';
+
+  @override
+  String get calendarCancel => '取消';
+
+  @override
+  String get calendarDelete => '删除';
+
+  @override
+  String get calendarEdit => '编辑';
+
+  @override
+  String get calendarDeleteConfirmTitle => '删除这个日程？';
+
+  @override
+  String get calendarDeleteConfirmBody => '删除后无法恢复。';
+
+  @override
+  String get calendarFieldTitle => '标题';
+
+  @override
+  String get calendarFieldTitleRequired => '请输入标题';
+
+  @override
+  String get calendarFieldDescription => '描述';
+
+  @override
+  String get calendarFieldLocation => '地点';
+
+  @override
+  String get calendarFieldCategory => '分类';
+
+  @override
+  String get calendarCategoryNone => '无分类';
+
+  @override
+  String get calendarFieldColor => '颜色';
+
+  @override
+  String get calendarColorDefault => '默认';
+
+  @override
+  String get calendarFieldReminder => '提醒';
+
+  @override
+  String get calendarReminderAtTime => '准时提醒';
+
+  @override
+  String calendarReminderHours(int hours) {
+    return '提前 $hours 小时';
+  }
+
+  @override
+  String calendarReminderDays(int days) {
+    return '提前 $days 天';
+  }
+
+  @override
+  String get calendarAllDayEvent => '全天';
+
+  @override
+  String get calendarFieldStart => '开始';
+
+  @override
+  String get calendarFieldEnd => '结束';
+
+  @override
+  String get calendarEndBeforeStart => '结束时间必须晚于开始时间';
+
+  @override
+  String get calendarEventSaved => '日程已保存';
+
+  @override
+  String get calendarEventDeleted => '日程已删除';
+
+  @override
+  String get calendarEventsThisWeek => '本周';
+
+  @override
+  String get calendarNoEventsThisWeek => '本周没有日程';
 
   @override
   String calendarEventsOn(String date) {

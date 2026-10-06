@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 2（本地数据库）已完成，Android 与 Windows 双端均已构建并实际运行验证**。
-> 日程 / 倒计时 / 提醒已经存在本机 SQLite 里；AI、通知尚未接入。
+> 当前状态：**Phase 3（日历交互）已完成，Android 与 Windows 双端均已构建并实际运行验证**。
+> 日程可以新建 / 编辑 / 删除并落库；倒计时界面、AI、通知尚未接入。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 57/57 | ✅ `flutter build apk --debug` | ✅ `flutter run -d android`（模拟器 toki_api34，数据库落盘） |
-| Windows | ✅ | ✅ 57/57 | ✅ `flutter build windows` | ✅ `flutter run -d windows`（数据库落盘） |
+| Android | ✅ | ✅ 69/69 | ✅ `flutter build apk --debug` | ✅ `flutter run -d android`（模拟器 toki_api34，含事件增删改实测） |
+| Windows | ✅ | ✅ 69/69 | ✅ `flutter build windows` | ✅ `flutter run -d windows`（数据库落盘） |
 
 ## 项目介绍
 
@@ -30,6 +30,8 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 - 设置持久化（语言 / 主题 / 微调）写入 shared_preferences
 - **本地数据库（Drift + SQLite）**：9 张表 + 8 个仓储 + 迁移快照与迁移测试
 - 首页 / 日历 / 倒计时改为读取数据库，并提供加载中与空状态；debug 构建首次启动写入示例数据
+- **日历交互**：月 / 周 / 日三种视图、新建 / 编辑 / 删除日程（二次确认）、全天事件、日期与时间选择器、
+  事件颜色、分类、提醒预设（准时 / 5 / 10 / 30 / 60 分钟 / 1 天），保存事件时同步提醒行
 
 计划中（尚未实现，按阶段推进）
 
@@ -38,7 +40,7 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 0 | 环境 + 项目脚手架 | ✅ |
 | Phase 1 | App Shell / 响应式 / 主题 / i18n | ✅ |
 | Phase 2 | Drift + SQLite、Repository CRUD、迁移测试 | ✅ |
-| Phase 3 | 日历月视图增删改、周 / 日视图 | ⏳ |
+| Phase 3 | 日历增删改、全天 / 时间选择器、颜色、周 / 日视图 | ✅ |
 | Phase 4 | 倒计时 CRUD、拖动排序、跨时区测试 | ⏳ |
 | Phase 5 | Android 本地通知 / Windows Toast | ⏳ |
 | Phase 6-8 | AI Provider、Persona、Tool Calling + 权限 | ⏳ |
@@ -87,7 +89,8 @@ lib/
 │   └── demo/demo_seed.dart       # debug 构建的示例数据
 ├── application/
 │   ├── countdown/                # CountdownController（唯一 1Hz 节拍）
-│   ├── calendar/ ai/             # 页面用的数据库 StreamProvider
+│   ├── calendar/                 # 数据库 StreamProvider + 写操作（CalendarActions）
+│   ├── ai/                       # 人设 / 服务商 Provider
 │   ├── theme/                    # 预设、ThemeConfig → ThemeData、主题控制器
 │   └── settings/                 # 语言、首次启动、启动初始化
 ├── infrastructure/
@@ -161,7 +164,7 @@ flutter build apk --debug
 Phase 6 起提供「OpenAI Compatible」Provider 配置（Base URL / API Key / Model / Temperature / Max Tokens / 流式开关），
 Phase 7 起提供人设管理，Phase 8 起提供工具调用与工具权限。API Key 只保存在本机、不写日志、不进 Git。
 
-## 数据库说明（规划）
+## 数据库说明
 
 Drift + SQLite，`schemaVersion = 1`，共 9 张表：
 
@@ -199,6 +202,22 @@ dart run drift_dev schema generate drift_schemas/ test/generated_migrations/
 flutter test test/data/migration_test.dart
 ```
 
+## 日历交互说明（Phase 3）
+
+* **视图**：月视图是 7 列网格（宽屏限制在 560px 内，避免格子被撑成巨大方块）；周 / 日视图是
+"议程式"列表（按天分组、可单日添加）——真正的"时间网格"排布留到后续按需再做。
+* **新建 / 编辑**：点顶部或区块的「新建日程」、周 / 日视图里每天的「+」都可以新建；点事件卡片看详情，
+详情里「编辑」进入表单。
+* **表单字段**：标题（必填）、全天开关、开始 / 结束（日期 + 时间选择器）、地点、描述、分类、颜色（8 色 + 默认）、
+提醒（准时 / 5 / 10 / 30 / 60 分钟 / 1 天）。
+* **校验**：标题不能为空；结束时间必须晚于开始时间（不满足时表单内红字提示，不落库）。
+* **全天事件**：开始为当天 00:00、结束为次日 00:00（半开区间），月历格子与列表都按"覆盖到这一天"判定。
+* **提醒**：保存事件时按 `reminderMinutes` 同步 `reminders` 表（同一事件只保留一条，改时间会跟着走，
+取消提醒会删除）；删除事件会先删提醒再删事件，避免外键约束报错。真正的通知调度在 Phase 5。
+* **删除**：编辑器底部「删除」→ 二次确认 → 删除。
+* 已知范围限制：分类目前只能在示例数据里出现，管理分类（增删改）不在本阶段；`repeatRule`
+（重复日程）字段已入库但界面未开放，留到后续阶段。
+
 ## 测试
 
 ```powershell
@@ -206,13 +225,14 @@ flutter analyze
 flutter test
 ```
 
-当前 57 个测试，覆盖：
+当前 69 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
-* 应用层：倒计时节拍（单 Timer、多订阅、释放）、主题解析、`ThemeData` 与玻璃层职责分离、字号缩放
+* 应用层：倒计时节拍（单 Timer、多订阅、释放）、主题解析、`ThemeData` 与玻璃层职责分离、字号缩放、
+  事件保存时的提醒同步（新增 / 替换 / 清除 / 改时间）与"删除事件先删提醒"
 * 数据层：8 个仓储的 CRUD / 排序 / 置顶 / 重排 / 默认服务商 / 外键级联、UTC 往返、示例数据幂等、迁移快照校验
 * 界面：响应式断点（599/600/999/1000）、五个导航目的地可达、语言跟随系统与回退中文、语言持久化、
-  倒计时卡片秒级刷新、空数据库的空状态
+  倒计时卡片秒级刷新、空数据库的空状态、日历新建 / 编辑 / 删除 / 校验 / 全天开关 / 月周日视图切换
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

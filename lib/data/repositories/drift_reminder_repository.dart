@@ -46,6 +46,15 @@ class DriftReminderRepository implements ReminderRepository {
   }
 
   @override
+  Future<List<Reminder>> getForEvent(String eventId) async {
+    final rows = await (_db.select(_db.reminders)
+          ..where(($RemindersTable t) => t.eventId.equals(eventId))
+          ..orderBy(_ordering()))
+        .get();
+    return _mapAll(rows);
+  }
+
+  @override
   Future<Reminder?> findById(String id) async {
     final row = await (_db.select(_db.reminders)
           ..where(($RemindersTable t) => t.id.equals(id)))
@@ -90,6 +99,13 @@ class DriftReminderRepository implements ReminderRepository {
   Future<void> deleteById(String id) async {
     await (_db.delete(_db.reminders)
           ..where(($RemindersTable t) => t.id.equals(id)))
+        .go();
+  }
+
+  @override
+  Future<void> deleteForEvent(String eventId) async {
+    await (_db.delete(_db.reminders)
+          ..where(($RemindersTable t) => t.eventId.equals(eventId)))
         .go();
   }
 

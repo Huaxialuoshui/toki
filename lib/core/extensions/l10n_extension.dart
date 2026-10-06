@@ -9,3 +9,16 @@ extension L10nExtension on BuildContext {
   /// 当前生效的语言代码（`zh` / `en`），用于日期格式化。
   String get localeCode => Localizations.localeOf(this).languageCode;
 }
+
+/// 提醒文案（`无` / `准时` / `提前 N 分钟|小时|天`）。
+extension ReminderLabelExtension on AppLocalizations {
+  String reminderLabel(int? minutes) {
+    if (minutes == null) return calendarNoReminder;
+    if (minutes == 0) return calendarReminderAtTime;
+    if (minutes < Duration.minutesPerHour) return calendarReminderMinutes(minutes);
+    if (minutes < Duration.minutesPerDay) {
+      return calendarReminderHours(minutes ~/ Duration.minutesPerHour);
+    }
+    return calendarReminderDays(minutes ~/ Duration.minutesPerDay);
+  }
+}

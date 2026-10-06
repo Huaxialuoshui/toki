@@ -135,7 +135,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarDayView => 'Day';
 
   @override
-  String get calendarWeekDayComingSoon => 'Week and day views arrive in Phase 3';
+  String get calendarNewEvent => 'New event';
+
+  @override
+  String get calendarEditEvent => 'Edit event';
+
+  @override
+  String get calendarSave => 'Save';
+
+  @override
+  String get calendarCancel => 'Cancel';
+
+  @override
+  String get calendarDelete => 'Delete';
+
+  @override
+  String get calendarEdit => 'Edit';
+
+  @override
+  String get calendarDeleteConfirmTitle => 'Delete this event?';
+
+  @override
+  String get calendarDeleteConfirmBody => 'This cannot be undone.';
+
+  @override
+  String get calendarFieldTitle => 'Title';
+
+  @override
+  String get calendarFieldTitleRequired => 'Please enter a title';
+
+  @override
+  String get calendarFieldDescription => 'Description';
+
+  @override
+  String get calendarFieldLocation => 'Location';
+
+  @override
+  String get calendarFieldCategory => 'Category';
+
+  @override
+  String get calendarCategoryNone => 'No category';
+
+  @override
+  String get calendarFieldColor => 'Color';
+
+  @override
+  String get calendarColorDefault => 'Default';
+
+  @override
+  String get calendarFieldReminder => 'Reminder';
+
+  @override
+  String get calendarReminderAtTime => 'At start time';
+
+  @override
+  String calendarReminderHours(int hours) {
+    return '$hours hours before';
+  }
+
+  @override
+  String calendarReminderDays(int days) {
+    return '$days days before';
+  }
+
+  @override
+  String get calendarAllDayEvent => 'All day';
+
+  @override
+  String get calendarFieldStart => 'Starts';
+
+  @override
+  String get calendarFieldEnd => 'Ends';
+
+  @override
+  String get calendarEndBeforeStart => 'End time must be after start time';
+
+  @override
+  String get calendarEventSaved => 'Event saved';
+
+  @override
+  String get calendarEventDeleted => 'Event deleted';
+
+  @override
+  String get calendarEventsThisWeek => 'This week';
+
+  @override
+  String get calendarNoEventsThisWeek => 'Nothing scheduled this week';
 
   @override
   String calendarEventsOn(String date) {

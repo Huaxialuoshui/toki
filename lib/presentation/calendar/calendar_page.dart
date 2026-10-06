@@ -11,11 +11,13 @@ import '../widgets/async_hint.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
+import 'day_agenda_view.dart';
+import 'event_editor_dialog.dart';
+import 'week_agenda_view.dart';
 
-/// 日历页：月视图 + 当日日程列表。
-///
-/// 数据来自数据库。第一版按规格只做月视图（周 / 日视图在 Phase 3），
-/// 点击日期切换列表、点击事件打开只读详情。
+enum CalendarViewMode { month, week, day }
+
+/// 日历页：月 / 周 / 日视图 + 日程增删改。
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
 
@@ -26,6 +28,7 @@ class CalendarPage extends ConsumerStatefulWidget {
 class _CalendarPageState extends ConsumerState<CalendarPage> {
   late DateTime _visibleMonth;
   late DateTime _selectedDay;
+  CalendarViewMode _mode = CalendarViewMode.month;
 
   @override
   void initState() {
@@ -35,9 +38,46 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     _selectedDay = DateUtils.dateOnly(now);
   }
 
-  void _shiftMonth(int delta) {
+  DateTime get _weekStart {
+    final monday = _selectedDay
+        .subtract(Duration(days: _selectedDay.weekday - DateTime.monday));
+    return DateUtils.dateOnly(monday);
+  }
+
+  DateTimeRange get _range {
+    switch (_mode) {
+      case CalendarViewMode.month:
+        return DateTimeRange(
+          start: DateTime(_visibleMonth.year, _visibleMonth.month),
+          end: DateTime(_visibleMonth.year, _visibleMonth.month + 1),
+        );
+      case CalendarViewMode.week:
+        return DateTimeRange(
+          start: _weekStart,
+          end: _weekStart.add(const Duration(days: 7)),
+        );
+      case CalendarViewMode.day:
+        final day = DateUtils.dateOnly(_selectedDay);
+        return DateTimeRange(start: day, end: day.add(const Duration(days: 1)));
+    }
+  }
+
+  void _shift(int delta) {
     setState(() {
-      _visibleMonth = DateTime(_visibleMonth.year, _visibleMonth.month + delta);
+      switch (_mode) {
+        case CalendarViewMode.month:
+          _visibleMonth =
+              DateTime(_visibleMonth.year, _visibleMonth.month + delta);
+          break;
+        case CalendarViewMode.week:
+          _selectedDay = _selectedDay.add(Duration(days: 7 * delta));
+          _visibleMonth = DateTime(_selectedDay.year, _selectedDay.month);
+          break;
+        case CalendarViewMode.day:
+          _selectedDay = _selectedDay.add(Duration(days: delta));
+          _visibleMonth = DateTime(_selectedDay.year, _selectedDay.month);
+          break;
+      }
     });
   }
 
@@ -49,17 +89,25 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     });
   }
 
+  String _subtitle(String locale) {
+    switch (_mode) {
+      case CalendarViewMode.month:
+        return DateFormats.monthTitle(_visibleMonth, locale);
+      case CalendarViewMode.week:
+        return '${DateFormats.shortDate(_weekStart, locale)} – '
+            '${DateFormats.shortDate(_weekStart.add(const Duration(days: 6)), locale)}';
+      case CalendarViewMode.day:
+        return DateFormats.fullDate(_selectedDay, locale);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final locale = context.localeCode;
     final now = ref.watch(clockProvider).now();
 
-    final range = DateTimeRange(
-      start: DateTime(_visibleMonth.year, _visibleMonth.month),
-      end: DateTime(_visibleMonth.year, _visibleMonth.month + 1),
-    );
-    final eventsAsync = ref.watch(eventsForRangeProvider(range));
+    final eventsAsync = ref.watch(eventsForRangeProvider(_range));
     final events = eventsAsync.valueOrNull ?? const <CalendarEvent>[];
     final dayEvents = events
         .where((CalendarEvent event) => event.occursOn(_selectedDay))
@@ -67,122 +115,141 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
 
     return PageScaffold(
       title: l10n.navCalendar,
-      subtitle: DateFormats.monthTitle(_visibleMonth, locale),
+      subtitle: _subtitle(locale),
       actions: <Widget>[
         IconButton(
-          onPressed: () => _shiftMonth(-1),
+          onPressed: () => _shift(-1),
           icon: const Icon(Icons.chevron_left),
-          tooltip: DateFormats.monthTitle(
-            DateTime(_visibleMonth.year, _visibleMonth.month - 1),
-            locale,
-          ),
+          tooltip: l10n.calendarMonthView,
         ),
         IconButton(
-          onPressed: () => _shiftMonth(1),
+          onPressed: () => _shift(1),
           icon: const Icon(Icons.chevron_right),
-          tooltip: DateFormats.monthTitle(
-            DateTime(_visibleMonth.year, _visibleMonth.month + 1),
-            locale,
-          ),
+          tooltip: l10n.calendarMonthView,
         ),
-        const SizedBox(width: 4),
         TextButton(onPressed: _goToToday, child: Text(l10n.calendarToday)),
         const SizedBox(width: 4),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const _ViewSwitcher(),
-          const SizedBox(height: 16),
-          _MonthGrid(
-            month: _visibleMonth,
-            selectedDay: _selectedDay,
-            today: now,
-            events: events,
-            onSelectDay: (DateTime day) =>
-                setState(() => _selectedDay = day),
-          ),
-          const SizedBox(height: 24),
-          SectionHeader(
-            title: l10n.calendarEventsOn(
-              DateFormats.fullDate(_selectedDay, locale),
-            ),
-            icon: Icons.event_note_outlined,
-          ),
-          if (eventsAsync.isLoading && events.isEmpty)
-            const LoadingHint()
-          else if (dayEvents.isEmpty)
-            EmptyHint(
-              text: l10n.calendarNoEvents,
-              icon: Icons.event_busy_outlined,
-            )
-          else
-            for (final event in dayEvents)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: EventTile(
-                  event: event,
-                  onTap: () => _showEventDetail(context, event),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: <Widget>[
+                    _modeChip(CalendarViewMode.month, l10n.calendarMonthView),
+                    _modeChip(CalendarViewMode.week, l10n.calendarWeekView),
+                    _modeChip(CalendarViewMode.day, l10n.calendarDayView),
+                  ],
                 ),
               ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.calendarReadOnlyHint,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
-                ),
+              const SizedBox(width: 8),
+              FilledButton.icon(
+                onPressed: () => _openEditor(day: _selectedDay),
+                icon: const Icon(Icons.add, size: 18),
+                label: Text(l10n.calendarNewEvent),
+              ),
+            ],
           ),
+          const SizedBox(height: 16),
+          if (_mode == CalendarViewMode.month) ...<Widget>[
+            _MonthGrid(
+              month: _visibleMonth,
+              selectedDay: _selectedDay,
+              today: now,
+              events: events,
+              onSelectDay: (DateTime day) => setState(() => _selectedDay = day),
+            ),
+            const SizedBox(height: 24),
+            SectionHeader(
+              title: l10n.calendarEventsOn(
+                DateFormats.fullDate(_selectedDay, locale),
+              ),
+              icon: Icons.event_note_outlined,
+              trailing: TextButton.icon(
+                onPressed: () => _openEditor(day: _selectedDay),
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(l10n.calendarNewEvent),
+              ),
+            ),
+            if (eventsAsync.isLoading && events.isEmpty)
+              const LoadingHint()
+            else if (dayEvents.isEmpty)
+              EmptyHint(
+                text: l10n.calendarNoEvents,
+                icon: Icons.event_busy_outlined,
+              )
+            else
+              for (final event in dayEvents)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: EventTile(
+                    event: event,
+                    onTap: () => _openDetail(event),
+                  ),
+                ),
+          ] else if (_mode == CalendarViewMode.week) ...<Widget>[
+            SectionHeader(
+              title: l10n.calendarEventsThisWeek,
+              icon: Icons.view_week_outlined,
+            ),
+            if (eventsAsync.isLoading && events.isEmpty)
+              const LoadingHint()
+            else if (events.isEmpty)
+              EmptyHint(
+                text: l10n.calendarNoEventsThisWeek,
+                icon: Icons.event_busy_outlined,
+              )
+            else
+              WeekAgendaView(
+                weekStart: _weekStart,
+                events: events,
+                today: now,
+                onSelectEvent: _openDetail,
+                onAddForDay: (DateTime day) => _openEditor(day: day),
+              ),
+          ] else ...<Widget>[
+            if (eventsAsync.isLoading && events.isEmpty)
+              const LoadingHint()
+            else
+              DayAgendaView(
+                day: _selectedDay,
+                events: dayEvents,
+                onSelectEvent: _openDetail,
+                onAddForDay: (DateTime day) => _openEditor(day: day),
+              ),
+          ],
         ],
       ),
     );
   }
 
-  void _showEventDetail(BuildContext context, CalendarEvent event) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => _EventDetailDialog(event: event),
+  Widget _modeChip(CalendarViewMode mode, String label) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: _mode == mode,
+      onSelected: (_) => setState(() => _mode = mode),
     );
   }
-}
 
-class _ViewSwitcher extends StatelessWidget {
-  const _ViewSwitcher();
+  Future<void> _openDetail(CalendarEvent event) async {
+    final edit = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => _EventDetailDialog(event: event),
+    );
+    if (edit == true && mounted) {
+      await _openEditor(event: event);
+    }
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final theme = Theme.of(context);
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: <Widget>[
-        ChoiceChip(
-          label: Text(l10n.calendarMonthView),
-          selected: true,
-          onSelected: (_) {},
-        ),
-        ChoiceChip(
-          label: Text(l10n.calendarWeekView),
-          selected: false,
-          onSelected: null,
-        ),
-        ChoiceChip(
-          label: Text(l10n.calendarDayView),
-          selected: false,
-          onSelected: null,
-        ),
-        Text(
-          l10n.calendarWeekDayComingSoon,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
-      ],
+  Future<void> _openEditor({CalendarEvent? event, DateTime? day}) async {
+    await showEventEditor(
+      context,
+      event: event,
+      initialDate: day ?? _selectedDay,
     );
   }
 }
@@ -211,64 +278,69 @@ class _MonthGrid extends StatelessWidget {
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     final cells = ((leading + daysInMonth) / 7).ceil() * 7;
 
-    return GlassCard(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 16),
-      child: Column(
-        children: <Widget>[
-          Row(
+    // 宽屏下限制月历宽度：否则 7 列正方形格子会撑成巨大的方块。
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: GlassCard(
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 16),
+          child: Column(
             children: <Widget>[
-              for (final label in DateFormats.weekdayHeaders(locale))
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      label,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.w600,
+              Row(
+                children: <Widget>[
+                  for (final label in DateFormats.weekdayHeaders(locale))
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          label,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: cells,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                  childAspectRatio: 1,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
                 ),
+                itemBuilder: (context, index) {
+                  final dayNumber = index - leading + 1;
+                  if (dayNumber < 1 || dayNumber > daysInMonth) {
+                    return const SizedBox.shrink();
+                  }
+                  final date = DateTime(month.year, month.month, dayNumber);
+                  final isSelected = date == selectedDay;
+                  final isToday = DateUtils.isSameDay(date, today);
+                  final colors = <Color>[
+                    for (final event in events)
+                      if (event.occursOn(date))
+                        event.color ?? theme.colorScheme.primary,
+                  ];
+
+                  return _DayCell(
+                    date: date,
+                    isSelected: isSelected,
+                    isToday: isToday,
+                    eventColors: colors,
+                    onTap: () => onSelectDay(date),
+                  );
+                },
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: cells,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemBuilder: (context, index) {
-              final dayNumber = index - leading + 1;
-              if (dayNumber < 1 || dayNumber > daysInMonth) {
-                return const SizedBox.shrink();
-              }
-              final date = DateTime(month.year, month.month, dayNumber);
-              final isSelected = date == selectedDay;
-              final isToday = date.year == today.year &&
-                  date.month == today.month &&
-                  date.day == today.day;
-              final colors = <Color>[
-                for (final event in events)
-                  if (event.occursOn(date))
-                    event.color ?? theme.colorScheme.primary,
-              ];
-
-              return _DayCell(
-                date: date,
-                isSelected: isSelected,
-                isToday: isToday,
-                eventColors: colors,
-                onTap: () => onSelectDay(date),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -316,9 +388,8 @@ class _DayCell extends StatelessWidget {
                 '${date.day}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: foreground,
-                  fontWeight: isSelected || isToday
-                      ? FontWeight.w700
-                      : FontWeight.w400,
+                  fontWeight:
+                      isSelected || isToday ? FontWeight.w700 : FontWeight.w400,
                 ),
               ),
               const SizedBox(height: 3),
@@ -350,6 +421,7 @@ class _DayCell extends StatelessWidget {
   }
 }
 
+/// 只读详情；点"编辑"返回 true，由调用方打开编辑器。
 class _EventDetailDialog extends StatelessWidget {
   const _EventDetailDialog({required this.event});
 
@@ -414,20 +486,31 @@ class _EventDetailDialog extends StatelessWidget {
                   label: l10n.calendarLocation,
                   value: event.location!,
                 ),
+              if (event.description != null)
+                _DetailRow(
+                  icon: Icons.notes_outlined,
+                  value: event.description!,
+                ),
               _DetailRow(
                 icon: Icons.notifications_none,
                 label: l10n.calendarReminder,
-                value: event.reminderMinutes == null
-                    ? l10n.calendarNoReminder
-                    : l10n.calendarReminderMinutes(event.reminderMinutes!),
+                value: l10n.reminderLabel(event.reminderMinutes),
               ),
-              const SizedBox(height: 18),
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton.tonal(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.calendarClose),
-                ),
+              const SizedBox(height: 14),
+              Row(
+                children: <Widget>[
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(l10n.calendarClose),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.tonalIcon(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    label: Text(l10n.calendarEdit),
+                  ),
+                ],
               ),
             ],
           ),
