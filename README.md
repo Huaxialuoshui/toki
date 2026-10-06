@@ -9,8 +9,8 @@
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 190/190 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、闹钟跨进程存活、AI 流式聊天、人设 CRUD、AI 真实创建日程、上下文注入、聊天外观、主题编辑器、备份导出（含 API Key 脱敏）与文件恢复（合并 / 覆盖） |
-| Windows | ✅ | ✅ 190/190 | ✅ `flutter build windows` | ✅ 构建实测（`toki.exe` 产物 + `analyze`/`test` 全绿）；桌面交互与系统 Toast 可见性待你空闲时确认 |
+| Android | ✅ | ✅ 191/191 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、闹钟跨进程存活、AI 流式聊天、人设 CRUD、AI 真实创建日程、上下文注入、聊天外观、主题编辑器、备份导出（含 API Key 脱敏）与文件恢复（合并 / 覆盖）、**小米 MiMo 真实 API 对话 + 工具调用建日程** |
+| Windows | ✅ | ✅ 191/191 | ✅ `flutter build windows` | ✅ 构建实测（`toki.exe` 产物 + `analyze`/`test` 全绿）；桌面交互与系统 Toast 可见性待你空闲时确认 |
 
 ## 项目介绍
 
@@ -289,6 +289,15 @@ Moonshot / 智谱 / Ollama），也可以手填：
 「测试连接」会用当前表单发一条最小请求（非流式），成功时把模型回复的前 40 字显示出来，
 失败时显示可读原因（HTTP 状态 + 提示，例如 401 → Key 可能无效、404 → 检查 Base URL）。
 
+「快速填充」内置预设：DeepSeek / **小米 MiMo** / OpenAI / Qwen / Moonshot / 智谱 / Ollama。
+小米 MiMo 走 OpenAI 兼容协议，Base URL 必须带 `/v1`（`https://api.xiaomimimo.com/v1`），
+模型填 `mimo-v2.6-pro`。
+
+> **思考模型的行为**：MiMo 这类 reasoning 模型在流式返回时会先发很多
+> `reasoning_content` 增量、之后才发 `content`，所以点击发送后会先有一段几秒的"空档"才逐字出字，
+> 这是正常的。思考片段当前不入库、也不会回传（规格 §12 要求不把模型内部推理展示给用户）；
+> 实测不影响工具调用后的继续对话。
+
 ### 聊天与流式输出
 
 * AI 页调用当前生效的服务商（默认项优先，否则列表第一个），逐块渲染回复——**用户能看到逐字输出**；
@@ -484,7 +493,7 @@ flutter analyze
 flutter test
 ```
 
-当前 190 个测试，覆盖：
+当前 191 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
@@ -500,6 +509,7 @@ flutter test
 * 界面·通知：权限状态展示、请求权限、发送测试通知
 * AI 层：Base URL 规范化、请求体字段、Authorization 头（有/无 Key）、SSE 解析（含 keep-alive 注释、
   `data:` 无空格、UTF-8 跨分片）、`[DONE]` 与无 `[DONE]` 收尾、错误映射（401/404/连接失败）且不含 Key
+  * 流式请求的错误体也要能读出来（`response.data` 是 `ResponseBody` 时不能只打印 `Instance of`）
 * AI 应用层：发送后用户 + 助手消息落库、流式状态逐块更新、system prompt 与历史顺序、
   出错不写助手消息、中止保留已收到内容、清空对话
 * 界面·AI：未配置时的提示与入口、发送后逐字显示回复、错误横幅、清空对话

@@ -27,7 +27,8 @@ class _FakeAdapter implements HttpClientAdapter {
     lastRequest = options;
     if (requestStream != null) {
       final chunks = await requestStream.toList();
-      lastBody = utf8.decode(chunks.expand((Uint8List chunk) => chunk).toList());
+      lastBody =
+          utf8.decode(chunks.expand((Uint8List chunk) => chunk).toList());
     }
     return handler(options);
   }
@@ -129,7 +130,10 @@ void main() {
         (_) => _json(<String, Object?>{
           'choices': <Object?>[
             <String, Object?>{
-              'message': <String, Object?>{'role': 'assistant', 'content': '今天有 3 个安排'},
+              'message': <String, Object?>{
+                'role': 'assistant',
+                'content': '今天有 3 个安排'
+              },
               'finish_reason': 'stop',
             },
           ],
@@ -156,7 +160,8 @@ void main() {
       expect(body['max_tokens'], 256);
       expect(body['stream'], false);
       expect((body['messages']! as List<Object?>).length, 1);
-      expect(adapter.lastRequest!.uri.toString(), 'http://127.0.0.1:11434/v1/chat/completions');
+      expect(adapter.lastRequest!.uri.toString(),
+          'http://127.0.0.1:11434/v1/chat/completions');
     });
 
     test('没有 API Key 时不发送 Authorization 头（本地 Ollama 场景）', () async {
@@ -171,7 +176,8 @@ void main() {
       );
       await _provider(adapter).chat(_request);
 
-      expect(adapter.lastRequest!.headers.containsKey('Authorization'), isFalse);
+      expect(
+          adapter.lastRequest!.headers.containsKey('Authorization'), isFalse);
     });
 
     test('有 API Key 时带上 Bearer 头', () async {
@@ -184,7 +190,8 @@ void main() {
           ],
         }),
       );
-      await _provider(adapter, config: _config(apiKey: 'sk-secret-123')).chat(_request);
+      await _provider(adapter, config: _config(apiKey: 'sk-secret-123'))
+          .chat(_request);
 
       expect(
         adapter.lastRequest!.headers['Authorization'],
@@ -193,7 +200,8 @@ void main() {
     });
 
     test('返回体结构异常时报错而不是崩溃', () async {
-      final adapter = _FakeAdapter((_) => _json(<String, Object?>{'foo': 'bar'}));
+      final adapter =
+          _FakeAdapter((_) => _json(<String, Object?>{'foo': 'bar'}));
       expect(
         () => _provider(adapter).chat(_request),
         throwsA(isA<AppException>()),
@@ -285,7 +293,8 @@ void main() {
       );
 
       try {
-        await _provider(adapter, config: _config(apiKey: apiKey)).chat(_request);
+        await _provider(adapter, config: _config(apiKey: apiKey))
+            .chat(_request);
         fail('应当抛出 AppException');
       } on AppException catch (error) {
         expect(error.message, contains('HTTP 401'));
@@ -296,7 +305,8 @@ void main() {
     });
 
     test('404 提示检查 Base URL', () async {
-      final adapter = _FakeAdapter((_) => _json(<String, Object?>{}, status: 404));
+      final adapter =
+          _FakeAdapter((_) => _json(<String, Object?>{}, status: 404));
       try {
         await _provider(adapter).chat(_request);
         fail('应当抛出 AppException');
@@ -322,11 +332,33 @@ void main() {
     });
 
     test('流式请求失败同样是 AppException', () async {
-      final adapter = _FakeAdapter((_) => _json(<String, Object?>{}, status: 500));
+      final adapter =
+          _FakeAdapter((_) => _json(<String, Object?>{}, status: 500));
       expect(
         () => _provider(adapter).chatStream(_request).toList(),
         throwsA(isA<AppException>()),
       );
+    });
+
+    test('流式请求的错误体要读出来，不能是 Instance of ResponseBody', () async {
+      // 流式请求的 response.data 是 ResponseBody（一个流），直接 toString()
+      // 只会得到 "Instance of 'ResponseBody'"，用户看不懂。
+      final adapter = _FakeAdapter(
+        (_) => _json(
+          <String, Object?>{
+            'error': <String, Object?>{'message': 'Invalid API key'},
+          },
+          status: 401,
+        ),
+      );
+      try {
+        await _provider(adapter).chatStream(_request).toList();
+        fail('应当抛出 AppException');
+      } on AppException catch (error) {
+        expect(error.message, contains('HTTP 401'));
+        expect(error.message, contains('Invalid API key'));
+        expect(error.message, isNot(contains('Instance of')));
+      }
     });
   });
 }

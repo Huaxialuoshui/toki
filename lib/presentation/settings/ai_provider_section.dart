@@ -23,8 +23,11 @@ class _Preset {
 
 const List<_Preset> _presets = <_Preset>[
   _Preset('DeepSeek', 'https://api.deepseek.com', 'deepseek-chat'),
+  // 小米 MiMo：OpenAI 兼容协议，Base URL 必须带 /v1。
+  _Preset('小米 MiMo', 'https://api.xiaomimimo.com/v1', 'mimo-v2.6-pro'),
   _Preset('OpenAI', 'https://api.openai.com/v1', 'gpt-4o-mini'),
-  _Preset('Qwen', 'https://dashscope.aliyuncs.com/compatible-mode/v1', 'qwen-plus'),
+  _Preset(
+      'Qwen', 'https://dashscope.aliyuncs.com/compatible-mode/v1', 'qwen-plus'),
   _Preset('Moonshot', 'https://api.moonshot.cn/v1', 'moonshot-v1-8k'),
   _Preset('智谱', 'https://open.bigmodel.cn/api/paas/v4', 'glm-4-flash'),
   _Preset('Ollama', 'http://127.0.0.1:11434/v1', 'qwen2.5:7b'),
@@ -53,8 +56,7 @@ class AiProviderSection extends ConsumerWidget {
               ),
             )
           else
-            for (final config in configs)
-              _ProviderRow(config: config),
+            for (final config in configs) _ProviderRow(config: config),
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
@@ -342,7 +344,8 @@ class _AiProviderEditorDialogState
                           controller: _baseUrl,
                           decoration: InputDecoration(
                             labelText: l10n.aiBaseUrl,
-                            helperText: 'https://api.deepseek.com 或 http://127.0.0.1:11434/v1',
+                            helperText:
+                                'https://api.deepseek.com 或 http://127.0.0.1:11434/v1',
                           ),
                           validator: (String? value) {
                             final text = value?.trim() ?? '';

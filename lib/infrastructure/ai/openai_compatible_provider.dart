@@ -86,7 +86,7 @@ class OpenAiCompatibleProvider implements AiProvider {
         options: Options(headers: _headers()),
       );
     } on DioException catch (error) {
-      throw _mapDioError(error);
+      throw await _mapDioError(error);
     }
 
     final data = response.data;
@@ -122,8 +122,9 @@ class OpenAiCompatibleProvider implements AiProvider {
         AiToolCall(
           id: entry['id'] is String ? entry['id'] as String : 'call-$index',
           name: function['name'] is String ? function['name'] as String : '',
-          argumentsJson:
-              function['arguments'] is String ? function['arguments'] as String : '',
+          argumentsJson: function['arguments'] is String
+              ? function['arguments'] as String
+              : '',
         ),
       );
       index++;
@@ -144,7 +145,7 @@ class OpenAiCompatibleProvider implements AiProvider {
         ),
       );
     } on DioException catch (error) {
-      throw _mapDioError(error, streamed: true);
+      throw await _mapDioError(error, streamed: true);
     }
 
     final body = response.data;
@@ -153,9 +154,8 @@ class OpenAiCompatibleProvider implements AiProvider {
     }
 
     // utf8.decoder 处理跨分片的 UTF-8 字符，LineSplitter 处理跨分片的行。
-    final lines = utf8.decoder
-        .bind(body.stream)
-        .transform(const LineSplitter());
+    final lines =
+        utf8.decoder.bind(body.stream).transform(const LineSplitter());
 
     final builders = <int, _ToolCallBuilder>{};
 
@@ -209,7 +209,8 @@ class OpenAiCompatibleProvider implements AiProvider {
         if (entry['id'] is String) builder.id = entry['id'] as String;
         final function = entry['function'];
         if (function is Map) {
-          if (function['name'] is String && (function['name'] as String).isNotEmpty) {
+          if (function['name'] is String &&
+              (function['name'] as String).isNotEmpty) {
             builder.name = function['name'] as String;
           }
           if (function['arguments'] is String) {
@@ -229,9 +230,7 @@ class OpenAiCompatibleProvider implements AiProvider {
     return <AiToolCall>[
       for (final index in indexes)
         AiToolCall(
-          id: builders[index]!.id.isEmpty
-              ? 'call-$index'
-              : builders[index]!.id,
+          id: builders[index]!.id.isEmpty ? 'call-$index' : builders[index]!.id,
           name: builders[index]!.name,
           argumentsJson: builders[index]!.arguments.toString(),
         ),
@@ -269,10 +268,13 @@ class OpenAiCompatibleProvider implements AiProvider {
     }
   }
 
-  AppException _mapDioError(DioException error, {bool streamed = false}) {
+  Future<AppException> _mapDioError(
+    DioException error, {
+    bool streamed = false,
+  }) async {
     final status = error.response?.statusCode;
     if (status != null) {
-      final snippet = _snippetOf(error.response?.data);
+      final snippet = await _snippetOf(error.response?.data);
       final hint = switch (status) {
         401 || 403 => '（API Key 可能无效或没有权限）',
         404 => '（检查 Base URL 是否正确）',
@@ -301,9 +303,25 @@ class OpenAiCompatibleProvider implements AiProvider {
   }
 
   /// 只取响应体的一小段作为错误提示，避免把大段内容塞进 UI。
-  static String _snippetOf(Object? data) {
+  /// 错误响应可能是普通字符串，也可能是流式请求的 `ResponseBody`。
+  /// 后者必须把流读出来，否则只会得到无用的 `Instance of 'ResponseBody'`。
+  static Future<String> _snippetOf(Object? data) async {
     if (data == null) return '';
-    final text = data is String ? data : data.toString();
+    String text;
+    if (data is ResponseBody) {
+      try {
+        text = utf8.decode(
+          await data.stream.fold<List<int>>(
+            <int>[],
+            (List<int> acc, List<int> chunk) => acc..addAll(chunk),
+          ),
+        );
+      } on Object {
+        text = '';
+      }
+    } else {
+      text = data is String ? data : data.toString();
+    }
     final oneLine = text.replaceAll(RegExp(r'\s+'), ' ').trim();
     return oneLine.length <= 200 ? oneLine : '${oneLine.substring(0, 200)}…';
   }
