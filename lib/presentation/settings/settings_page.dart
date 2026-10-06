@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/settings/settings_controller.dart';
+import '../../application/notification/notification_providers.dart';
 import '../../application/theme/theme_controller.dart';
 import '../../application/theme/theme_presets.dart';
 import '../../core/constants/app_constants.dart';
@@ -148,7 +150,7 @@ class SettingsPage extends ConsumerWidget {
             title: l10n.settingsNotificationSection,
             icon: Icons.notifications_active_outlined,
           ),
-          _ComingSoonCard(subtitle: l10n.settingsNotificationSectionSubtitle),
+          const _NotificationCard(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsBackupSection,
@@ -222,6 +224,151 @@ class _FieldLabel extends StatelessWidget {
         style: theme.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+/// 通知设置：权限状态 + 请求权限 + 发送测试通知。
+class _NotificationCard extends ConsumerStatefulWidget {
+  const _NotificationCard();
+
+  @override
+  ConsumerState<_NotificationCard> createState() => _NotificationCardState();
+}
+
+class _NotificationCardState extends ConsumerState<_NotificationCard> {
+  bool? _enabled;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_refresh());
+  }
+
+  Future<void> _refresh() async {
+    final service = ref.read(notificationServiceProvider);
+    final enabled = await service.areNotificationsEnabled();
+    if (!mounted) return;
+    setState(() => _enabled = enabled);
+  }
+
+  Future<void> _requestPermission() async {
+    setState(() => _busy = true);
+    await ref.read(notificationServiceProvider).requestPermission();
+    await _refresh();
+    if (!mounted) return;
+    setState(() => _busy = false);
+  }
+
+  Future<void> _sendTestNotification() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    setState(() => _busy = true);
+
+    final service = ref.read(notificationServiceProvider);
+    await service.initialize();
+    await service.scheduleNotification(
+      id: 1,
+      title: l10n.appName,
+      body: l10n.notificationDefaultBody,
+      scheduledTime: DateTime.now().add(const Duration(seconds: 5)),
+    );
+
+    if (!mounted) return;
+    setState(() => _busy = false);
+    messenger?.showSnackBar(
+      SnackBar(content: Text(l10n.settingsNotificationTestSent)),
+    );
+  }
+
+  Future<void> _requestExactAlarm() async {
+    setState(() => _busy = true);
+    await ref.read(notificationServiceProvider).requestExactAlarmPermission();
+    await _refresh();
+    if (!mounted) return;
+    setState(() => _busy = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final allowed = _enabled ?? false;
+
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            l10n.settingsNotificationSectionSubtitle,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: <Widget>[
+              Text(
+                l10n.settingsNotificationPermission,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: allowed
+                      ? theme.colorScheme.primary.withValues(alpha: 0.14)
+                      : theme.colorScheme.error.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  allowed
+                      ? l10n.settingsNotificationPermissionGranted
+                      : l10n.settingsNotificationPermissionDenied,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: allowed
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.error,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: <Widget>[
+              OutlinedButton.icon(
+                onPressed: _busy ? null : _requestPermission,
+                icon: const Icon(Icons.notifications_none, size: 18),
+                label: Text(l10n.settingsNotificationRequest),
+              ),
+              OutlinedButton.icon(
+                onPressed: _busy ? null : _requestExactAlarm,
+                icon: const Icon(Icons.alarm_on_outlined, size: 18),
+                label: Text(l10n.settingsNotificationExactAlarm),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: _busy ? null : _sendTestNotification,
+                icon: const Icon(Icons.send_outlined, size: 18),
+                label: Text(l10n.settingsNotificationTest),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.settingsNotificationExactAlarmHint,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
       ),
     );
   }

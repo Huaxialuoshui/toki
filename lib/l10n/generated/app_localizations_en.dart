@@ -376,7 +376,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsNotificationSection => 'Notifications';
 
   @override
-  String get settingsNotificationSectionSubtitle => 'Local notifications and toasts (Phase 5)';
+  String get settingsNotificationSectionSubtitle => 'System notifications on Android, toasts on Windows';
+
+  @override
+  String get settingsNotificationPermission => 'Permission';
+
+  @override
+  String get settingsNotificationPermissionGranted => 'Allowed';
+
+  @override
+  String get settingsNotificationPermissionDenied => 'Not allowed';
+
+  @override
+  String get settingsNotificationRequest => 'Request permission';
+
+  @override
+  String get settingsNotificationExactAlarm => 'Allow precise reminders';
+
+  @override
+  String get settingsNotificationExactAlarmHint => 'Without it the system may delay reminders by a few minutes.';
+
+  @override
+  String get settingsNotificationTest => 'Send a test notification';
+
+  @override
+  String get settingsNotificationTestSent => 'Test notification scheduled (5s)';
+
+  @override
+  String get notificationDefaultBody => 'Reminder from Toki';
+
+  @override
+  String get notificationLeadNow => 'Starting now';
+
+  @override
+  String notificationLeadMinutes(int minutes) {
+    return 'Starts in $minutes min';
+  }
+
+  @override
+  String notificationLeadHours(int hours) {
+    return 'Starts in $hours h';
+  }
+
+  @override
+  String notificationLeadDays(int days) {
+    return 'Starts in $days d';
+  }
 
   @override
   String get settingsBackupSection => 'Backup & restore';
@@ -400,7 +445,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsProjectPath => 'Project path';
 
   @override
-  String get settingsPhaseNote => 'Phase 2 — local database (Drift + SQLite), repositories and migration tests.';
+  String get settingsPhaseNote => 'Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.';
 
   @override
   String get mockEventDefense => 'Thesis defense';

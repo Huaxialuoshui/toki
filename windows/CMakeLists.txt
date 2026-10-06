@@ -10,6 +10,11 @@ set(BINARY_NAME "toki")
 # versions of CMake.
 cmake_policy(VERSION 3.14...3.25)
 
+# flutter_local_notifications_windows 使用了 <experimental/coroutine>。
+# 新版 MSVC（VS 2026 / 14.5x）默认把该头文件视为错误，官方给出的做法是
+# 定义这个宏来保持旧行为，否则 Windows 端无法编译。
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Define build configuration option.
 get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(IS_MULTICONFIG)

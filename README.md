@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 4（倒计时交互）已完成，Android 与 Windows 双端均已构建并实际运行验证**。
-> 日程与倒计时都可以增删改、排序并落库；AI、通知尚未接入。
+> 当前状态：**Phase 5（通知提醒）已完成**：日程 / 倒计时的增删改、排序、通知提醒都已落地；
+> AI 助手尚未接入（Phase 6 起）。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 86/86 | ✅ `flutter build apk --debug` | ✅ `flutter run -d android`（模拟器 toki_api34，含日程与倒计时增删改、拖拽排序实测） |
-| Windows | ✅ | ✅ 86/86 | ✅ `flutter build windows` | ✅ `flutter run -d windows`（含桌面鼠标拖动排序实测） |
+| Android | ✅ | ✅ 95/95 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递与"进程结束后系统闹钟仍在" |
+| Windows | ✅ | ✅ 95/95 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 的可见性待你在空闲时确认（见下） |
 
 ## 项目介绍
 
@@ -34,6 +34,8 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
   事件颜色、分类、提醒预设（准时 / 5 / 10 / 30 / 60 分钟 / 1 天），保存事件时同步提醒行
 - **倒计时交互**：新建 / 编辑 / 删除、置顶开关、拖动排序（移动端长按手柄、桌面直接拖）、
   两种显示样式（大数字 / 完整文本）、颜色与目标时间选择器，每秒实时刷新
+- **通知提醒**：`NotificationService` 抽象 + Android 本地通知 / Windows Toast（同一插件两端实现）、
+  提醒自动排期与取消、通知权限与"精确提醒"入口、测试通知，设置页可视状态
 
 计划中（尚未实现，按阶段推进）
 
@@ -44,7 +46,7 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 2 | Drift + SQLite、Repository CRUD、迁移测试 | ✅ |
 | Phase 3 | 日历增删改、全天 / 时间选择器、颜色、周 / 日视图 | ✅ |
 | Phase 4 | 倒计时 CRUD、置顶、拖动排序、跨天/跨月/跨年/时区/夏令时测试 | ✅ |
-| Phase 5 | Android 本地通知 / Windows Toast | ⏳ |
+| Phase 5 | Android 本地通知 / Windows Toast、提醒排期 | ✅ |
 | Phase 6-8 | AI Provider、Persona、Tool Calling + 权限 | ⏳ |
 | Phase 9-13 | Context、聊天自定义、主题编辑器、备份、质量优化 | ⏳ |
 
@@ -234,6 +236,34 @@ flutter test test/data/migration_test.dart
   因此时区、夏令时都不会让它多算/少算一小时（`test/domain/countdown_time_zones_test.dart` 覆盖：
   跨天、跨月、跨年、UTC/本地混用、春季拨快（当天 23 小时）、秋季拨回（当天 25 小时）、目标时间已过去）。
 
+## 通知说明（Phase 5）
+
+* **抽象**：业务层只依赖 `NotificationService`（`initialize` / `requestPermission` /
+  `areNotificationsEnabled` / `scheduleNotification` / `cancelNotification` / `cancelAll`，
+  另有 Android 专用的 `requestExactAlarmPermission`）。
+  实现放在 `infrastructure/notification`：Android 用系统本地通知、Windows 用系统 Toast，
+  两者都来自 `flutter_local_notifications`（同一个包的两个平台实现）。
+* **排期策略**（`ReminderScheduler`，幂等）：
+  目标集合 = 已启用且触发时间在未来的 `reminders` 行；先取消"上次排过、这次不在集合里"的通知
+  （覆盖提醒被删除 / 停用 / 改到过去），再重新排期；已排期的通知 id 记在 shared_preferences 里，
+  用来精确取消而不是"清空所有通知"。
+* **通知内容**：标题 = 事件标题；正文按提前量生成（`30 分钟后开始` / `2 小时后开始` /
+  `1 天后开始` / `现在开始`），语言跟随应用语言设置，没有关联日程时用通用文案。
+* **应用关闭后仍能提醒**：提醒交给 Android 的 `AlarmManager`（`RTC_WAKEUP` + 通知接收器），
+  进程结束后闹钟仍由系统持有。实测：`am crash` 杀掉进程后，`dumpsys alarm` 里
+  `com.toki.toki` 的两条 RTC_WAKEUP 仍原样存在 ✅。清单里也注册了
+  `ScheduledNotificationBootReceiver`，开机 / 应用更新后会重新登记。
+* **精确提醒权限**：Android 12+ 的 `SCHEDULE_EXACT_ALARM` 默认不授予，插件会抛
+  `exact_alarms_not_permitted`；实现里捕获后退回 `inexactAllowWhileIdle`（提醒仍会送达，
+  可能被系统推迟几分钟），设置页提供"允许精确提醒"入口按需开启，不会一进应用就跳系统设置。
+* **Windows 说明**：`flutter_local_notifications_windows` 用了 `<experimental/coroutine>`，
+  VS 2026（MSVC 14.5x）默认视为错误，`windows/CMakeLists.txt` 里加了官方建议的
+  `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` 才能编译通过。
+  桌面端 Toast 的可见性验证留给你空闲时点一下设置页的"发送一条测试通知"确认
+  （我这边自动化时会抢占你正在使用的桌面，就没有继续）。
+* **调试工具**：`tool/seed_device_reminder.dart` 可以往设备数据库里写一条"马上要触发"的提醒，
+  便于手工验证"关掉应用后仍能提醒"。
+
 ## 测试
 
 ```powershell
@@ -241,17 +271,20 @@ flutter analyze
 flutter test
 ```
 
-当前 86 个测试，覆盖：
+当前 95 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
 * 应用层：倒计时节拍（单 Timer、多订阅、释放）、主题解析、`ThemeData` 与玻璃层职责分离、字号缩放、
   事件保存时的提醒同步（新增 / 替换 / 清除 / 改时间）与"删除事件先删提醒"
 * 应用层·倒计时：创建（id / 时间戳 / 排序位）、更新保留 createdAt、置顶分组切换、拖动顺序写回、删除
+* 应用层·通知：只排期"启用且在未来"的提醒、提前量文案（分钟 / 小时 / 天 / 到点 / 无关联日程）、
+  删除 / 停用 / 改到过去会取消排期、重复同步幂等、通知 id 稳定非负
 * 数据层：8 个仓储的 CRUD / 排序 / 置顶 / 重排 / 默认服务商 / 外键级联、UTC 往返、示例数据幂等、迁移快照校验
 * 界面：响应式断点（599/600/999/1000）、五个导航目的地可达、语言跟随系统与回退中文、语言持久化、
   倒计时卡片秒级刷新、空数据库的空状态、日历新建 / 编辑 / 删除 / 校验 / 全天开关 / 月周日视图切换
 * 界面·倒计时：新建 / 编辑（含样式切换）/ 删除二次确认 / 置顶分组 / 拖动排序
+* 界面·通知：权限状态展示、请求权限、发送测试通知
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

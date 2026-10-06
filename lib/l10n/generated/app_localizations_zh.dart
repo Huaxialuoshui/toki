@@ -376,7 +376,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsNotificationSection => '通知提醒';
 
   @override
-  String get settingsNotificationSectionSubtitle => '本地通知与系统提醒（Phase 5）';
+  String get settingsNotificationSectionSubtitle => 'Android 用系统本地通知，Windows 用系统 Toast';
+
+  @override
+  String get settingsNotificationPermission => '通知权限';
+
+  @override
+  String get settingsNotificationPermissionGranted => '已允许';
+
+  @override
+  String get settingsNotificationPermissionDenied => '未允许';
+
+  @override
+  String get settingsNotificationRequest => '请求权限';
+
+  @override
+  String get settingsNotificationExactAlarm => '允许精确提醒';
+
+  @override
+  String get settingsNotificationExactAlarmHint => '不开启时系统可能把提醒推迟几分钟。';
+
+  @override
+  String get settingsNotificationTest => '发送一条测试通知';
+
+  @override
+  String get settingsNotificationTestSent => '测试通知已排期（5 秒后）';
+
+  @override
+  String get notificationDefaultBody => 'Toki 日程提醒';
+
+  @override
+  String get notificationLeadNow => '现在开始';
+
+  @override
+  String notificationLeadMinutes(int minutes) {
+    return '$minutes 分钟后开始';
+  }
+
+  @override
+  String notificationLeadHours(int hours) {
+    return '$hours 小时后开始';
+  }
+
+  @override
+  String notificationLeadDays(int days) {
+    return '$days 天后开始';
+  }
 
   @override
   String get settingsBackupSection => '备份与恢复';
@@ -400,7 +445,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsProjectPath => '项目路径';
 
   @override
-  String get settingsPhaseNote => 'Phase 2 — 本地数据库（Drift + SQLite）、仓储层与迁移测试。';
+  String get settingsPhaseNote => 'Phase 5 — 日历、倒计时与系统通知已可用；接下来接入 AI 助手。';
 
   @override
   String get mockEventDefense => '毕业设计答辩';

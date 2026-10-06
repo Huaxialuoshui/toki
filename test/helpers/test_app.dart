@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toki/app/app.dart';
 import 'package:toki/application/app_startup.dart';
+import 'package:toki/application/notification/notification_providers.dart';
 import 'package:toki/core/clock.dart';
 import 'package:toki/data/demo/demo_seed.dart';
 import 'package:toki/data/repositories/repository_providers.dart';
@@ -15,6 +16,7 @@ import 'package:toki/infrastructure/database/app_database.dart';
 import 'package:toki/infrastructure/storage/app_settings_store.dart';
 
 import 'sqlite_bootstrap.dart';
+import 'fake_notification_service.dart';
 
 /// 测试中统一使用的固定时间：2026-10-06 10:00（星期二）。
 final DateTime kTestNow = DateTime(2026, 10, 6, 10);
@@ -70,6 +72,7 @@ Future<ProviderContainer> createTestContainer({
   Clock? clock,
   Map<String, Object> initialPreferences = const <String, Object>{},
   bool seedDatabase = false,
+  FakeNotificationService? notifications,
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -87,6 +90,9 @@ Future<ProviderContainer> createTestContainer({
       appDatabaseProvider.overrideWithValue(database),
       // 测试自己决定是否预置数据，关掉启动时的自动写入。
       demoSeedEnabledProvider.overrideWithValue(false),
+      notificationServiceProvider.overrideWithValue(
+        notifications ?? FakeNotificationService(),
+      ),
     ],
   );
   addTearDown(() async {
@@ -103,6 +109,7 @@ Future<void> pumpTokiApp(
   Clock? clock,
   Map<String, Object> initialPreferences = const <String, Object>{},
   bool seedDatabase = true,
+  FakeNotificationService? notifications,
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -125,6 +132,9 @@ Future<void> pumpTokiApp(
         clockProvider.overrideWithValue(effectiveClock),
         appDatabaseProvider.overrideWithValue(database),
         demoSeedEnabledProvider.overrideWithValue(false),
+        notificationServiceProvider.overrideWithValue(
+          notifications ?? FakeNotificationService(),
+        ),
       ],
       child: const TokiApp(),
     ),

@@ -186,7 +186,41 @@
   "settingsAiSection": "AI & providers",
   "settingsAiSectionSubtitle": "Provider, persona and tool permissions (Phase 6-8)",
   "settingsNotificationSection": "Notifications",
-  "settingsNotificationSectionSubtitle": "Local notifications and toasts (Phase 5)",
+  "settingsNotificationSectionSubtitle": "System notifications on Android, toasts on Windows",
+  "settingsNotificationPermission": "Permission",
+  "settingsNotificationPermissionGranted": "Allowed",
+  "settingsNotificationPermissionDenied": "Not allowed",
+  "settingsNotificationRequest": "Request permission",
+  "settingsNotificationExactAlarm": "Allow precise reminders",
+  "settingsNotificationExactAlarmHint": "Without it the system may delay reminders by a few minutes.",
+  "settingsNotificationTest": "Send a test notification",
+  "settingsNotificationTestSent": "Test notification scheduled (5s)",
+  "notificationDefaultBody": "Reminder from Toki",
+  "notificationLeadNow": "Starting now",
+  "notificationLeadMinutes": "Starts in {minutes} min",
+  "@notificationLeadMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationLeadHours": "Starts in {hours} h",
+  "@notificationLeadHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationLeadDays": "Starts in {days} d",
+  "@notificationLeadDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "settingsBackupSection": "Backup & restore",
   "settingsBackupSectionSubtitle": "Versioned JSON export and import (Phase 12)",
   "settingsAbout": "About",
@@ -194,7 +228,7 @@
   "settingsFlutterVersion": "Flutter",
   "settingsDartVersion": "Dart",
   "settingsProjectPath": "Project path",
-  "settingsPhaseNote": "Phase 2 — local database (Drift + SQLite), repositories and migration tests.",
+  "settingsPhaseNote": "Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.",
 
   "mockEventDefense": "Thesis defense",
   "mockEventProjectDeadline": "Course project deadline",

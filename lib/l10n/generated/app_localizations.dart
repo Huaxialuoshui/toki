@@ -800,8 +800,86 @@ abstract class AppLocalizations {
   /// No description provided for @settingsNotificationSectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Local notifications and toasts (Phase 5)'**
+  /// **'System notifications on Android, toasts on Windows'**
   String get settingsNotificationSectionSubtitle;
+
+  /// No description provided for @settingsNotificationPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission'**
+  String get settingsNotificationPermission;
+
+  /// No description provided for @settingsNotificationPermissionGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed'**
+  String get settingsNotificationPermissionGranted;
+
+  /// No description provided for @settingsNotificationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Not allowed'**
+  String get settingsNotificationPermissionDenied;
+
+  /// No description provided for @settingsNotificationRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Request permission'**
+  String get settingsNotificationRequest;
+
+  /// No description provided for @settingsNotificationExactAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow precise reminders'**
+  String get settingsNotificationExactAlarm;
+
+  /// No description provided for @settingsNotificationExactAlarmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Without it the system may delay reminders by a few minutes.'**
+  String get settingsNotificationExactAlarmHint;
+
+  /// No description provided for @settingsNotificationTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a test notification'**
+  String get settingsNotificationTest;
+
+  /// No description provided for @settingsNotificationTestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification scheduled (5s)'**
+  String get settingsNotificationTestSent;
+
+  /// No description provided for @notificationDefaultBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder from Toki'**
+  String get notificationDefaultBody;
+
+  /// No description provided for @notificationLeadNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting now'**
+  String get notificationLeadNow;
+
+  /// No description provided for @notificationLeadMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {minutes} min'**
+  String notificationLeadMinutes(int minutes);
+
+  /// No description provided for @notificationLeadHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {hours} h'**
+  String notificationLeadHours(int hours);
+
+  /// No description provided for @notificationLeadDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {days} d'**
+  String notificationLeadDays(int days);
 
   /// No description provided for @settingsBackupSection.
   ///
@@ -848,7 +926,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPhaseNote.
   ///
   /// In en, this message translates to:
-  /// **'Phase 2 — local database (Drift + SQLite), repositories and migration tests.'**
+  /// **'Phase 5 — calendar, countdowns and system notifications are working; the AI assistant comes next.'**
   String get settingsPhaseNote;
 
   /// No description provided for @mockEventDefense.

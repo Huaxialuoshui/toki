@@ -19,6 +19,8 @@ class AppSettingsStore {
   static const String _fontScaleKey = 'settings.fontScale';
   static const String _borderRadiusKey = 'settings.borderRadius';
   static const String _firstLaunchSeenKey = 'settings.firstLaunchSeen';
+  static const String _scheduledNotificationIdsKey =
+      'settings.scheduledNotificationIds';
 
   /// 语言代码；返回 null 表示"跟随系统"。
   String? readLocaleCode() => _preferences.getString(_localeKey);
@@ -66,6 +68,25 @@ class AppSettingsStore {
 
   Future<void> markFirstLaunchSeen() =>
       _preferences.setBool(_firstLaunchSeenKey, true);
+
+  /// 最近一次已排期的通知 id（用于取消已删除/已停用提醒留下的排期）。
+  List<int> readScheduledNotificationIds() {
+    final raw = _preferences.getStringList(_scheduledNotificationIdsKey);
+    if (raw == null) return const <int>[];
+    return raw
+        .map(int.tryParse)
+        .whereType<int>()
+        .toList(growable: false);
+  }
+
+  Future<void> writeScheduledNotificationIds(List<int> ids) =>
+      _preferences.setStringList(
+        _scheduledNotificationIdsKey,
+        ids.map((int id) => '$id').toList(growable: false),
+      );
+
+  Future<void> clearScheduledNotificationIds() =>
+      _preferences.remove(_scheduledNotificationIdsKey);
 }
 
 /// 必须在 `main()` 中 override（见 `lib/main.dart`）。

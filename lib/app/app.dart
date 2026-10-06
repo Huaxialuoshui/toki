@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../application/settings/settings_controller.dart';
 import '../application/app_startup.dart';
+import '../application/notification/reminder_sync.dart';
 import '../application/theme/theme_controller.dart';
 import '../application/theme/theme_mapper.dart';
 import '../core/extensions/l10n_extension.dart';
@@ -23,6 +24,9 @@ class TokiApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 触发启动初始化（debug 构建下为数据库写入示例数据）。
     ref.watch(appStartupProvider);
+    // 通知：请求权限 + 首次排期同步，并在提醒变化时自动重排。
+    ref.watch(notificationStartupProvider);
+    ref.watch(reminderAutoSyncProvider);
 
     final resolution = ref.watch(themeResolutionProvider);
     final locale = ref.watch(localeControllerProvider);
