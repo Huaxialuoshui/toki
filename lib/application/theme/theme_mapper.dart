@@ -75,8 +75,7 @@ ThemeData buildThemeData(ThemeConfig config) {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: config.surfaceColor,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: config.radius,
         borderSide: BorderSide(color: hairline),

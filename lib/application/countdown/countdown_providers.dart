@@ -4,8 +4,7 @@ import '../../data/repositories/repository_providers.dart';
 import '../../domain/entities/countdown_item.dart';
 
 /// 全部倒计时（置顶优先）。
-final countdownsProvider =
-    StreamProvider.autoDispose<List<CountdownItem>>(
+final countdownsProvider = StreamProvider.autoDispose<List<CountdownItem>>(
   (ref) => ref.watch(countdownRepositoryProvider).watchAll(),
 );
 

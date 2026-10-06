@@ -6,8 +6,9 @@ import '../helpers/test_app.dart';
 
 void main() {
   tokiWidgetTest('系统语言为英文时界面是英文', (tester) async {
-    tester.binding.platformDispatcher.localesTestValue =
-        const <Locale>[Locale('en', 'US')];
+    tester.binding.platformDispatcher.localesTestValue = const <Locale>[
+      Locale('en', 'US')
+    ];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
 
     await pumpTokiApp(tester, size: const Size(1280, 900));
@@ -17,8 +18,9 @@ void main() {
   });
 
   tokiWidgetTest('系统语言不受支持时回退中文', (tester) async {
-    tester.binding.platformDispatcher.localesTestValue =
-        const <Locale>[Locale('ja', 'JP')];
+    tester.binding.platformDispatcher.localesTestValue = const <Locale>[
+      Locale('ja', 'JP')
+    ];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
 
     await pumpTokiApp(tester, size: const Size(1280, 900));
@@ -28,14 +30,16 @@ void main() {
   });
 
   tokiWidgetTest('设置页切换语言后界面立即变化且被持久化', (tester) async {
-    tester.binding.platformDispatcher.localesTestValue =
-        const <Locale>[Locale('en', 'US')];
+    tester.binding.platformDispatcher.localesTestValue = const <Locale>[
+      Locale('en', 'US')
+    ];
     addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
 
     await pumpTokiApp(tester, size: const Size(1280, 900));
     expect(find.text('Home'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
+    await tester
+        .tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ChoiceChip, '中文'));

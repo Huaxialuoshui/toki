@@ -96,7 +96,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countdownEmpty => 'No countdowns yet';
 
   @override
-  String get countdownReadOnlyHint => 'Creating, editing and reordering countdowns arrives in Phase 4';
+  String get countdownNew => 'New countdown';
+
+  @override
+  String get countdownEdit => 'Edit countdown';
+
+  @override
+  String get countdownFieldTarget => 'Target time';
+
+  @override
+  String get countdownFieldStyle => 'Display style';
+
+  @override
+  String get countdownStyleBigNumber => 'Big number';
+
+  @override
+  String get countdownStyleFullText => 'Full text';
+
+  @override
+  String get countdownFieldPinned => 'Pin to top';
+
+  @override
+  String get countdownDragHint => 'Drag the handle to reorder';
+
+  @override
+  String get countdownDragHintLongPress => 'Long-press the handle to reorder';
+
+  @override
+  String get countdownDragHandle => 'Reorder';
+
+  @override
+  String get countdownDeleteConfirmTitle => 'Delete this countdown?';
+
+  @override
+  String get countdownSaved => 'Countdown saved';
+
+  @override
+  String get countdownDeleted => 'Countdown deleted';
 
   @override
   String get unitDay => 'd';

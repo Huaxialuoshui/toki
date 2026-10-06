@@ -36,8 +36,7 @@ class DriftCountdownRepository implements CountdownRepository {
 
   @override
   Future<List<CountdownItem>> getAll() async {
-    final rows =
-        await (_db.select(_db.countdowns)..orderBy(_ordering())).get();
+    final rows = await (_db.select(_db.countdowns)..orderBy(_ordering())).get();
     return _mapAll(rows);
   }
 
@@ -120,7 +119,6 @@ class DriftCountdownRepository implements CountdownRepository {
   @override
   Future<void> deleteAll() => _db.delete(_db.countdowns).go();
 
-  List<CountdownItem> _mapAll(List<CountdownRow> rows) => rows
-      .map((CountdownRow row) => row.toDomain())
-      .toList(growable: false);
+  List<CountdownItem> _mapAll(List<CountdownRow> rows) =>
+      rows.map((CountdownRow row) => row.toDomain()).toList(growable: false);
 }

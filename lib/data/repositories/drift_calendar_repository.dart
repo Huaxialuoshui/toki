@@ -47,7 +47,8 @@ class DriftCalendarRepository implements CalendarRepository {
     int limit = 5,
   }) {
     final query = _db.select(_db.calendarEvents)
-      ..where(($CalendarEventsTable t) => t.startTime.isBiggerOrEqualValue(after))
+      ..where(
+          ($CalendarEventsTable t) => t.startTime.isBiggerOrEqualValue(after))
       ..orderBy(<OrderClauseGenerator<$CalendarEventsTable>>[
         ($CalendarEventsTable t) => OrderingTerm.asc(t.startTime),
       ])
@@ -116,8 +117,9 @@ class DriftCalendarRepository implements CalendarRepository {
   @override
   Future<void> deleteAll() => _db.delete(_db.calendarEvents).go();
 
-  List<CalendarEvent> _mapAll(List<CalendarEventRow> rows) =>
-      rows.map((CalendarEventRow row) => row.toDomain()).toList(growable: false);
+  List<CalendarEvent> _mapAll(List<CalendarEventRow> rows) => rows
+      .map((CalendarEventRow row) => row.toDomain())
+      .toList(growable: false);
 }
 
 /// [CalendarCategoryRepository] 的 Drift 实现。
@@ -146,9 +148,9 @@ class DriftCalendarCategoryRepository implements CalendarCategoryRepository {
   }
 
   @override
-  Future<void> upsert(CalendarCategory category) =>
-      _db.into(_db.calendarCategories)
-          .insertOnConflictUpdate(calendarCategoryToCompanion(category));
+  Future<void> upsert(CalendarCategory category) => _db
+      .into(_db.calendarCategories)
+      .insertOnConflictUpdate(calendarCategoryToCompanion(category));
 
   @override
   Future<void> deleteById(String id) async {

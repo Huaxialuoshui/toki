@@ -123,9 +123,8 @@ class DriftAiProviderRepository implements AiProviderRepository {
   @override
   Future<void> deleteAll() => _db.delete(_db.aiProviders).go();
 
-  List<AiProviderConfig> _mapAll(List<AiProviderRow> rows) => rows
-      .map((AiProviderRow row) => row.toDomain())
-      .toList(growable: false);
+  List<AiProviderConfig> _mapAll(List<AiProviderRow> rows) =>
+      rows.map((AiProviderRow row) => row.toDomain()).toList(growable: false);
 }
 
 /// [ChatRepository] 的 Drift 实现。

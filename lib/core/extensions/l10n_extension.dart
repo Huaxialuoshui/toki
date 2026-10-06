@@ -15,7 +15,9 @@ extension ReminderLabelExtension on AppLocalizations {
   String reminderLabel(int? minutes) {
     if (minutes == null) return calendarNoReminder;
     if (minutes == 0) return calendarReminderAtTime;
-    if (minutes < Duration.minutesPerHour) return calendarReminderMinutes(minutes);
+    if (minutes < Duration.minutesPerHour) {
+      return calendarReminderMinutes(minutes);
+    }
     if (minutes < Duration.minutesPerDay) {
       return calendarReminderHours(minutes ~/ Duration.minutesPerHour);
     }

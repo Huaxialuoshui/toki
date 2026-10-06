@@ -17,7 +17,6 @@ final activePersonaProvider = Provider.autoDispose<AiPersona?>((ref) {
 });
 
 /// AI 服务商配置（Phase 6 接入请求时会用到）。
-final aiProvidersProvider =
-    StreamProvider.autoDispose<List<AiProviderConfig>>(
+final aiProvidersProvider = StreamProvider.autoDispose<List<AiProviderConfig>>(
   (ref) => ref.watch(aiProviderRepositoryProvider).watchAll(),
 );

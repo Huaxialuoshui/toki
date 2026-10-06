@@ -179,9 +179,8 @@ class DesktopShell extends StatelessWidget {
                   const Spacer(),
                   const Divider(height: 1),
                   Align(
-                    alignment: collapsed
-                        ? Alignment.center
-                        : Alignment.centerRight,
+                    alignment:
+                        collapsed ? Alignment.center : Alignment.centerRight,
                     child: IconButton(
                       key: kSidebarToggleKey,
                       onPressed: onToggleCollapsed,

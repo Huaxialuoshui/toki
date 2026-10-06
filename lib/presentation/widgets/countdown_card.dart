@@ -17,11 +17,15 @@ class CountdownCard extends ConsumerWidget {
     required this.item,
     this.compact = false,
     this.onTap,
+    this.trailing,
   });
 
   final CountdownItem item;
   final bool compact;
   final VoidCallback? onTap;
+
+  /// 标题行末尾的额外操作（倒计时页放置顶按钮与拖动手柄）。
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,8 +87,8 @@ class CountdownCard extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (item.isPinned)
-                Icon(Icons.push_pin, size: 14, color: accent),
+              if (item.isPinned) Icon(Icons.push_pin, size: 14, color: accent),
+              if (trailing != null) trailing!,
             ],
           ),
           const SizedBox(height: 12),
@@ -142,7 +146,8 @@ class _FullReadout extends StatelessWidget {
     final l10n = context.l10n;
     final numberStyle = theme.textTheme.titleLarge?.copyWith(
       fontWeight: FontWeight.w700,
-      color: isPast ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : accent,
+      color:
+          isPast ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : accent,
     );
 
     return Column(

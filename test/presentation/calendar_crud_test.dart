@@ -17,7 +17,8 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> tapText(WidgetTester tester, String text, {bool last = false}) async {
+  Future<void> tapText(WidgetTester tester, String text,
+      {bool last = false}) async {
     final finder = find.text(text);
     await tester.ensureVisible(last ? finder.last : finder.first);
     await tester.pumpAndSettle();

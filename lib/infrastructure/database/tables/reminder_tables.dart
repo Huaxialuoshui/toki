@@ -9,8 +9,7 @@ class Reminders extends Table {
   TextColumn get id => text()();
 
   /// 关联日程；为空表示独立提醒。
-  TextColumn get eventId =>
-      text().nullable().references(CalendarEvents, #id)();
+  TextColumn get eventId => text().nullable().references(CalendarEvents, #id)();
 
   TextColumn get title => text()();
   DateTimeColumn get triggerTime => dateTime()();

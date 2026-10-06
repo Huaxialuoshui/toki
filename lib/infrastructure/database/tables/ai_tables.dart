@@ -51,8 +51,7 @@ class AiProviders extends Table {
 class ChatSessions extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
-  TextColumn get personaId =>
-      text().nullable().references(AiPersonas, #id)();
+  TextColumn get personaId => text().nullable().references(AiPersonas, #id)();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

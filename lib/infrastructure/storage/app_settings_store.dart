@@ -33,7 +33,8 @@ class AppSettingsStore {
 
   String? readThemeId() => _preferences.getString(_themeIdKey);
 
-  Future<void> writeThemeId(String id) => _preferences.setString(_themeIdKey, id);
+  Future<void> writeThemeId(String id) =>
+      _preferences.setString(_themeIdKey, id);
 
   bool? readFollowSystem() => _preferences.getBool(_followSystemKey);
 

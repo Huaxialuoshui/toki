@@ -72,9 +72,7 @@ class PageScaffold extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: scrollable
-                    ? SingleChildScrollView(child: child)
-                    : child,
+                child: scrollable ? SingleChildScrollView(child: child) : child,
               ),
             ],
           ),

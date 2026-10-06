@@ -15,13 +15,12 @@ class DriftThemeRepository implements ThemeRepository {
   final Clock _clock;
 
   @override
-  Stream<List<ThemeConfig>> watchAll() =>
-      (_db.select(_db.themeConfigs)
-            ..orderBy(<OrderClauseGenerator<$ThemeConfigsTable>>[
-              ($ThemeConfigsTable t) => OrderingTerm.asc(t.name),
-            ]))
-          .watch()
-          .map(_mapAll);
+  Stream<List<ThemeConfig>> watchAll() => (_db.select(_db.themeConfigs)
+        ..orderBy(<OrderClauseGenerator<$ThemeConfigsTable>>[
+          ($ThemeConfigsTable t) => OrderingTerm.asc(t.name),
+        ]))
+      .watch()
+      .map(_mapAll);
 
   @override
   Future<List<ThemeConfig>> getAll() async {
@@ -66,7 +65,6 @@ class DriftThemeRepository implements ThemeRepository {
   @override
   Future<void> deleteAll() => _db.delete(_db.themeConfigs).go();
 
-  List<ThemeConfig> _mapAll(List<ThemeConfigRow> rows) => rows
-      .map((ThemeConfigRow row) => row.toDomain())
-      .toList(growable: false);
+  List<ThemeConfig> _mapAll(List<ThemeConfigRow> rows) =>
+      rows.map((ThemeConfigRow row) => row.toDomain()).toList(growable: false);
 }

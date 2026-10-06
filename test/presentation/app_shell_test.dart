@@ -50,11 +50,13 @@ void main() {
 
       expect(find.text("Today's schedule"), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/calendar')));
+      await tester
+          .tap(find.byKey(const ValueKey<String>('sidebar-tile-/calendar')));
       await tester.pumpAndSettle();
       expect(find.text('Month'), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/countdown')));
+      await tester
+          .tap(find.byKey(const ValueKey<String>('sidebar-tile-/countdown')));
       await tester.pumpAndSettle();
       expect(find.text('Pinned'), findsOneWidget);
 
@@ -62,11 +64,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byTooltip('Send'), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
+      await tester
+          .tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
       await tester.pumpAndSettle();
       expect(find.text('Appearance'), findsOneWidget);
 
-      await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/home')));
+      await tester
+          .tap(find.byKey(const ValueKey<String>('sidebar-tile-/home')));
       await tester.pumpAndSettle();
       expect(find.text("Today's schedule"), findsOneWidget);
     });

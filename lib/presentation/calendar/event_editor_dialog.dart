@@ -103,9 +103,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
     final l10n = context.l10n;
     final locale = context.localeCode;
     final theme = Theme.of(context);
-    final categories =
-        ref.watch(calendarCategoriesProvider).valueOrNull ??
-            const <CalendarCategory>[];
+    final categories = ref.watch(calendarCategoriesProvider).valueOrNull ??
+        const <CalendarCategory>[];
 
     // 分类列表可能还在加载（首帧为空），旧事件也可能引用了一个已被删除的分类。
     // DropdownButton 要求 value 在 items 中唯一匹配，这里补一条占位项兜底。
@@ -158,7 +157,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
                       ),
                     ),
                     IconButton(
-                      onPressed: _busy ? null : () => Navigator.of(context).pop(),
+                      onPressed:
+                          _busy ? null : () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close),
                       tooltip: l10n.calendarCancel,
                     ),
@@ -399,7 +399,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
       if (isStart) {
         final duration = _end.difference(_start);
         _start = updated;
-        _end = _start.add(duration.isNegative ? const Duration(hours: 1) : duration);
+        _end = _start
+            .add(duration.isNegative ? const Duration(hours: 1) : duration);
       } else {
         _end = updated;
       }

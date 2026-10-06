@@ -49,12 +49,10 @@ class ThemeState {
         dark: config,
       );
     }
-    final lightPreset = selected.isLight
-        ? selected
-        : ThemePresets.byId(ThemePresets.defaultId);
-    final darkPreset = selected.isDark
-        ? selected
-        : ThemePresets.byId(ThemePresets.darkId);
+    final lightPreset =
+        selected.isLight ? selected : ThemePresets.byId(ThemePresets.defaultId);
+    final darkPreset =
+        selected.isDark ? selected : ThemePresets.byId(ThemePresets.darkId);
     return ThemeResolution(
       mode: ThemeMode.system,
       light: configFor(lightPreset),
@@ -89,7 +87,8 @@ class ThemeState {
   }
 
   @override
-  int get hashCode => Object.hash(themeId, followSystem, fontScale, borderRadius);
+  int get hashCode =>
+      Object.hash(themeId, followSystem, fontScale, borderRadius);
 }
 
 /// 解析结果：`MaterialApp` 需要的两组 `ThemeData` 与 `ThemeMode`。
@@ -142,7 +141,8 @@ class ThemeController extends Notifier<ThemeState> {
 
   /// 选择某个预设；显式选择预设意味着不再跟随系统。
   void selectPreset(String id) {
-    if (!ThemePresets.isKnownId(id) || id == state.themeId && !state.followSystem) {
+    if (!ThemePresets.isKnownId(id) ||
+        id == state.themeId && !state.followSystem) {
       return;
     }
     state = state.copyWith(themeId: id, followSystem: false);

@@ -62,7 +62,8 @@ CalendarEventsCompanion calendarEventToCompanion(CalendarEvent event) =>
       allDay: Value<bool>(event.allDay),
       location: Value<String?>(event.location),
       categoryId: Value<String?>(event.categoryId),
-      color: Value<int?>(event.color == null ? null : argbFromColor(event.color!)),
+      color:
+          Value<int?>(event.color == null ? null : argbFromColor(event.color!)),
       repeatRule: Value<String?>(event.repeatRule),
       reminderMinutes: Value<int?>(event.reminderMinutes),
       status: Value<EventStatus>(event.status),
@@ -117,7 +118,8 @@ CountdownsCompanion countdownToCompanion(CountdownItem item) =>
       title: Value<String>(item.title),
       targetTime: Value<DateTime>(item.targetTime),
       description: Value<String?>(item.description),
-      color: Value<int?>(item.color == null ? null : argbFromColor(item.color!)),
+      color:
+          Value<int?>(item.color == null ? null : argbFromColor(item.color!)),
       icon: Value<String?>(item.icon),
       isPinned: Value<bool>(item.isPinned),
       displayStyle: Value<CountdownDisplayStyle>(item.displayStyle),
@@ -138,8 +140,7 @@ extension ReminderRowMapper on ReminderRow {
       );
 }
 
-RemindersCompanion reminderToCompanion(Reminder reminder) =>
-    RemindersCompanion(
+RemindersCompanion reminderToCompanion(Reminder reminder) => RemindersCompanion(
       id: Value<String>(reminder.id),
       eventId: Value<String?>(reminder.eventId),
       title: Value<String>(reminder.title),
@@ -227,7 +228,8 @@ ChatSessionsCompanion chatSessionToCompanion(ChatSession session) =>
     ChatSessionsCompanion(
       id: Value<String>(session.id),
       title: Value<String>(session.title),
-      personaId: Value<String?>(session.personaId.isEmpty ? null : session.personaId),
+      personaId:
+          Value<String?>(session.personaId.isEmpty ? null : session.personaId),
       createdAt: Value<DateTime>(session.createdAt),
       updatedAt: Value<DateTime>(session.updatedAt),
     );

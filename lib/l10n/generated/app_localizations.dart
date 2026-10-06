@@ -257,11 +257,83 @@ abstract class AppLocalizations {
   /// **'No countdowns yet'**
   String get countdownEmpty;
 
-  /// No description provided for @countdownReadOnlyHint.
+  /// No description provided for @countdownNew.
   ///
   /// In en, this message translates to:
-  /// **'Creating, editing and reordering countdowns arrives in Phase 4'**
-  String get countdownReadOnlyHint;
+  /// **'New countdown'**
+  String get countdownNew;
+
+  /// No description provided for @countdownEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit countdown'**
+  String get countdownEdit;
+
+  /// No description provided for @countdownFieldTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target time'**
+  String get countdownFieldTarget;
+
+  /// No description provided for @countdownFieldStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display style'**
+  String get countdownFieldStyle;
+
+  /// No description provided for @countdownStyleBigNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Big number'**
+  String get countdownStyleBigNumber;
+
+  /// No description provided for @countdownStyleFullText.
+  ///
+  /// In en, this message translates to:
+  /// **'Full text'**
+  String get countdownStyleFullText;
+
+  /// No description provided for @countdownFieldPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to top'**
+  String get countdownFieldPinned;
+
+  /// No description provided for @countdownDragHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the handle to reorder'**
+  String get countdownDragHint;
+
+  /// No description provided for @countdownDragHintLongPress.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press the handle to reorder'**
+  String get countdownDragHintLongPress;
+
+  /// No description provided for @countdownDragHandle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get countdownDragHandle;
+
+  /// No description provided for @countdownDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this countdown?'**
+  String get countdownDeleteConfirmTitle;
+
+  /// No description provided for @countdownSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown saved'**
+  String get countdownSaved;
+
+  /// No description provided for @countdownDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown deleted'**
+  String get countdownDeleted;
 
   /// No description provided for @unitDay.
   ///

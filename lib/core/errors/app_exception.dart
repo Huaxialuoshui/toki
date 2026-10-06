@@ -9,6 +9,7 @@ class AppException implements Exception {
   final Object? cause;
 
   @override
-  String toString() =>
-      cause == null ? 'AppException: $message' : 'AppException: $message ($cause)';
+  String toString() => cause == null
+      ? 'AppException: $message'
+      : 'AppException: $message ($cause)';
 }

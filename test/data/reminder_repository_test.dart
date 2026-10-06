@@ -105,7 +105,8 @@ void main() {
     ]);
 
     final forEvent = await repository.watchForEvent('e1').first;
-    expect(forEvent.map((Reminder reminder) => reminder.id), <String>['r-event']);
+    expect(
+        forEvent.map((Reminder reminder) => reminder.id), <String>['r-event']);
 
     await repository.setEnabled(id: 'r-event', enabled: false);
     expect((await repository.findById('r-event'))!.enabled, isFalse);

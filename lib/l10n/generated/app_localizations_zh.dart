@@ -96,7 +96,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get countdownEmpty => '还没有倒计时';
 
   @override
-  String get countdownReadOnlyHint => '倒计时的创建、编辑与拖动排序将在 Phase 4 提供';
+  String get countdownNew => '新建倒计时';
+
+  @override
+  String get countdownEdit => '编辑倒计时';
+
+  @override
+  String get countdownFieldTarget => '目标时间';
+
+  @override
+  String get countdownFieldStyle => '显示样式';
+
+  @override
+  String get countdownStyleBigNumber => '大数字';
+
+  @override
+  String get countdownStyleFullText => '完整文本';
+
+  @override
+  String get countdownFieldPinned => '置顶';
+
+  @override
+  String get countdownDragHint => '拖动右侧手柄可以排序';
+
+  @override
+  String get countdownDragHintLongPress => '长按右侧手柄可以拖动排序';
+
+  @override
+  String get countdownDragHandle => '拖动排序';
+
+  @override
+  String get countdownDeleteConfirmTitle => '删除这个倒计时？';
+
+  @override
+  String get countdownSaved => '倒计时已保存';
+
+  @override
+  String get countdownDeleted => '倒计时已删除';
 
   @override
   String get unitDay => '天';
