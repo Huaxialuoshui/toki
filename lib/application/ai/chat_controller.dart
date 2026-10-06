@@ -15,6 +15,7 @@ import '../../domain/services/ai_provider.dart';
 import '../../infrastructure/ai/openai_compatible_provider.dart';
 import '../../infrastructure/clock_provider.dart';
 import 'ai_providers.dart';
+import 'context_service.dart';
 import 'tool_permissions.dart';
 import 'tools/ai_tool.dart';
 import 'tools/tool_registry.dart';
@@ -245,10 +246,17 @@ class ChatController extends Notifier<ChatStreamState> {
     final persona = _persona;
 
     try {
+      // Phase 9：按用户问题动态收集上下文（今天/相关日程/倒计时/当前时间），
+      // 只算一次，后续轮次靠工具结果补充细节。
+      final question = await _latestUserQuestion(session.id);
+      final context = question == null
+          ? null
+          : await ref.read(contextServiceProvider).buildContext(question);
+
       for (var round = 0; round < maxToolRounds; round++) {
         final history = await repository.getMessages(session.id);
         final request = AiChatRequest(
-          messages: _toAiMessages(history, persona),
+          messages: _toAiMessages(history, persona, context),
           temperature: persona?.temperature,
           tools: registry.definitions(
             permissions: permissions,
@@ -299,6 +307,14 @@ class ChatController extends Notifier<ChatStreamState> {
       _completer = null;
       _pending = null;
     }
+  }
+
+  Future<String?> _latestUserQuestion(String sessionId) async {
+    final history = await ref.read(chatRepositoryProvider).getMessages(sessionId);
+    for (final message in history.reversed) {
+      if (message.role == ChatRole.user) return message.content;
+    }
+    return null;
   }
 
   /// 跑一轮流式请求，实时更新 streamingText，返回文本与工具调用。
@@ -414,16 +430,28 @@ class ChatController extends Notifier<ChatStreamState> {
   static List<AiMessage> _toAiMessages(
     List<ChatMessage> history,
     AiPersona? persona,
+    String? context,
   ) {
     final messages = <AiMessage>[
       if ((persona?.systemPrompt ?? '').trim().isNotEmpty)
         AiMessage.system(persona!.systemPrompt!.trim()),
+      if ((context ?? '').trim().isNotEmpty)
+        AiMessage.system(
+          '以下是用户当前与本问题相关的数据（可能不完整，需要更多细节时请调用工具）。'
+          '回答时优先依据这些数据，不要凭空编造：\n$context',
+        ),
     ];
 
-    // 控制上下文长度：只带最近 40 条。
-    final recent = history.length <= 40
+    // 控制上下文长度：只带最近 40 条，并从一条 user 消息开始——
+    // 否则可能把 assistant(tool_calls) 或 tool 结果截断，导致协议不合法。
+    var recent = history.length <= 40
         ? history
         : history.sublist(history.length - 40);
+    final firstUserIndex = recent.indexWhere(
+      (ChatMessage message) => message.role == ChatRole.user,
+    );
+    if (firstUserIndex > 0) recent = recent.sublist(firstUserIndex);
+
     for (final message in recent) {
       switch (message.role) {
         case ChatRole.user:
@@ -448,7 +476,7 @@ class ChatController extends Notifier<ChatStreamState> {
           messages.add(
             AiMessage.toolResult(
               toolCallId: message.toolCallId ?? '',
-              content: message.toolResult ?? message.content,
+              content: _truncate(message.toolResult ?? message.content),
             ),
           );
         case ChatRole.system:
@@ -456,6 +484,12 @@ class ChatController extends Notifier<ChatStreamState> {
       }
     }
     return messages;
+  }
+
+  /// 工具结果可能很大（例如整月日程），按字符截断以控制 token。
+  static String _truncate(String text, {int maxChars = 2000}) {
+    if (text.length <= maxChars) return text;
+    return '${text.substring(0, maxChars)}…（结果过长已截断）';
   }
 
   /// 中止当前输出；已经收到的文本会保留并落库。

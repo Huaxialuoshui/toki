@@ -62,8 +62,13 @@ class Handler(BaseHTTPRequestHandler):
         messages = body.get("messages") or []
         has_tool_result = any(m.get("role") == "tool" for m in messages)
         wants_tool_call = bool(body.get("tools")) and not has_tool_result
+        system_messages = [m for m in messages if m.get("role") == "system"]
+        context_chars = (
+            len(system_messages[-1].get("content", "")) if system_messages else 0
+        )
         sys.stderr.write(
-            "REQ path=%s stream=%s model=%s auth=%s tools=%s tool_result=%s\n"
+            "REQ path=%s stream=%s model=%s auth=%s tools=%s tool_result=%s "
+            "system_msgs=%d context_chars=%d\n"
             % (
                 self.path,
                 stream,
@@ -71,6 +76,8 @@ class Handler(BaseHTTPRequestHandler):
                 "yes" if self.headers.get("authorization") else "no",
                 "yes" if body.get("tools") else "no",
                 "yes" if has_tool_result else "no",
+                len(system_messages),
+                context_chars,
             )
         )
         sys.stderr.flush()
