@@ -12,6 +12,7 @@ import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
+import '../widgets/persona_avatar.dart';
 
 /// AI 聊天页：真实调用已配置的 AI 服务商，逐字流式输出并落库。
 class AiPage extends ConsumerStatefulWidget {
@@ -69,12 +70,19 @@ class _AiPageState extends ConsumerState<AiPage> {
             const <ChatMessage>[];
     final stream = ref.watch(chatControllerProvider);
     final config = ref.watch(activeAiConfigProvider);
+    final personas =
+        ref.watch(personasProvider).valueOrNull ?? const <AiPersona>[];
 
     return PageScaffold(
       title: l10n.navAi,
       subtitle: '${persona.name} · ${persona.description ?? ''}',
       actions: <Widget>[
-        _PersonaChip(persona: persona),
+        _PersonaSwitcher(
+          personas: personas,
+          active: persona,
+          onSelect: (AiPersona selected) => _switchPersona(selected),
+          onManage: () => context.go('/settings'),
+        ),
         const SizedBox(width: 8),
         IconButton(
           onPressed: messages.isEmpty && !stream.isStreaming
@@ -155,39 +163,88 @@ class _AiPageState extends ConsumerState<AiPage> {
     if (confirmed != true) return;
     await ref.read(chatControllerProvider.notifier).clearConversation();
   }
+
+  Future<void> _switchPersona(AiPersona persona) async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final l10n = context.l10n;
+
+    final personas = ref.read(personasProvider).valueOrNull ?? const <AiPersona>[];
+    final isPersisted = personas.any((AiPersona item) => item.id == persona.id);
+    if (isPersisted) {
+      await ref
+          .read(chatControllerProvider.notifier)
+          .switchPersona(persona.id);
+    }
+    messenger?.showSnackBar(
+      SnackBar(content: Text(l10n.aiPersonaSwitched(persona.name))),
+    );
+  }
 }
 
-class _PersonaChip extends StatelessWidget {
-  const _PersonaChip({required this.persona});
+/// 人设切换器：列出全部人设 + 「管理人设」入口。
+class _PersonaSwitcher extends StatelessWidget {
+  const _PersonaSwitcher({
+    required this.personas,
+    required this.active,
+    required this.onSelect,
+    required this.onManage,
+  });
 
-  final AiPersona persona;
+  final List<AiPersona> personas;
+  final AiPersona active;
+  final ValueChanged<AiPersona> onSelect;
+  final VoidCallback onManage;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
-    return Tooltip(
-      message: l10n.aiPersonaSwitchSoon,
+    return PopupMenuButton<Object>(
+      tooltip: l10n.aiPersona,
+      onSelected: (Object value) {
+        if (value == 'manage') {
+          onManage();
+        } else if (value is AiPersona) {
+          onSelect(value);
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<Object>>[
+        for (final persona in personas)
+          PopupMenuItem<Object>(
+            value: persona,
+            child: Row(
+              children: <Widget>[
+                PersonaAvatar(persona: persona, radius: 12),
+                const SizedBox(width: 10),
+                Expanded(child: Text(persona.name)),
+                if (persona.id == active.id)
+                  Icon(Icons.check, size: 16, color: theme.colorScheme.primary),
+              ],
+            ),
+          ),
+        if (personas.isNotEmpty) const PopupMenuDivider(),
+        PopupMenuItem<Object>(
+          value: 'manage',
+          child: Row(
+            children: <Widget>[
+              const Icon(Icons.tune, size: 18),
+              const SizedBox(width: 10),
+              Text(l10n.aiManagePersonas),
+            ],
+          ),
+        ),
+      ],
       child: GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            CircleAvatar(
-              radius: 12,
-              backgroundColor:
-                  theme.colorScheme.primary.withValues(alpha: 0.16),
-              child: Text(
-                persona.avatarInitial,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+            PersonaAvatar(persona: active, radius: 12),
             const SizedBox(width: 8),
-            Text(persona.name, style: theme.textTheme.labelLarge),
+            Text(active.name, style: theme.textTheme.labelLarge),
+            const SizedBox(width: 4),
+            const Icon(Icons.arrow_drop_down, size: 18),
           ],
         ),
       ),
@@ -292,16 +349,7 @@ class _EmptyConversation extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.14),
-            child: Text(
-              persona.avatarInitial,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ),
+          PersonaAvatar(persona: persona, radius: 28),
           const SizedBox(height: 12),
           Text(
             l10n.aiEmptyConversation(persona.name),
@@ -441,18 +489,7 @@ class _AssistantAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return CircleAvatar(
-      radius: 14,
-      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.14),
-      child: Text(
-        persona.avatarInitial,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
+    return PersonaAvatar(persona: persona, radius: 14);
   }
 }
 

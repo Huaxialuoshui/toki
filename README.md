@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 6（AI Provider）已完成**：日程 / 倒计时 / 通知之外，AI 助手已经能真实调用
-> OpenAI Compatible 服务并逐字流式回复；人设管理（Phase 7）与工具调用（Phase 8）待做。
+> 当前状态：**Phase 7（AI 人设）已完成**：日程 / 倒计时 / 通知 / AI 聊天之外，
+> 人设可以自由创建、编辑、删除并在聊天页切换；工具调用（Phase 8）待做。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 118/118 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、"进程结束后系统闹钟仍在"、AI 真实流式聊天 |
-| Windows | ✅ | ✅ 118/118 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 可见性待你空闲时确认 |
+| Android | ✅ | ✅ 123/123 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、"进程结束后系统闹钟仍在"、AI 真实流式聊天、人设增删改 |
+| Windows | ✅ | ✅ 123/123 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 可见性待你空闲时确认 |
 
 ## 项目介绍
 
@@ -39,6 +39,8 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 - **AI Provider**：`AiProvider` 抽象 + OpenAI Compatible 实现（含 SSE 流式）、服务商配置界面
   （预设 / Base URL / API Key 脱敏 / 模型 / 温度 / 最大 token / 流式开关 / 测试连接）、
   真实聊天与逐字输出，会话与消息落库
+- **AI 人设**：人设 CRUD（名称 / 身份 / 头像 / 性格 / 说话方式 / 称呼 / 系统提示词 / 温度）、
+  聊天页切换人设、头像支持 emoji / 单字 / 图片路径或 URL
 
 计划中（尚未实现，按阶段推进）
 
@@ -51,6 +53,7 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 4 | 倒计时 CRUD、置顶、拖动排序、跨天/跨月/跨年/时区/夏令时测试 | ✅ |
 | Phase 5 | Android 本地通知 / Windows Toast、提醒排期 | ✅ |
 | Phase 6 | AI Provider（OpenAI Compatible）+ 流式聊天 | ✅ |
+| Phase 7 | AI 人设 CRUD 与聊天页切换 | ✅ |
 | Phase 6-8 | AI Provider、Persona、Tool Calling + 权限 | ⏳ |
 | Phase 9-13 | Context、聊天自定义、主题编辑器、备份、质量优化 | ⏳ |
 
@@ -280,6 +283,24 @@ adb reverse tcp:11434 tcp:11434          # Android 模拟器/真机：把端口�
 
 它支持非流式与 SSE 流式两种响应，用来验证整条链路（网络 → 解析 → 逐字渲染 → 落库）。
 
+### 人设（Phase 7）
+
+设置 → AI 人设：可以新建 / 编辑 / 删除多个 AI 人设，字段包括：
+
+| 字段 | 说明 |
+| --- | --- |
+| 名称 | 显示在聊天页顶部与消息气泡旁 |
+| 身份 | 一句话说明（例如「私人日程助手」） |
+| 头像 | emoji / 单个字 / 图片路径 / `http(s)` 图片 URL；图片加载失败自动回落到文字头像 |
+| 性格 / 说话方式 | 会拼进 system prompt 的补充说明 |
+| 对你的称呼 | 例如「主人」 |
+| 系统提示词 | 直接作为 `system` 消息发给模型；留空则用默认提示词 |
+| 温度 | 该人设的默认采样温度 |
+
+聊天页右上角的人设按钮可以切换（菜单里还有「管理人设」跳设置页）。切换只影响**后续请求**的
+system prompt——`chat_sessions.persona_id` 记录当前会话选用的人设；删除人设前会先把引用它的会话置空，
+否则会撞 `chat_sessions.persona_id` 的外键约束（这个坑有专门的回归测试）。
+
 ## 通知说明（Phase 5）
 
 * **抽象**：业务层只依赖 `NotificationService`（`initialize` / `requestPermission` /
@@ -315,7 +336,7 @@ flutter analyze
 flutter test
 ```
 
-当前 118 个测试，覆盖：
+当前 123 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
@@ -334,6 +355,8 @@ flutter test
 * AI 应用层：发送后用户 + 助手消息落库、流式状态逐块更新、system prompt 与历史顺序、
   出错不写助手消息、中止保留已收到内容、清空对话
 * 界面·AI：未配置时的提示与入口、发送后逐字显示回复、错误横幅、清空对话
+* 人设：设置页新建 / 编辑 / 删除、删除时清理会话引用（外键回归）、
+  聊天页切换人设并让后续请求带上新的 system prompt
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

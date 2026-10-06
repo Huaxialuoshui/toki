@@ -60,7 +60,8 @@ final chatSessionProvider = FutureProvider.autoDispose<ChatSession>((ref) async 
   final session = ChatSession(
     id: kDefaultChatSessionId,
     title: 'Toki',
-    personaId: ref.read(activePersonaProvider)?.id ?? '',
+    // 不能用 activePersonaProvider（它反过来依赖本 provider，会形成环）。
+    personaId: _firstPersonaId(ref),
     createdAt: now,
     updatedAt: now,
   );
@@ -68,11 +69,35 @@ final chatSessionProvider = FutureProvider.autoDispose<ChatSession>((ref) async 
   return session;
 });
 
+/// 新建会话时的默认人设：数据库里第一个；没有就留空。
+String _firstPersonaId(Ref ref) {
+  final personas = ref.read(personasProvider).valueOrNull;
+  if (personas == null || personas.isEmpty) return '';
+  return personas.first.id;
+}
+
 final chatMessagesProvider =
     StreamProvider.autoDispose.family<List<ChatMessage>, String>(
   (ref, String sessionId) =>
       ref.watch(chatRepositoryProvider).watchMessages(sessionId),
 );
+
+/// 当前生效的人设：
+/// 1. 当前会话 `chat_sessions.persona_id` 指定的人设；
+/// 2. 否则数据库里的第一个人设；
+/// 3. 数据库为空时返回 null，由 UI 回落到内置文案。
+final activePersonaProvider = Provider.autoDispose<AiPersona?>((ref) {
+  final personas = ref.watch(personasProvider).valueOrNull;
+  if (personas == null || personas.isEmpty) return null;
+
+  final selectedId = ref.watch(chatSessionProvider).valueOrNull?.personaId;
+  if (selectedId != null && selectedId.isNotEmpty) {
+    for (final persona in personas) {
+      if (persona.id == selectedId) return persona;
+    }
+  }
+  return personas.first;
+});
 
 /// 当前生效的 AI 服务商配置：优先"默认"，否则用列表里的第一个。
 final activeAiConfigProvider = Provider.autoDispose<AiProviderConfig?>((ref) {
@@ -228,6 +253,24 @@ class ChatController extends Notifier<ChatStreamState> {
       await repository.deleteMessage(message.id);
     }
     state = const ChatStreamState();
+  }
+
+  /// 切换当前会话使用的人设（只影响后续请求的 system prompt）。
+  Future<void> switchPersona(String personaId) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final session = await ref.read(chatSessionProvider.future);
+    await repository.upsertSession(
+      ChatSession(
+        id: session.id,
+        title: session.title,
+        personaId: personaId,
+        createdAt: session.createdAt,
+        updatedAt: clock.now(),
+      ),
+    );
+    // 会话变了 → activePersonaProvider 需要重新解析。
+    ref.invalidate(chatSessionProvider);
   }
 
   void clearError() {

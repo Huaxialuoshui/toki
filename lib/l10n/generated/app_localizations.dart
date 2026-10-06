@@ -641,12 +641,6 @@ abstract class AppLocalizations {
   /// **'Persona'**
   String get aiPersona;
 
-  /// No description provided for @aiPersonaSwitchSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Persona switching arrives in Phase 7'**
-  String get aiPersonaSwitchSoon;
-
   /// No description provided for @aiComposerHint.
   ///
   /// In en, this message translates to:
@@ -874,6 +868,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stored only on this device, never written to logs.'**
   String get aiKeyStoredLocally;
+
+  /// No description provided for @aiPersonaSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personas'**
+  String get aiPersonaSectionTitle;
+
+  /// No description provided for @aiAddPersona.
+  ///
+  /// In en, this message translates to:
+  /// **'Add persona'**
+  String get aiAddPersona;
+
+  /// No description provided for @aiEditPersona.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit persona'**
+  String get aiEditPersona;
+
+  /// No description provided for @aiNoPersonas.
+  ///
+  /// In en, this message translates to:
+  /// **'No personas yet'**
+  String get aiNoPersonas;
+
+  /// No description provided for @aiPersonaName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get aiPersonaName;
+
+  /// No description provided for @aiPersonaIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get aiPersonaIdentity;
+
+  /// No description provided for @aiPersonaPersonality.
+  ///
+  /// In en, this message translates to:
+  /// **'Personality'**
+  String get aiPersonaPersonality;
+
+  /// No description provided for @aiPersonaSpeakingStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Speaking style'**
+  String get aiPersonaSpeakingStyle;
+
+  /// No description provided for @aiPersonaNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls you'**
+  String get aiPersonaNickname;
+
+  /// No description provided for @aiPersonaSystemPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'System prompt'**
+  String get aiPersonaSystemPrompt;
+
+  /// No description provided for @aiPersonaAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get aiPersonaAvatar;
+
+  /// No description provided for @aiPersonaAvatarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'An emoji, a single character, or an image path/URL'**
+  String get aiPersonaAvatarHint;
+
+  /// No description provided for @aiPersonaDefaultPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.'**
+  String get aiPersonaDefaultPrompt;
+
+  /// No description provided for @aiPersonaSwitched.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched to {name}'**
+  String aiPersonaSwitched(String name);
+
+  /// No description provided for @aiManagePersonas.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage personas'**
+  String get aiManagePersonas;
 
   /// No description provided for @settingsAppearance.
   ///

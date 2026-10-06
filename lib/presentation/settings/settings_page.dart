@@ -13,6 +13,7 @@ import '../../core/extensions/l10n_extension.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
+import 'ai_persona_section.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
@@ -146,6 +147,12 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.smart_toy_outlined,
           ),
           const AiProviderSection(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.aiPersonaSectionTitle,
+            icon: Icons.face_retouching_natural_outlined,
+          ),
+          const AiPersonaSection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsNotificationSection,

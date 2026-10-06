@@ -34,6 +34,9 @@ abstract interface class ChatRepository {
   Future<void> upsertSession(ChatSession session);
   Future<void> deleteSession(String id);
 
+  /// 把引用了该人设的会话改成"未指定人设"（删除人设前调用，避免外键约束）。
+  Future<void> clearPersonaFromSessions(String personaId);
+
   Stream<List<ChatMessage>> watchMessages(String sessionId);
   Future<List<ChatMessage>> getMessages(String sessionId);
   Future<void> upsertMessage(ChatMessage message);

@@ -296,9 +296,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiPersona => '人设';
 
   @override
-  String get aiPersonaSwitchSoon => '切换人设将在 Phase 7 提供';
-
-  @override
   String aiComposerHint(String personaName) {
     return '给$personaName发消息…';
   }
@@ -417,6 +414,53 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aiKeyStoredLocally => '只保存在本机，不会写入日志。';
+
+  @override
+  String get aiPersonaSectionTitle => 'AI 人设';
+
+  @override
+  String get aiAddPersona => '添加人设';
+
+  @override
+  String get aiEditPersona => '编辑人设';
+
+  @override
+  String get aiNoPersonas => '还没有人设';
+
+  @override
+  String get aiPersonaName => '名称';
+
+  @override
+  String get aiPersonaIdentity => '身份';
+
+  @override
+  String get aiPersonaPersonality => '性格';
+
+  @override
+  String get aiPersonaSpeakingStyle => '说话方式';
+
+  @override
+  String get aiPersonaNickname => '对你的称呼';
+
+  @override
+  String get aiPersonaSystemPrompt => '系统提示词';
+
+  @override
+  String get aiPersonaAvatar => '头像';
+
+  @override
+  String get aiPersonaAvatarHint => '可以填 emoji、1 个字，或图片路径 / URL';
+
+  @override
+  String get aiPersonaDefaultPrompt => '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
+
+  @override
+  String aiPersonaSwitched(String name) {
+    return '已切换到 $name';
+  }
+
+  @override
+  String get aiManagePersonas => '管理人设';
 
   @override
   String get settingsAppearance => '外观';

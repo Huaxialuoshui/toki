@@ -152,7 +152,6 @@
   "calendarNoReminder": "None",
 
   "aiPersona": "Persona",
-  "aiPersonaSwitchSoon": "Persona switching arrives in Phase 7",
   "aiComposerHint": "Message {personaName}…",
   "@aiComposerHint": {
     "placeholders": {
@@ -212,6 +211,28 @@
   "aiShowKey": "Show",
   "aiHideKey": "Hide",
   "aiKeyStoredLocally": "Stored only on this device, never written to logs.",
+  "aiPersonaSectionTitle": "Personas",
+  "aiAddPersona": "Add persona",
+  "aiEditPersona": "Edit persona",
+  "aiNoPersonas": "No personas yet",
+  "aiPersonaName": "Name",
+  "aiPersonaIdentity": "Role",
+  "aiPersonaPersonality": "Personality",
+  "aiPersonaSpeakingStyle": "Speaking style",
+  "aiPersonaNickname": "Calls you",
+  "aiPersonaSystemPrompt": "System prompt",
+  "aiPersonaAvatar": "Avatar",
+  "aiPersonaAvatarHint": "An emoji, a single character, or an image path/URL",
+  "aiPersonaDefaultPrompt": "You are the user's personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.",
+  "aiPersonaSwitched": "Switched to {name}",
+  "@aiPersonaSwitched": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiManagePersonas": "Manage personas",
 
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",

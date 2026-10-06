@@ -296,9 +296,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPersona => 'Persona';
 
   @override
-  String get aiPersonaSwitchSoon => 'Persona switching arrives in Phase 7';
-
-  @override
   String aiComposerHint(String personaName) {
     return 'Message $personaName…';
   }
@@ -417,6 +414,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiKeyStoredLocally => 'Stored only on this device, never written to logs.';
+
+  @override
+  String get aiPersonaSectionTitle => 'Personas';
+
+  @override
+  String get aiAddPersona => 'Add persona';
+
+  @override
+  String get aiEditPersona => 'Edit persona';
+
+  @override
+  String get aiNoPersonas => 'No personas yet';
+
+  @override
+  String get aiPersonaName => 'Name';
+
+  @override
+  String get aiPersonaIdentity => 'Role';
+
+  @override
+  String get aiPersonaPersonality => 'Personality';
+
+  @override
+  String get aiPersonaSpeakingStyle => 'Speaking style';
+
+  @override
+  String get aiPersonaNickname => 'Calls you';
+
+  @override
+  String get aiPersonaSystemPrompt => 'System prompt';
+
+  @override
+  String get aiPersonaAvatar => 'Avatar';
+
+  @override
+  String get aiPersonaAvatarHint => 'An emoji, a single character, or an image path/URL';
+
+  @override
+  String get aiPersonaDefaultPrompt => 'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
+
+  @override
+  String aiPersonaSwitched(String name) {
+    return 'Switched to $name';
+  }
+
+  @override
+  String get aiManagePersonas => 'Manage personas';
 
   @override
   String get settingsAppearance => 'Appearance';

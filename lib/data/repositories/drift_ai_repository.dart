@@ -184,6 +184,13 @@ class DriftChatRepository implements ChatRepository {
   }
 
   @override
+  Future<void> clearPersonaFromSessions(String personaId) async {
+    await (_db.update(_db.chatSessions)
+          ..where(($ChatSessionsTable t) => t.personaId.equals(personaId)))
+        .write(const ChatSessionsCompanion(personaId: Value<String?>(null)));
+  }
+
+  @override
   Stream<List<ChatMessage>> watchMessages(String sessionId) {
     final query = _db.select(_db.chatMessages)
       ..where(($ChatMessagesTable t) => t.sessionId.equals(sessionId))

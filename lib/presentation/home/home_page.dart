@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../application/ai/ai_providers.dart';
+import '../../application/ai/chat_controller.dart';
 import '../../application/calendar/calendar_providers.dart';
 import '../../application/countdown/countdown_providers.dart';
 import '../../application/settings/settings_controller.dart';
@@ -18,6 +18,7 @@ import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
+import '../widgets/persona_avatar.dart';
 import '../widgets/section_header.dart';
 
 /// 首页：日期 / 天气占位、今日事项、倒计时、AI 快捷入口、未来事件。
@@ -244,17 +245,7 @@ class _AiShortcut extends StatelessWidget {
       onTap: () => context.go('/ai'),
       child: Row(
         children: <Widget>[
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.16),
-            child: Text(
-              persona.avatarInitial,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+          PersonaAvatar(persona: persona, radius: 22),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
