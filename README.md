@@ -2,7 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 1（App Shell）已完成**。数据库、AI、通知尚未接入，页面上的数据是 mock 内容。
+> 当前状态：**Phase 1（App Shell）已完成，Android 与 Windows 双端均已构建并实际运行验证**。
+> 数据库、AI、通知尚未接入，页面上的数据是 mock 内容。
+
+平台验证状态（2026-10-06）：
+
+| 平台 | analyze | test | 构建 | 运行 |
+| --- | --- | --- | --- | --- |
+| Android | ✅ | ✅ 31/31 | ✅ `flutter build apk --debug` | ✅ `flutter run -d android`（模拟器 toki_api34） |
+| Windows | ✅ | ✅ 31/31 | ✅ `flutter build windows` | ✅ `flutter run -d windows` |
 
 ## 项目介绍
 
@@ -95,6 +103,7 @@ lib/
 | JDK（Gradle 使用） | `D:\Program Files\Java\jdk-17.0.12`（`flutter config --jdk-dir=...`） |
 | Android Studio | `D:\Program Files\Android\Android Studio`（2024.2） |
 | 模拟器 | AVD `toki_api34`（Android 14 / google_apis_playstore / x86_64） |
+| Windows 工具链 | Visual Studio Community 2026 18.10.3（`D:\Program Files\vscode`）+ MSVC 14.51.36231 + Windows SDK 10.0.28000.0 |
 
 首次配置命令（换机器时参考）：
 
@@ -107,16 +116,20 @@ flutter doctor -v
 
 ## Windows 运行 / 构建
 
-前置条件：**Visual Studio 2022 + "Desktop development with C++" 工作负载**（含 Windows 10/11 SDK）。
+前置条件：**Visual Studio +「使用 C++ 的桌面开发」工作负载**（含 MSVC 工具集与 Windows 10/11 SDK）。
 
 ```powershell
 flutter run -d windows
 flutter build windows
+# 产物：build\windows\x64\runner\Release\toki.exe
 ```
 
-> 本机当前**未安装** Visual Studio C++ 工作负载，因此 `flutter build windows` 会报
-> `Unable to find suitable Visual Studio toolchain`。代码、工程与响应式桌面布局已就绪，
-> 装好工作负载后即可直接运行验证。
+本机已用 **Visual Studio Community 2026（版本 18.x）** 验证通过。
+
+> ⚠️ 版本注意：Flutter 3.27.2 的 `visual_studio.dart` 只映射 VS 16(2019) / 17(2022) 的 CMake 生成器，
+> 遇到 VS 18(2026) 会回落到 `Visual Studio 16 2019` 并报 `could not find any instance of Visual Studio`。
+> 本机在 Flutter SDK 内补了一行映射 `18 => 'Visual Studio 18 2026'`（见「常见问题」）。
+> 升级 Flutter 后如果上游已支持 VS 2026，可用同样方式把这行改动还原。
 
 ## Android 运行 / 构建
 
@@ -168,7 +181,27 @@ Flutter 模板的 Gradle 8.3 需要 JDK 17；本机通过 `flutter config --jdk-
 不要用 Android Studio 自带的 JBR 21 直接跑该模板。
 
 **Windows 构建失败**
-安装 Visual Studio 2022 并勾选 "Desktop development with C++"（含 Windows SDK）后重试。
+按报错分两类处理：
+
+1. `Unable to find suitable Visual Studio toolchain`：说明没装「使用 C++ 的桌面开发」工作负载，
+   用 Visual Studio Installer 勾选安装（含 Windows SDK）。
+2. `CMake Error ... Generator "Visual Studio 16 2019" could not find any instance`：
+   Flutter 版本不认你安装的 VS 大版本。检查 `flutter doctor -v` 里显示的 VS 版本号，
+   在 `packages/flutter_tools/lib/src/windows/visual_studio.dart` 的 `cmakeGenerator` 中补上对应分支，例如：
+
+   ```dart
+   return switch (_majorVersion) {
+     18 => 'Visual Studio 18 2026',
+     17 => 'Visual Studio 17 2022',
+     _  => 'Visual Studio 16 2019',
+   };
+   ```
+
+   改完删掉 `bin/cache/flutter_tools.stamp`（下次运行会自动重新编译 flutter_tools），再重新构建。
+   如果之前用错误的生成器失败过，需要先删掉 `build/windows` 或执行 `flutter clean`，否则 CMake 会抱怨
+   `generator does not match the generator used previously`。
+
+   还原方式：`git -C <Flutter SDK> checkout -- packages/flutter_tools/lib/src/windows/visual_studio.dart`
 
 ## 开发原则
 
