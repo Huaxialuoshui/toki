@@ -1649,6 +1649,168 @@ abstract class AppLocalizations {
   /// **'Versioned JSON export and import (Phase 12)'**
   String get settingsBackupSectionSubtitle;
 
+  /// No description provided for @backupIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.'**
+  String get backupIntro;
+
+  /// No description provided for @backupIncludeApiKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'Include API keys'**
+  String get backupIncludeApiKeys;
+
+  /// No description provided for @backupIncludeApiKeysHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.'**
+  String get backupIncludeApiKeysHint;
+
+  /// No description provided for @backupExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get backupExport;
+
+  /// No description provided for @backupExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved to {path} (also copied to clipboard)'**
+  String backupExported(String path);
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String backupExportFailed(String error);
+
+  /// No description provided for @backupRestoreFromFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from file'**
+  String get backupRestoreFromFile;
+
+  /// No description provided for @backupRestoreFromPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste JSON'**
+  String get backupRestoreFromPaste;
+
+  /// No description provided for @backupPasteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a Toki backup JSON here'**
+  String get backupPasteHint;
+
+  /// No description provided for @backupFileListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup files'**
+  String get backupFileListTitle;
+
+  /// No description provided for @backupNoFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup files yet'**
+  String get backupNoFiles;
+
+  /// No description provided for @backupConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup?'**
+  String get backupConfirmTitle;
+
+  /// No description provided for @backupConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {time} · {total} rows{apiKeys}'**
+  String backupConfirmBody(String time, int total, String apiKeys);
+
+  /// No description provided for @backupContainsApiKeys.
+  ///
+  /// In en, this message translates to:
+  /// **' · contains API keys'**
+  String get backupContainsApiKeys;
+
+  /// No description provided for @backupModeReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get backupModeReplace;
+
+  /// No description provided for @backupModeReplaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete local data first, then write the backup'**
+  String get backupModeReplaceHint;
+
+  /// No description provided for @backupModeMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get backupModeMerge;
+
+  /// No description provided for @backupModeMergeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep local data; same ids are overwritten, new ones are added'**
+  String get backupModeMergeHint;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {count} rows'**
+  String backupRestored(int count);
+
+  /// No description provided for @backupRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed'**
+  String get backupRestoreFailed;
+
+  /// No description provided for @backupDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup folder'**
+  String get backupDirectory;
+
+  /// No description provided for @backupErrorNotJson.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not valid JSON.'**
+  String get backupErrorNotJson;
+
+  /// No description provided for @backupErrorNotBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not a Toki backup file.'**
+  String get backupErrorNotBackup;
+
+  /// No description provided for @backupErrorFormatVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was created by a newer version of Toki.'**
+  String get backupErrorFormatVersion;
+
+  /// No description provided for @backupErrorSchemaVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup comes from a newer database version.'**
+  String get backupErrorSchemaVersion;
+
+  /// No description provided for @backupErrorMissingTables.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup has no data section.'**
+  String get backupErrorMissingTables;
+
+  /// No description provided for @backupErrorCorrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is damaged and cannot be restored.'**
+  String get backupErrorCorrupted;
+
   /// No description provided for @settingsAbout.
   ///
   /// In en, this message translates to:

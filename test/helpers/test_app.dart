@@ -79,6 +79,7 @@ Future<ProviderContainer> createTestContainer({
   FakeNotificationService? notifications,
   AiProvider? aiProvider,
   AiProviderConfig? aiConfig,
+  List<Override> extraOverrides = const <Override>[],
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -104,6 +105,7 @@ Future<ProviderContainer> createTestContainer({
       ),
       if (aiProvider != null)
         aiProviderFactoryProvider.overrideWithValue(() => aiProvider),
+      ...extraOverrides,
     ],
   );
   addTearDown(() async {
@@ -123,6 +125,7 @@ Future<void> pumpTokiApp(
   FakeNotificationService? notifications,
   AiProvider? aiProvider,
   AiProviderConfig? aiConfig,
+  List<Override> extraOverrides = const <Override>[],
 }) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   ensureSqliteLibraryAvailable();
@@ -153,6 +156,7 @@ Future<void> pumpTokiApp(
         ),
         if (aiProvider != null)
           aiProviderFactoryProvider.overrideWithValue(() => aiProvider),
+        ...extraOverrides,
       ],
       child: const TokiApp(),
     ),

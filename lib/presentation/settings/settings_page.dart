@@ -17,6 +17,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
 import 'ai_persona_section.dart';
+import 'backup_section.dart';
 import 'chat_appearance_section.dart';
 import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
@@ -258,7 +259,7 @@ class SettingsPage extends ConsumerWidget {
             title: l10n.settingsBackupSection,
             icon: Icons.save_alt_outlined,
           ),
-          _ComingSoonCard(subtitle: l10n.settingsBackupSectionSubtitle),
+          const BackupSection(),
           const SizedBox(height: 24),
           SectionHeader(
             title: l10n.settingsAbout,
@@ -565,46 +566,6 @@ class _NotificationCardState extends ConsumerState<_NotificationCard> {
             l10n.settingsNotificationExactAlarmHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ComingSoonCard extends StatelessWidget {
-  const _ComingSoonCard({required this.subtitle});
-
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final theme = Theme.of(context);
-    return GlassCard(
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              subtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              l10n.commonComingSoon,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.primary,
-              ),
             ),
           ),
         ],

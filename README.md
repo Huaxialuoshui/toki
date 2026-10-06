@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 11（主题编辑器）已完成**：可视化调色 / 圆角 / 透明度 / 模糊 / 阴影 / 字号，
-> 编辑时全应用实时预览，可保存为用户主题、另存为、导入导出 JSON、删除；备份等后续阶段待做。
+> 当前状态：**Phase 12（备份与恢复）已完成**：整库导出为一个带版本号的 JSON 文件（可选是否包含
+> API Key），支持从文件或粘贴 JSON 恢复，可选「覆盖」或「合并」；质量优化等后续阶段待做。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 179/179 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、闹钟跨进程存活、AI 流式聊天、人设 CRUD、AI 真实创建日程、上下文注入、聊天外观、主题编辑器（实时预览 → 保存 → 落库 → 重启仍在） |
-| Windows | ✅ | ✅ 179/179 | ✅ `flutter build windows` | ✅ 构建实测（`toki.exe` 产物 + `analyze`/`test` 全绿）；桌面交互与系统 Toast 可见性待你空闲时确认 |
+| Android | ✅ | ✅ 190/190 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、闹钟跨进程存活、AI 流式聊天、人设 CRUD、AI 真实创建日程、上下文注入、聊天外观、主题编辑器、备份导出（含 API Key 脱敏）与文件恢复（合并 / 覆盖） |
+| Windows | ✅ | ✅ 190/190 | ✅ `flutter build windows` | ✅ 构建实测（`toki.exe` 产物 + `analyze`/`test` 全绿）；桌面交互与系统 Toast 可见性待你空闲时确认 |
 
 ## 项目介绍
 
@@ -51,6 +51,8 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 - **主题编辑器**：可视化调整主色 / 次要色 / 背景 / 卡片 / 文字、明暗、圆角、卡片透明度、背景模糊、
   阴影强度、字号、过渡动画；编辑期间**整个应用**实时跟随预览，可保存为用户主题 / 另存为新主题 /
   导出导入 JSON / 删除，用户主题存在数据库、当前主题 id 存在 shared_preferences
+- **备份与恢复**：整库（9 张表）导出为一个带 `formatVersion` / `schemaVersion` 的 JSON 文件，
+  API Key 默认脱敏；恢复时可「覆盖」或「合并」，格式不对或数据损坏只提示、不写坏现有数据
 
 计划中（尚未实现，按阶段推进）
 
@@ -68,7 +70,8 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 9 | ContextService：动态上下文与 Token 控制 | ✅ |
 | Phase 10 | 聊天自定义：背景 / 头像 / 气泡 / 字号 / 动画 | ✅ |
 | Phase 11 | 主题编辑器：可视化调色 / 保存为用户主题 / JSON 导入导出 | ✅ |
-| Phase 12-13 | 备份与恢复、质量优化 | ⏳ |
+| Phase 12 | 备份与恢复：整库 JSON 导出 / 覆盖或合并导入 / 版本校验 | ✅ |
+| Phase 13 | 质量优化 | ⏳ |
 
 ## 技术栈
 
@@ -109,6 +112,7 @@ lib/
 ├── domain/entities/              # ThemeConfig / GlassStyle / CalendarEvent / CountdownItem / AiPersona / Chat*
 ├── domain/repositories/          # 仓储抽象（上层只依赖接口）
 ├── data/
+│   ├── backup/                   # 整库读出 / 写回（BackupStore + 备份专用 ValueSerializer）
 │   ├── repositories/             # Drift 实现 + 行↔实体映射 + Provider 装配
 │   └── demo/demo_seed.dart       # debug 构建的示例数据
 ├── application/
@@ -116,11 +120,13 @@ lib/
 │   ├── calendar/                 # 数据库 StreamProvider + 写操作（CalendarActions）
 │   ├── ai/                       # 人设 / 服务商 Provider + ChatController（流式聊天）
 │   ├── notification/             # ReminderScheduler：提醒 → 系统通知
+│   ├── backup/                   # 备份 JSON 编解码、版本校验、恢复策略
 │   ├── theme/                    # 预设、ThemeConfig → ThemeData、主题控制器（含编辑器实时预览草稿）
 │   └── settings/                 # 语言、首次启动、启动初始化
 ├── infrastructure/
 │   ├── database/                 # Drift 表定义、AppDatabase、连接、转换器
 │   ├── ai/                       # OpenAI Compatible 实现（Dio + SSE）
+│   ├── backup/                   # 备份文件目录解析与读写（BackupFileStore）
 │   ├── notification/             # Android 通知 / Windows Toast 实现
 │   ├── storage/                  # shared_preferences 封装
 │   └── mock/                     # 仅剩 AI 演示会话 + 兜底人设
@@ -400,6 +406,49 @@ AI 不能碰数据库，只能通过工具层操作；工具执行结果会原�
 JSON 结构（`schemaVersion: 1`）就是 `ThemeConfig` 的扁平化：`name` / `brightness` /
 `primaryColor` 等（颜色是 ARGB int），缺字段按默认值补齐，因此手写一小段 JSON 也能导入。
 
+### 备份与恢复（Phase 12）
+
+设置 → 备份与恢复。
+
+| 操作 | 说明 |
+| --- | --- |
+| 导出备份 | 9 张表 → 一个 JSON 文件，写到「备份目录」并同时复制到剪贴板（手机端可以直接粘到笔记 / 电脑上取走） |
+| 导出时包含 API Key | **默认关闭**；打开后 `ai_providers.api_key` 会以明文写进文件，请自行保管 |
+| 从文件恢复 | 列出备份目录里的 `toki-backup-*.json`（时间倒序），挑一个 → 看摘要 → 选「覆盖」或「合并」 |
+| 粘贴 JSON | 从剪贴板预填或手动粘贴一份备份 JSON，同样先看摘要再恢复 |
+| 覆盖 / 合并 | 覆盖＝先清空本机数据再整体写入；合并＝保留本机数据，同 id 覆盖、新 id 追加 |
+
+备份目录：
+
+* Android：`/storage/emulated/0/Android/data/com.toki.toki/files`（应用专属但可用 USB 直接拷出）
+* Windows：系统「文档」目录
+
+JSON 结构（`formatVersion: 1`）：
+
+```json
+{
+  "format": "toki-backup",
+  "formatVersion": 1,
+  "schemaVersion": 3,
+  "exportedAt": "2026-10-06T15:15:57.000",
+  "appVersion": "0.1.0+1",
+  "includesApiKeys": false,
+  "counts": { "calendar_events": 9, "countdowns": 4, "...": 0 },
+  "tables": { "calendar_events": [ { "id": "...", "startTime": "2026-10-06T09:00:00" } ] }
+}
+```
+
+安全与健壮性约定：
+
+* `format` 不是 `toki-backup`、`formatVersion` / `schemaVersion` 比当前应用新、JSON 不合法、
+  某一行解析失败 → 一律**拒绝导入**并给出可读原因，不动现有数据；
+* 写入放在一个事务里，中途失败会整体回滚（有专门的回归测试）；
+* 恢复不会改动 shared_preferences 里的语言 / 当前主题 id 等应用级设置。
+
+> 实现说明：`data/backup/backup_store.dart` 用的是 drift 数据类的 `toJson()` / `fromJson()`，
+> 但配了一个自定义 `ValueSerializer`——drift 默认序列化器在 JSON 往返后无法还原
+> `List<String>`（`ai_personas.enabled_tools`），直接用会在恢复时报类型转换错误。
+
 ## 通知说明（Phase 5）
 
 * **抽象**：业务层只依赖 `NotificationService`（`initialize` / `requestPermission` /
@@ -435,7 +484,7 @@ flutter analyze
 flutter test
 ```
 
-当前 179 个测试，覆盖：
+当前 190 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
@@ -472,6 +521,9 @@ flutter test
   改色实时生效 + 关闭撤销、保存写库并写入 shared_preferences、另存为新增第二条、
   导入合法 JSON 落库 / 非法 JSON 只提示不写库、删除用户主题后回落到默认预设、
   `shadow_strength` 迁移到 v3 后列存在且能往返
+* 备份与恢复：导出落盘与元信息、API Key 默认脱敏 / 开关后才带上、覆盖恢复后内容一致、
+  合并恢复（同 id 覆盖 + 新 id 追加 + 其余保留）、非 JSON / 非 Toki 备份 / 更高格式或结构版本
+  被拒绝、损坏行动整次恢复失败且事务回滚、设置页导出落盘 + 复制剪贴板 + 粘贴恢复
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

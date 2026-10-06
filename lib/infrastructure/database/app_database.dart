@@ -40,8 +40,11 @@ class AppDatabase extends _$AppDatabase {
   /// 测试用：内存数据库。
   AppDatabase.memory() : super(NativeDatabase.memory());
 
+  /// 当前结构版本。备份文件里会带上它，用来判断"这份备份能不能直接恢复"。
+  static const int currentSchemaVersion = 3;
+
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => currentSchemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

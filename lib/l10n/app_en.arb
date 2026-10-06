@@ -413,6 +413,67 @@
   },
   "settingsBackupSection": "Backup & restore",
   "settingsBackupSectionSubtitle": "Versioned JSON export and import (Phase 12)",
+  "backupIntro": "Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.",
+  "backupIncludeApiKeys": "Include API keys",
+  "backupIncludeApiKeysHint": "Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.",
+  "backupExport": "Export backup",
+  "backupExported": "Backup saved to {path} (also copied to clipboard)",
+  "@backupExported": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "backupExportFailed": "Export failed: {error}",
+  "@backupExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreFromFile": "Restore from file",
+  "backupRestoreFromPaste": "Paste JSON",
+  "backupPasteHint": "Paste a Toki backup JSON here",
+  "backupFileListTitle": "Backup files",
+  "backupNoFiles": "No backup files yet",
+  "backupConfirmTitle": "Restore this backup?",
+  "backupConfirmBody": "Exported {time} · {total} rows{apiKeys}",
+  "@backupConfirmBody": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      },
+      "apiKeys": {
+        "type": "String"
+      }
+    }
+  },
+  "backupContainsApiKeys": " · contains API keys",
+  "backupModeReplace": "Replace",
+  "backupModeReplaceHint": "Delete local data first, then write the backup",
+  "backupModeMerge": "Merge",
+  "backupModeMergeHint": "Keep local data; same ids are overwritten, new ones are added",
+  "backupRestored": "Restored {count} rows",
+  "@backupRestored": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreFailed": "Restore failed",
+  "backupDirectory": "Backup folder",
+  "backupErrorNotJson": "That is not valid JSON.",
+  "backupErrorNotBackup": "That is not a Toki backup file.",
+  "backupErrorFormatVersion": "This backup was created by a newer version of Toki.",
+  "backupErrorSchemaVersion": "This backup comes from a newer database version.",
+  "backupErrorMissingTables": "This backup has no data section.",
+  "backupErrorCorrupted": "This backup is damaged and cannot be restored.",
   "settingsAbout": "About",
   "settingsVersion": "App version",
   "settingsFlutterVersion": "Flutter",

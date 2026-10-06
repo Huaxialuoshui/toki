@@ -826,6 +826,95 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsBackupSectionSubtitle => '带版本控制的 JSON 导入导出（Phase 12）';
 
   @override
+  String get backupIntro => '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
+
+  @override
+  String get backupIncludeApiKeys => '导出时包含 API Key';
+
+  @override
+  String get backupIncludeApiKeysHint => '默认关闭。备份文件是明文，只有你确认能妥善保管时再打开。';
+
+  @override
+  String get backupExport => '导出备份';
+
+  @override
+  String backupExported(String path) {
+    return '已导出到 $path（同时复制到剪贴板）';
+  }
+
+  @override
+  String backupExportFailed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
+  String get backupRestoreFromFile => '从文件恢复';
+
+  @override
+  String get backupRestoreFromPaste => '粘贴 JSON';
+
+  @override
+  String get backupPasteHint => '把 Toki 备份 JSON 粘贴到这里';
+
+  @override
+  String get backupFileListTitle => '备份文件';
+
+  @override
+  String get backupNoFiles => '还没有备份文件';
+
+  @override
+  String get backupConfirmTitle => '恢复这份备份？';
+
+  @override
+  String backupConfirmBody(String time, int total, String apiKeys) {
+    return '导出于 $time · 共 $total 条$apiKeys';
+  }
+
+  @override
+  String get backupContainsApiKeys => ' · 含 API Key';
+
+  @override
+  String get backupModeReplace => '覆盖';
+
+  @override
+  String get backupModeReplaceHint => '先清空本机数据，再整体写入备份';
+
+  @override
+  String get backupModeMerge => '合并';
+
+  @override
+  String get backupModeMergeHint => '保留本机数据，同 id 覆盖、新 id 追加';
+
+  @override
+  String backupRestored(int count) {
+    return '已恢复 $count 条数据';
+  }
+
+  @override
+  String get backupRestoreFailed => '恢复失败';
+
+  @override
+  String get backupDirectory => '备份目录';
+
+  @override
+  String get backupErrorNotJson => '这不是合法的 JSON。';
+
+  @override
+  String get backupErrorNotBackup => '这不是 Toki 备份文件。';
+
+  @override
+  String get backupErrorFormatVersion => '这份备份来自更新版本的 Toki。';
+
+  @override
+  String get backupErrorSchemaVersion => '这份备份的数据库版本比当前应用新。';
+
+  @override
+  String get backupErrorMissingTables => '这份备份里没有数据段。';
+
+  @override
+  String get backupErrorCorrupted => '这份备份已损坏，无法恢复。';
+
+  @override
   String get settingsAbout => '关于';
 
   @override

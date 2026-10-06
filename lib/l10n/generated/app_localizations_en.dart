@@ -826,6 +826,95 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBackupSectionSubtitle => 'Versioned JSON export and import (Phase 12)';
 
   @override
+  String get backupIntro => 'Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.';
+
+  @override
+  String get backupIncludeApiKeys => 'Include API keys';
+
+  @override
+  String get backupIncludeApiKeysHint => 'Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.';
+
+  @override
+  String get backupExport => 'Export backup';
+
+  @override
+  String backupExported(String path) {
+    return 'Backup saved to $path (also copied to clipboard)';
+  }
+
+  @override
+  String backupExportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get backupRestoreFromFile => 'Restore from file';
+
+  @override
+  String get backupRestoreFromPaste => 'Paste JSON';
+
+  @override
+  String get backupPasteHint => 'Paste a Toki backup JSON here';
+
+  @override
+  String get backupFileListTitle => 'Backup files';
+
+  @override
+  String get backupNoFiles => 'No backup files yet';
+
+  @override
+  String get backupConfirmTitle => 'Restore this backup?';
+
+  @override
+  String backupConfirmBody(String time, int total, String apiKeys) {
+    return 'Exported $time · $total rows$apiKeys';
+  }
+
+  @override
+  String get backupContainsApiKeys => ' · contains API keys';
+
+  @override
+  String get backupModeReplace => 'Replace';
+
+  @override
+  String get backupModeReplaceHint => 'Delete local data first, then write the backup';
+
+  @override
+  String get backupModeMerge => 'Merge';
+
+  @override
+  String get backupModeMergeHint => 'Keep local data; same ids are overwritten, new ones are added';
+
+  @override
+  String backupRestored(int count) {
+    return 'Restored $count rows';
+  }
+
+  @override
+  String get backupRestoreFailed => 'Restore failed';
+
+  @override
+  String get backupDirectory => 'Backup folder';
+
+  @override
+  String get backupErrorNotJson => 'That is not valid JSON.';
+
+  @override
+  String get backupErrorNotBackup => 'That is not a Toki backup file.';
+
+  @override
+  String get backupErrorFormatVersion => 'This backup was created by a newer version of Toki.';
+
+  @override
+  String get backupErrorSchemaVersion => 'This backup comes from a newer database version.';
+
+  @override
+  String get backupErrorMissingTables => 'This backup has no data section.';
+
+  @override
+  String get backupErrorCorrupted => 'This backup is damaged and cannot be restored.';
+
+  @override
   String get settingsAbout => 'About';
 
   @override
