@@ -1,0 +1,158 @@
+{
+  "@@locale": "en",
+  "appName": "Toki",
+  "appTagline": "Local-first AI calendar & reminders",
+
+  "navHome": "Home",
+  "navCalendar": "Calendar",
+  "navCountdown": "Countdown",
+  "navAi": "AI Assistant",
+  "navSettings": "Settings",
+  "commonComingSoon": "Planned for a later phase",
+  "commonViewAll": "View all",
+
+  "homeGreeting": "Welcome back",
+  "homeWeatherPlaceholder": "Weather",
+  "homeWeatherHint": "Weather integration is reserved for a later phase",
+  "homeTodayEvents": "Today's schedule",
+  "homeNoEvents": "Nothing scheduled today",
+  "homeCountdowns": "Countdowns",
+  "homeUpcoming": "Upcoming",
+  "homeAskAi": "Ask {personaName}",
+  "@homeAskAi": {
+    "placeholders": {
+      "personaName": {
+        "type": "String"
+      }
+    }
+  },
+  "homeAskAiHint": "Chat, query your schedule, create reminders",
+  "homeOpenAi": "Open assistant",
+  "homePhaseBannerTitle": "Phase 1 skeleton",
+  "homePhaseBannerBody": "Layout, theming and both languages are wired up. All data below is mock content until the database lands in Phase 2.",
+  "homePhaseBannerDismiss": "Got it",
+
+  "countdownTimeUntil": "Time until {title}",
+  "@countdownTimeUntil": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownTimeSince": "{title} has passed",
+  "@countdownTimeSince": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownTargetAt": "Target {time}",
+  "@countdownTargetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownPinned": "Pinned",
+  "countdownReadOnlyHint": "Creating, editing and reordering countdowns arrives in Phase 4",
+  "unitDay": "d",
+  "unitHour": "h",
+  "unitMinute": "m",
+  "unitSecond": "s",
+  "unitDayFull": "days",
+  "unitHourFull": "hours",
+  "unitMinuteFull": "minutes",
+  "unitSecondFull": "seconds",
+
+  "calendarToday": "Today",
+  "calendarMonthView": "Month",
+  "calendarWeekView": "Week",
+  "calendarDayView": "Day",
+  "calendarWeekDayComingSoon": "Week and day views arrive in Phase 3",
+  "calendarEventsOn": "Events on {date}",
+  "@calendarEventsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarNoEvents": "No events on this day",
+  "calendarAllDay": "All day",
+  "calendarReadOnlyHint": "Read-only in this phase — creating and editing events arrives in Phase 3",
+  "calendarEventDetail": "Event detail",
+  "calendarClose": "Close",
+  "calendarLocation": "Location",
+  "calendarReminder": "Reminder",
+  "calendarReminderMinutes": "{minutes} min before",
+  "@calendarReminderMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarNoReminder": "None",
+
+  "aiPersona": "Persona",
+  "aiPersonaSwitchSoon": "Persona switching arrives in Phase 7",
+  "aiComposerHint": "Message {personaName}…",
+  "@aiComposerHint": {
+    "placeholders": {
+      "personaName": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSend": "Send",
+  "aiMockNotice": "Mock conversation — the AI provider is not connected in this phase",
+  "aiToolCallLabel": "Tool call",
+  "aiToolRunning": "Looking up your schedule…",
+  "aiToolDone": "Done",
+  "aiMockUser": "What's on my schedule next week?",
+  "aiMockToolSummary": "Found 4 events",
+  "aiMockAssistant": "You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.",
+
+  "settingsAppearance": "Appearance",
+  "settingsTheme": "Theme",
+  "settingsThemeFollowSystem": "Follow system",
+  "settingsThemeDefault": "Default",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsFontScale": "Font size",
+  "settingsCornerRadius": "Corner radius",
+  "settingsReset": "Reset",
+  "settingsLanguage": "Language",
+  "settingsLanguageFollowSystem": "Follow system",
+  "settingsLanguageChinese": "中文",
+  "settingsLanguageEnglish": "English",
+  "settingsAiSection": "AI & providers",
+  "settingsAiSectionSubtitle": "Provider, persona and tool permissions (Phase 6-8)",
+  "settingsNotificationSection": "Notifications",
+  "settingsNotificationSectionSubtitle": "Local notifications and toasts (Phase 5)",
+  "settingsBackupSection": "Backup & restore",
+  "settingsBackupSectionSubtitle": "Versioned JSON export and import (Phase 12)",
+  "settingsAbout": "About",
+  "settingsVersion": "App version",
+  "settingsFlutterVersion": "Flutter",
+  "settingsDartVersion": "Dart",
+  "settingsProjectPath": "Project path",
+  "settingsPhaseNote": "Phase 1 — environment, app shell, responsive layout, theming and i18n.",
+
+  "mockEventDefense": "Thesis defense",
+  "mockEventProjectDeadline": "Course project deadline",
+  "mockEventLabMeeting": "Lab meeting",
+  "mockEventMorningPlan": "Morning planning",
+  "mockEventHealthCheck": "Health check-up",
+  "mockEventBirthday": "Birthday",
+  "mockLocationLab": "Building A-302",
+  "mockLocationOnline": "Online",
+  "mockPersonaName": "Xiaoxue",
+  "mockPersonaDescription": "Personal schedule assistant",
+  "mockPersonaPersonality": "Gentle and lively, occasionally nudging you to stop procrastinating",
+  "mockPersonaSpeakingStyle": "Short and natural, never overly formal",
+  "mockPersonaNickname": "you"
+}
