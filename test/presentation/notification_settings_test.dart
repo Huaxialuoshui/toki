@@ -14,6 +14,16 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// 设置页很长，先把目标控件滚进可视区域再操作。
+  Future<void> reveal(WidgetTester tester, Finder target) async {
+    await tester.scrollUntilVisible(
+      target,
+      260,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+  }
+
   tokiWidgetTest('设置页显示通知权限状态与操作按钮', (tester) async {
     final notifications = FakeNotificationService(enabled: true);
     await pumpTokiApp(
@@ -23,6 +33,7 @@ void main() {
     );
     await openSettings(tester);
 
+    await reveal(tester, find.text('Notifications').first);
     expect(find.text('Notifications'), findsWidgets);
     expect(find.text('Allowed'), findsOneWidget);
     expect(find.text('Request permission'), findsOneWidget);
@@ -39,6 +50,7 @@ void main() {
     );
     await openSettings(tester);
 
+    await reveal(tester, find.text('Not allowed'));
     expect(find.text('Not allowed'), findsOneWidget);
 
     await tester.tap(find.text('Request permission'));
@@ -56,6 +68,7 @@ void main() {
     );
     await openSettings(tester);
 
+    await reveal(tester, find.text('Send a test notification'));
     await tester.tap(find.text('Send a test notification'));
     await tester.pumpAndSettle();
 

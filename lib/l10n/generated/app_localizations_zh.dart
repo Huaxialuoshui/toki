@@ -310,7 +310,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiToolCallLabel => '工具调用';
 
   @override
-  String get aiToolRunning => '正在查询日程…';
+  String aiToolRunning(String tool) {
+    return '正在$tool…';
+  }
 
   @override
   String get aiToolDone => '已完成';
@@ -461,6 +463,83 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aiManagePersonas => '管理人设';
+
+  @override
+  String get aiPermissionSection => 'AI 权限';
+
+  @override
+  String get aiPermissionRead => '允许查询日程 / 倒计时';
+
+  @override
+  String get aiPermissionCreate => '允许创建日程 / 倒计时';
+
+  @override
+  String get aiPermissionUpdate => '允许修改已有内容';
+
+  @override
+  String get aiPermissionDelete => '允许删除（危险）';
+
+  @override
+  String get aiPermissionHint => '被拒绝的工具会如实告诉 AI；删除操作始终需要你确认。';
+
+  @override
+  String get aiToolConfirmTitle => '允许执行这个操作？';
+
+  @override
+  String aiToolConfirmBody(String tool) {
+    return 'AI 想要$tool，参数如下：';
+  }
+
+  @override
+  String get aiToolConfirmAllow => '允许';
+
+  @override
+  String get aiToolConfirmDeny => '拒绝';
+
+  @override
+  String get aiToolGetCurrentTime => '查询当前时间';
+
+  @override
+  String get aiToolGetTodayEvents => '查询今日日程';
+
+  @override
+  String get aiToolGetEvents => '查询日程';
+
+  @override
+  String get aiToolSearchEvents => '搜索日程';
+
+  @override
+  String get aiToolSummary => '统计日程';
+
+  @override
+  String get aiToolCreateEvent => '创建日程';
+
+  @override
+  String get aiToolUpdateEvent => '修改日程';
+
+  @override
+  String get aiToolDeleteEvent => '删除日程';
+
+  @override
+  String get aiToolGetCountdowns => '查询倒计时';
+
+  @override
+  String get aiToolCreateCountdown => '创建倒计时';
+
+  @override
+  String get aiToolUpdateCountdown => '修改倒计时';
+
+  @override
+  String get aiToolDeleteCountdown => '删除倒计时';
+
+  @override
+  String get aiToolCreateReminder => '创建提醒';
+
+  @override
+  String get aiToolUpdateReminder => '修改提醒';
+
+  @override
+  String get aiToolDeleteReminder => '删除提醒';
 
   @override
   String get settingsAppearance => '外观';

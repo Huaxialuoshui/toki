@@ -3558,6 +3558,12 @@ class $ChatMessagesTable extends ChatMessages
   late final GeneratedColumn<String> toolName = GeneratedColumn<String>(
       'tool_name', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _toolCallIdMeta =
+      const VerificationMeta('toolCallId');
+  @override
+  late final GeneratedColumn<String> toolCallId = GeneratedColumn<String>(
+      'tool_call_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _toolArgumentsMeta =
       const VerificationMeta('toolArguments');
   @override
@@ -3583,6 +3589,7 @@ class $ChatMessagesTable extends ChatMessages
         role,
         content,
         toolName,
+        toolCallId,
         toolArguments,
         toolResult,
         createdAt
@@ -3617,6 +3624,12 @@ class $ChatMessagesTable extends ChatMessages
     if (data.containsKey('tool_name')) {
       context.handle(_toolNameMeta,
           toolName.isAcceptableOrUnknown(data['tool_name']!, _toolNameMeta));
+    }
+    if (data.containsKey('tool_call_id')) {
+      context.handle(
+          _toolCallIdMeta,
+          toolCallId.isAcceptableOrUnknown(
+              data['tool_call_id']!, _toolCallIdMeta));
     }
     if (data.containsKey('tool_arguments')) {
       context.handle(
@@ -3656,6 +3669,8 @@ class $ChatMessagesTable extends ChatMessages
           .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
       toolName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}tool_name']),
+      toolCallId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tool_call_id']),
       toolArguments: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}tool_arguments']),
       toolResult: attachedDatabase.typeMapping
@@ -3680,6 +3695,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
   final ChatRole role;
   final String content;
   final String? toolName;
+
+  /// OpenAI 协议里 `role=tool` 的消息必须带 `tool_call_id`。
+  final String? toolCallId;
   final String? toolArguments;
   final String? toolResult;
   final DateTime createdAt;
@@ -3689,6 +3707,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       required this.role,
       required this.content,
       this.toolName,
+      this.toolCallId,
       this.toolArguments,
       this.toolResult,
       required this.createdAt});
@@ -3704,6 +3723,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
     map['content'] = Variable<String>(content);
     if (!nullToAbsent || toolName != null) {
       map['tool_name'] = Variable<String>(toolName);
+    }
+    if (!nullToAbsent || toolCallId != null) {
+      map['tool_call_id'] = Variable<String>(toolCallId);
     }
     if (!nullToAbsent || toolArguments != null) {
       map['tool_arguments'] = Variable<String>(toolArguments);
@@ -3724,6 +3746,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       toolName: toolName == null && nullToAbsent
           ? const Value.absent()
           : Value(toolName),
+      toolCallId: toolCallId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toolCallId),
       toolArguments: toolArguments == null && nullToAbsent
           ? const Value.absent()
           : Value(toolArguments),
@@ -3744,6 +3769,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           .fromJson(serializer.fromJson<String>(json['role'])),
       content: serializer.fromJson<String>(json['content']),
       toolName: serializer.fromJson<String?>(json['toolName']),
+      toolCallId: serializer.fromJson<String?>(json['toolCallId']),
       toolArguments: serializer.fromJson<String?>(json['toolArguments']),
       toolResult: serializer.fromJson<String?>(json['toolResult']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -3759,6 +3785,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           .toJson<String>($ChatMessagesTable.$converterrole.toJson(role)),
       'content': serializer.toJson<String>(content),
       'toolName': serializer.toJson<String?>(toolName),
+      'toolCallId': serializer.toJson<String?>(toolCallId),
       'toolArguments': serializer.toJson<String?>(toolArguments),
       'toolResult': serializer.toJson<String?>(toolResult),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -3771,6 +3798,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           ChatRole? role,
           String? content,
           Value<String?> toolName = const Value.absent(),
+          Value<String?> toolCallId = const Value.absent(),
           Value<String?> toolArguments = const Value.absent(),
           Value<String?> toolResult = const Value.absent(),
           DateTime? createdAt}) =>
@@ -3780,6 +3808,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
         role: role ?? this.role,
         content: content ?? this.content,
         toolName: toolName.present ? toolName.value : this.toolName,
+        toolCallId: toolCallId.present ? toolCallId.value : this.toolCallId,
         toolArguments:
             toolArguments.present ? toolArguments.value : this.toolArguments,
         toolResult: toolResult.present ? toolResult.value : this.toolResult,
@@ -3792,6 +3821,8 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       role: data.role.present ? data.role.value : this.role,
       content: data.content.present ? data.content.value : this.content,
       toolName: data.toolName.present ? data.toolName.value : this.toolName,
+      toolCallId:
+          data.toolCallId.present ? data.toolCallId.value : this.toolCallId,
       toolArguments: data.toolArguments.present
           ? data.toolArguments.value
           : this.toolArguments,
@@ -3809,6 +3840,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           ..write('role: $role, ')
           ..write('content: $content, ')
           ..write('toolName: $toolName, ')
+          ..write('toolCallId: $toolCallId, ')
           ..write('toolArguments: $toolArguments, ')
           ..write('toolResult: $toolResult, ')
           ..write('createdAt: $createdAt')
@@ -3818,7 +3850,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
 
   @override
   int get hashCode => Object.hash(id, sessionId, role, content, toolName,
-      toolArguments, toolResult, createdAt);
+      toolCallId, toolArguments, toolResult, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3828,6 +3860,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           other.role == this.role &&
           other.content == this.content &&
           other.toolName == this.toolName &&
+          other.toolCallId == this.toolCallId &&
           other.toolArguments == this.toolArguments &&
           other.toolResult == this.toolResult &&
           other.createdAt == this.createdAt);
@@ -3839,6 +3872,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
   final Value<ChatRole> role;
   final Value<String> content;
   final Value<String?> toolName;
+  final Value<String?> toolCallId;
   final Value<String?> toolArguments;
   final Value<String?> toolResult;
   final Value<DateTime> createdAt;
@@ -3849,6 +3883,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     this.role = const Value.absent(),
     this.content = const Value.absent(),
     this.toolName = const Value.absent(),
+    this.toolCallId = const Value.absent(),
     this.toolArguments = const Value.absent(),
     this.toolResult = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -3860,6 +3895,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     required ChatRole role,
     required String content,
     this.toolName = const Value.absent(),
+    this.toolCallId = const Value.absent(),
     this.toolArguments = const Value.absent(),
     this.toolResult = const Value.absent(),
     required DateTime createdAt,
@@ -3875,6 +3911,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     Expression<String>? role,
     Expression<String>? content,
     Expression<String>? toolName,
+    Expression<String>? toolCallId,
     Expression<String>? toolArguments,
     Expression<String>? toolResult,
     Expression<DateTime>? createdAt,
@@ -3886,6 +3923,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       if (role != null) 'role': role,
       if (content != null) 'content': content,
       if (toolName != null) 'tool_name': toolName,
+      if (toolCallId != null) 'tool_call_id': toolCallId,
       if (toolArguments != null) 'tool_arguments': toolArguments,
       if (toolResult != null) 'tool_result': toolResult,
       if (createdAt != null) 'created_at': createdAt,
@@ -3899,6 +3937,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       Value<ChatRole>? role,
       Value<String>? content,
       Value<String?>? toolName,
+      Value<String?>? toolCallId,
       Value<String?>? toolArguments,
       Value<String?>? toolResult,
       Value<DateTime>? createdAt,
@@ -3909,6 +3948,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       role: role ?? this.role,
       content: content ?? this.content,
       toolName: toolName ?? this.toolName,
+      toolCallId: toolCallId ?? this.toolCallId,
       toolArguments: toolArguments ?? this.toolArguments,
       toolResult: toolResult ?? this.toolResult,
       createdAt: createdAt ?? this.createdAt,
@@ -3935,6 +3975,9 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     if (toolName.present) {
       map['tool_name'] = Variable<String>(toolName.value);
     }
+    if (toolCallId.present) {
+      map['tool_call_id'] = Variable<String>(toolCallId.value);
+    }
     if (toolArguments.present) {
       map['tool_arguments'] = Variable<String>(toolArguments.value);
     }
@@ -3958,6 +4001,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
           ..write('role: $role, ')
           ..write('content: $content, ')
           ..write('toolName: $toolName, ')
+          ..write('toolCallId: $toolCallId, ')
           ..write('toolArguments: $toolArguments, ')
           ..write('toolResult: $toolResult, ')
           ..write('createdAt: $createdAt, ')
@@ -7081,6 +7125,7 @@ typedef $$ChatMessagesTableCreateCompanionBuilder = ChatMessagesCompanion
   required ChatRole role,
   required String content,
   Value<String?> toolName,
+  Value<String?> toolCallId,
   Value<String?> toolArguments,
   Value<String?> toolResult,
   required DateTime createdAt,
@@ -7093,6 +7138,7 @@ typedef $$ChatMessagesTableUpdateCompanionBuilder = ChatMessagesCompanion
   Value<ChatRole> role,
   Value<String> content,
   Value<String?> toolName,
+  Value<String?> toolCallId,
   Value<String?> toolArguments,
   Value<String?> toolResult,
   Value<DateTime> createdAt,
@@ -7141,6 +7187,9 @@ class $$ChatMessagesTableFilterComposer
 
   ColumnFilters<String> get toolName => $composableBuilder(
       column: $table.toolName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get toolCallId => $composableBuilder(
+      column: $table.toolCallId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get toolArguments => $composableBuilder(
       column: $table.toolArguments, builder: (column) => ColumnFilters(column));
@@ -7193,6 +7242,9 @@ class $$ChatMessagesTableOrderingComposer
   ColumnOrderings<String> get toolName => $composableBuilder(
       column: $table.toolName, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get toolCallId => $composableBuilder(
+      column: $table.toolCallId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get toolArguments => $composableBuilder(
       column: $table.toolArguments,
       builder: (column) => ColumnOrderings(column));
@@ -7244,6 +7296,9 @@ class $$ChatMessagesTableAnnotationComposer
 
   GeneratedColumn<String> get toolName =>
       $composableBuilder(column: $table.toolName, builder: (column) => column);
+
+  GeneratedColumn<String> get toolCallId => $composableBuilder(
+      column: $table.toolCallId, builder: (column) => column);
 
   GeneratedColumn<String> get toolArguments => $composableBuilder(
       column: $table.toolArguments, builder: (column) => column);
@@ -7303,6 +7358,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             Value<ChatRole> role = const Value.absent(),
             Value<String> content = const Value.absent(),
             Value<String?> toolName = const Value.absent(),
+            Value<String?> toolCallId = const Value.absent(),
             Value<String?> toolArguments = const Value.absent(),
             Value<String?> toolResult = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -7314,6 +7370,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             role: role,
             content: content,
             toolName: toolName,
+            toolCallId: toolCallId,
             toolArguments: toolArguments,
             toolResult: toolResult,
             createdAt: createdAt,
@@ -7325,6 +7382,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             required ChatRole role,
             required String content,
             Value<String?> toolName = const Value.absent(),
+            Value<String?> toolCallId = const Value.absent(),
             Value<String?> toolArguments = const Value.absent(),
             Value<String?> toolResult = const Value.absent(),
             required DateTime createdAt,
@@ -7336,6 +7394,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             role: role,
             content: content,
             toolName: toolName,
+            toolCallId: toolCallId,
             toolArguments: toolArguments,
             toolResult: toolResult,
             createdAt: createdAt,

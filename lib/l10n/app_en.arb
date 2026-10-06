@@ -233,6 +233,46 @@
     }
   },
   "aiManagePersonas": "Manage personas",
+  "aiPermissionSection": "AI permissions",
+  "aiPermissionRead": "Read calendar & countdowns",
+  "aiPermissionCreate": "Create events / countdowns",
+  "aiPermissionUpdate": "Modify existing items",
+  "aiPermissionDelete": "Delete items (dangerous)",
+  "aiPermissionHint": "Refused tools are reported back to the assistant. Deletions always ask for your confirmation.",
+  "aiToolRunning": "Running: {tool}",
+  "@aiToolRunning": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "aiToolConfirmTitle": "Allow this action?",
+  "aiToolConfirmBody": "The assistant wants to run {tool} with:",
+  "@aiToolConfirmBody": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "aiToolConfirmAllow": "Allow",
+  "aiToolConfirmDeny": "Deny",
+  "aiToolGetCurrentTime": "checking the time",
+  "aiToolGetTodayEvents": "reading today's schedule",
+  "aiToolGetEvents": "reading your schedule",
+  "aiToolSearchEvents": "searching your events",
+  "aiToolSummary": "summarising your schedule",
+  "aiToolCreateEvent": "creating an event",
+  "aiToolUpdateEvent": "updating an event",
+  "aiToolDeleteEvent": "deleting an event",
+  "aiToolGetCountdowns": "reading countdowns",
+  "aiToolCreateCountdown": "creating a countdown",
+  "aiToolUpdateCountdown": "updating a countdown",
+  "aiToolDeleteCountdown": "deleting a countdown",
+  "aiToolCreateReminder": "creating a reminder",
+  "aiToolUpdateReminder": "updating a reminder",
+  "aiToolDeleteReminder": "deleting a reminder",
 
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",

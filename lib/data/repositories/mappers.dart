@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' show Brightness, Color;
 
@@ -240,17 +242,33 @@ extension ChatMessageRowMapper on ChatMessageRow {
         sessionId: sessionId,
         role: role,
         content: content,
+        toolCallId: toolCallId,
+        requestedToolCalls: role == ChatRole.assistant
+            ? ChatToolCall.parseList(toolArguments)
+            : const <ChatToolCall>[],
+        toolResult: toolResult,
         toolCall: toolName == null
             ? null
             : ToolCallInfo(
                 toolName: toolName!,
-                status: toolResult == null
-                    ? ToolCallStatus.running
+                // 结果 JSON 里带 error 字段说明工具执行失败（见 AiToolResult）。
+                status: _toolResultFailed(toolResult)
+                    ? ToolCallStatus.failed
                     : ToolCallStatus.succeeded,
-                summary: toolResult,
+                summary: toolResult == null ? content : null,
               ),
         createdAt: createdAt,
       );
+}
+
+bool _toolResultFailed(String? raw) {
+  if (raw == null || raw.trim().isEmpty) return false;
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is Map && decoded.containsKey('error');
+  } on FormatException {
+    return false;
+  }
 }
 
 ChatMessagesCompanion chatMessageToCompanion(ChatMessage message) =>
@@ -260,8 +278,13 @@ ChatMessagesCompanion chatMessageToCompanion(ChatMessage message) =>
       role: Value<ChatRole>(message.role),
       content: Value<String>(message.content),
       toolName: Value<String?>(message.toolCall?.toolName),
-      toolArguments: const Value<String?>(null),
-      toolResult: Value<String?>(message.toolCall?.summary),
+      toolCallId: Value<String?>(message.toolCallId),
+      toolArguments: Value<String?>(
+        message.requestedToolCalls.isEmpty
+            ? null
+            : ChatToolCall.encodeList(message.requestedToolCalls),
+      ),
+      toolResult: Value<String?>(message.toolResult),
       createdAt: Value<DateTime>(message.createdAt),
     );
 

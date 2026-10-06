@@ -68,6 +68,11 @@ class OpenAiCompatibleProvider implements AiProvider {
       if ((request.maxTokens ?? config.maxTokens) != null)
         'max_tokens': request.maxTokens ?? config.maxTokens,
       'stream': stream,
+      if (request.tools.isNotEmpty)
+        'tools': request.tools
+            .map((AiToolDefinition tool) => tool.toJson())
+            .toList(growable: false),
+      if (request.tools.isNotEmpty) 'tool_choice': 'auto',
     };
   }
 
@@ -100,7 +105,30 @@ class OpenAiCompatibleProvider implements AiProvider {
       finishReason: first is Map && first['finish_reason'] is String
           ? first['finish_reason'] as String
           : null,
+      toolCalls: _toolCallsOf(message is Map ? message['tool_calls'] : null),
     );
+  }
+
+  /// 解析非流式响应里的 tool_calls。
+  static List<AiToolCall> _toolCallsOf(Object? raw) {
+    if (raw is! List) return const <AiToolCall>[];
+    final calls = <AiToolCall>[];
+    var index = 0;
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final function = entry['function'];
+      if (function is! Map) continue;
+      calls.add(
+        AiToolCall(
+          id: entry['id'] is String ? entry['id'] as String : 'call-$index',
+          name: function['name'] is String ? function['name'] as String : '',
+          argumentsJson:
+              function['arguments'] is String ? function['arguments'] as String : '',
+        ),
+      );
+      index++;
+    }
+    return calls;
   }
 
   @override
@@ -129,13 +157,20 @@ class OpenAiCompatibleProvider implements AiProvider {
         .bind(body.stream)
         .transform(const LineSplitter());
 
+    final builders = <int, _ToolCallBuilder>{};
+
     await for (final String line in lines) {
       final payload = _sseData(line);
       if (payload == null) continue;
       if (payload == '[DONE]') {
+        if (builders.isNotEmpty) {
+          yield AiResponseChunk(toolCalls: _finishToolCalls(builders));
+        }
         yield const AiResponseChunk(delta: '', done: true);
         return;
       }
+
+      _collectToolCalls(payload, builders);
 
       final delta = _deltaOf(payload);
       if (delta == null) continue;
@@ -144,7 +179,63 @@ class OpenAiCompatibleProvider implements AiProvider {
     }
 
     // 有些服务端不发 [DONE]，直接结束流。
+    if (builders.isNotEmpty) {
+      yield AiResponseChunk(toolCalls: _finishToolCalls(builders));
+    }
     yield const AiResponseChunk(delta: '', done: true);
+  }
+
+  /// 累积流式返回的 tool_calls 分片（id / name / arguments 都可能被切开）。
+  static void _collectToolCalls(
+    String payload,
+    Map<int, _ToolCallBuilder> builders,
+  ) {
+    try {
+      final decoded = jsonDecode(payload);
+      if (decoded is! Map) return;
+      final choices = decoded['choices'];
+      if (choices is! List || choices.isEmpty) return;
+      final first = choices.first;
+      if (first is! Map) return;
+      final delta = first['delta'];
+      if (delta is! Map) return;
+      final toolCalls = delta['tool_calls'];
+      if (toolCalls is! List) return;
+
+      for (final entry in toolCalls) {
+        if (entry is! Map) continue;
+        final index = entry['index'] is int ? entry['index'] as int : 0;
+        final builder = builders.putIfAbsent(index, _ToolCallBuilder.new);
+        if (entry['id'] is String) builder.id = entry['id'] as String;
+        final function = entry['function'];
+        if (function is Map) {
+          if (function['name'] is String && (function['name'] as String).isNotEmpty) {
+            builder.name = function['name'] as String;
+          }
+          if (function['arguments'] is String) {
+            builder.arguments.write(function['arguments'] as String);
+          }
+        }
+      }
+    } on FormatException {
+      // 分片不完整时不处理，等下一块补齐。
+    }
+  }
+
+  static List<AiToolCall> _finishToolCalls(
+    Map<int, _ToolCallBuilder> builders,
+  ) {
+    final indexes = builders.keys.toList()..sort();
+    return <AiToolCall>[
+      for (final index in indexes)
+        AiToolCall(
+          id: builders[index]!.id.isEmpty
+              ? 'call-$index'
+              : builders[index]!.id,
+          name: builders[index]!.name,
+          argumentsJson: builders[index]!.arguments.toString(),
+        ),
+    ];
   }
 
   /// 取出一行 SSE 里的 data 负载；非 data 行（空行 / 注释 / event: 行）返回 null。
@@ -216,4 +307,11 @@ class OpenAiCompatibleProvider implements AiProvider {
     final oneLine = text.replaceAll(RegExp(r'\s+'), ' ').trim();
     return oneLine.length <= 200 ? oneLine : '${oneLine.substring(0, 200)}…';
   }
+}
+
+/// 流式 tool_calls 的累积器。
+class _ToolCallBuilder {
+  String id = '';
+  String name = '';
+  final StringBuffer arguments = StringBuffer();
 }

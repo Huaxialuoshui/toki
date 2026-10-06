@@ -25,6 +25,14 @@ CHUNKS = [
     "20:00 课程项目截止。",
 ]
 
+# 让 mock 也能演示"工具调用"：如果请求里带了 tools 且还没有工具结果，
+# 就先请求调用 create_event；拿到工具结果后再给出最终回复。
+TOOL_CALL_ARGS = {
+    "title": "毕业答辩（AI 创建）",
+    "start_time": "2026-10-20T15:00:00",
+    "reminder_minutes": 30,
+}
+
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -51,13 +59,18 @@ class Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             body = {}
         stream = bool(body.get("stream"))
+        messages = body.get("messages") or []
+        has_tool_result = any(m.get("role") == "tool" for m in messages)
+        wants_tool_call = bool(body.get("tools")) and not has_tool_result
         sys.stderr.write(
-            "REQ path=%s stream=%s model=%s auth=%s\n"
+            "REQ path=%s stream=%s model=%s auth=%s tools=%s tool_result=%s\n"
             % (
                 self.path,
                 stream,
                 body.get("model"),
                 "yes" if self.headers.get("authorization") else "no",
+                "yes" if body.get("tools") else "no",
+                "yes" if has_tool_result else "no",
             )
         )
         sys.stderr.flush()
@@ -68,6 +81,42 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-cache")
             self.send_header("Connection", "keep-alive")
             self.end_headers()
+            if wants_tool_call:
+                payload = {
+                    "choices": [
+                        {
+                            "delta": {
+                                "tool_calls": [
+                                    {
+                                        "index": 0,
+                                        "id": "call_mock_1",
+                                        "type": "function",
+                                        "function": {
+                                            "name": "create_event",
+                                            "arguments": json.dumps(
+                                                TOOL_CALL_ARGS, ensure_ascii=False
+                                            ),
+                                        },
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                line = "data: %s\n\n" % json.dumps(payload, ensure_ascii=False)
+                self.wfile.write(line.encode("utf-8"))
+                self.wfile.flush()
+                time.sleep(0.3)
+                final = {
+                    "choices": [{"delta": {}, "finish_reason": "tool_calls"}]
+                }
+                self.wfile.write(
+                    ("data: %s\n\n" % json.dumps(final)).encode("utf-8")
+                )
+                self.wfile.flush()
+                self.wfile.write(b"data: [DONE]\n\n")
+                self.wfile.flush()
+                return
             for chunk in CHUNKS:
                 payload = {"choices": [{"delta": {"content": chunk}}]}
                 line = "data: %s\n\n" % json.dumps(payload, ensure_ascii=False)

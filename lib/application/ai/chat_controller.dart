@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,9 +15,26 @@ import '../../domain/services/ai_provider.dart';
 import '../../infrastructure/ai/openai_compatible_provider.dart';
 import '../../infrastructure/clock_provider.dart';
 import 'ai_providers.dart';
+import 'tool_permissions.dart';
+import 'tools/ai_tool.dart';
+import 'tools/tool_registry.dart';
 
-/// 默认会话 id（Phase 7 会支持多会话）。
+/// 默认会话 id（多会话在后续阶段实现）。
 const String kDefaultChatSessionId = 'session-default';
+
+/// 需要用户确认的危险操作。
+@immutable
+class PendingToolConfirmation {
+  const PendingToolConfirmation({
+    required this.toolName,
+    required this.category,
+    required this.arguments,
+  });
+
+  final String toolName;
+  final AiToolCategory category;
+  final Map<String, Object?> arguments;
+}
 
 /// 聊天页的流式状态。
 @immutable
@@ -25,6 +43,8 @@ class ChatStreamState {
     this.isStreaming = false,
     this.streamingText = '',
     this.error,
+    this.pendingConfirmation,
+    this.activeToolName,
   });
 
   final bool isStreaming;
@@ -35,16 +55,31 @@ class ChatStreamState {
   /// 最近一次错误（可读文案，不含 API Key）。
   final String? error;
 
+  /// 等待用户确认的危险工具调用。
+  final PendingToolConfirmation? pendingConfirmation;
+
+  /// 正在执行的工具名（用于"正在创建日程…"）。
+  final String? activeToolName;
+
   ChatStreamState copyWith({
     bool? isStreaming,
     String? streamingText,
     String? error,
     bool clearError = false,
+    PendingToolConfirmation? pendingConfirmation,
+    bool clearConfirmation = false,
+    String? activeToolName,
+    bool clearActiveTool = false,
   }) {
     return ChatStreamState(
       isStreaming: isStreaming ?? this.isStreaming,
       streamingText: streamingText ?? this.streamingText,
       error: clearError ? null : (error ?? this.error),
+      pendingConfirmation: clearConfirmation
+          ? null
+          : (pendingConfirmation ?? this.pendingConfirmation),
+      activeToolName:
+          clearActiveTool ? null : (activeToolName ?? this.activeToolName),
     );
   }
 }
@@ -60,7 +95,6 @@ final chatSessionProvider = FutureProvider.autoDispose<ChatSession>((ref) async 
   final session = ChatSession(
     id: kDefaultChatSessionId,
     title: 'Toki',
-    // 不能用 activePersonaProvider（它反过来依赖本 provider，会形成环）。
     personaId: _firstPersonaId(ref),
     createdAt: now,
     updatedAt: now,
@@ -119,9 +153,34 @@ final aiProviderFactoryProvider =
   };
 });
 
+/// 单轮流式结果。
+class _TurnResult {
+  const _TurnResult({required this.text, required this.toolCalls});
+
+  final String text;
+  final List<AiToolCall> toolCalls;
+}
+
+/// 工具执行结果（给模型看的内容 + 给用户看的摘要）。
+class _ToolOutcome {
+  const _ToolOutcome({
+    required this.content,
+    required this.isError,
+    required this.display,
+  });
+
+  final String content;
+  final bool isError;
+  final String display;
+}
+
 class ChatController extends Notifier<ChatStreamState> {
+  /// 一次用户输入最多允许几轮"模型 → 工具 → 模型"。
+  static const int maxToolRounds = 5;
+
   StreamSubscription<AiResponseChunk>? _subscription;
   Completer<void>? _completer;
+  Completer<bool>? _confirmation;
   Future<void>? _pending;
 
   @override
@@ -129,13 +188,24 @@ class ChatController extends Notifier<ChatStreamState> {
     ref.onDispose(() {
       _subscription?.cancel();
       _subscription = null;
+      _confirmation?.complete(false);
+      _confirmation = null;
     });
     return const ChatStreamState();
   }
 
   AiPersona? get _persona => ref.read(activePersonaProvider);
 
-  /// 把用户输入发给模型，并把流式结果写进状态、结束后落库。
+  /// 用户确认 / 拒绝一个危险工具调用。
+  void resolveConfirmation(bool approved) {
+    final completer = _confirmation;
+    _confirmation = null;
+    state = state.copyWith(clearConfirmation: true);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(approved);
+    }
+  }
+
   Future<void> send(String text) async {
     final content = text.trim();
     if (content.isEmpty || state.isStreaming) return;
@@ -162,39 +232,92 @@ class ChatController extends Notifier<ChatStreamState> {
       ),
     );
 
-    final history = await repository.getMessages(session.id);
-    final request = AiChatRequest(
-      messages: <AiMessage>[
-        if ((_persona?.systemPrompt ?? '').trim().isNotEmpty)
-          AiMessage.system(_persona!.systemPrompt!.trim()),
-        for (final message in history)
-          if (message.role == ChatRole.user)
-            AiMessage.user(message.content)
-          else if (message.role == ChatRole.assistant)
-            AiMessage.assistant(message.content),
-      ],
-      temperature: _persona?.temperature,
-    );
-
-    final pending = _runStream(provider, request, session.id);
+    final pending = _runAgent(provider, session);
     _pending = pending;
     await pending;
   }
 
-  Future<void> _runStream(
+  /// 核心循环：模型 → 工具 → 模型 …… 直到模型给出最终回复。
+  Future<void> _runAgent(AiProvider provider, ChatSession session) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final registry = ref.read(aiToolRegistryProvider);
+    final permissions = ref.read(toolPermissionsProvider);
+    final persona = _persona;
+
+    try {
+      for (var round = 0; round < maxToolRounds; round++) {
+        final history = await repository.getMessages(session.id);
+        final request = AiChatRequest(
+          messages: _toAiMessages(history, persona),
+          temperature: persona?.temperature,
+          tools: registry.definitions(
+            permissions: permissions,
+            persona: persona,
+          ),
+        );
+
+        final turn = await _streamTurn(provider, request);
+
+        if (turn.toolCalls.isEmpty) {
+          final reply = turn.text.trim();
+          if (reply.isEmpty) {
+            state = const ChatStreamState(error: 'empty');
+            return;
+          }
+          await _persistAssistantMessage(session.id, reply);
+          state = const ChatStreamState();
+          return;
+        }
+
+        // 1) 记录助手这一轮的文字与工具请求
+        await _persistAssistantMessage(
+          session.id,
+          turn.text.trim(),
+          toolCalls: turn.toolCalls,
+        );
+
+        // 2) 依次执行工具，并把结果落库（模型下一轮会看到）
+        for (final call in turn.toolCalls) {
+          final outcome = await _executeTool(
+            call: call,
+            registry: registry,
+            permissions: permissions,
+          );
+          await _persistToolMessage(session.id, call, outcome);
+        }
+      }
+
+      state = const ChatStreamState(
+        error: '工具调用轮数过多，已停止（可以换个说法再试）',
+      );
+    } on AppException catch (error) {
+      state = ChatStreamState(error: error.message);
+    } catch (error) {
+      state = ChatStreamState(error: '$error');
+    } finally {
+      _subscription = null;
+      _completer = null;
+      _pending = null;
+    }
+  }
+
+  /// 跑一轮流式请求，实时更新 streamingText，返回文本与工具调用。
+  Future<_TurnResult> _streamTurn(
     AiProvider provider,
     AiChatRequest request,
-    String sessionId,
   ) async {
     final buffer = StringBuffer();
     final completer = Completer<void>();
     _completer = completer;
+    var toolCalls = const <AiToolCall>[];
 
     _subscription = provider.chatStream(request).listen(
       (AiResponseChunk chunk) {
+        if (chunk.toolCalls.isNotEmpty) {
+          toolCalls = chunk.toolCalls;
+        }
         if (chunk.delta.isNotEmpty) {
           buffer.write(chunk.delta);
-          // 逐字刷新：只更新状态里的流式文本。
           state = state.copyWith(streamingText: buffer.toString());
         }
       },
@@ -207,29 +330,135 @@ class ChatController extends Notifier<ChatStreamState> {
       cancelOnError: true,
     );
 
-    try {
-      await completer.future;
-      final reply = buffer.toString().trim();
-      if (reply.isEmpty) {
-        state = const ChatStreamState(error: 'empty');
-        return;
+    await completer.future;
+    return _TurnResult(text: buffer.toString(), toolCalls: toolCalls);
+  }
+
+  /// 权限检查 → 危险操作二次确认 → 执行。
+  Future<_ToolOutcome> _executeTool({
+    required AiToolCall call,
+    required AiToolRegistry registry,
+    required ToolPermissions permissions,
+  }) async {
+    final tool = registry.byName(call.name);
+    if (tool == null) {
+      return _ToolOutcome(
+        content: _errorPayload('未注册的工具：${call.name}'),
+        isError: true,
+        display: '未知工具 ${call.name}',
+      );
+    }
+
+    if (!permissions.allows(tool.category)) {
+      return _ToolOutcome(
+        content: _errorPayload(
+          '用户未授权 AI 执行「${tool.category.name}」类操作，本次调用被拒绝。'
+          '请告知用户可以在设置里开启该权限。',
+        ),
+        isError: true,
+        display: '权限被拒绝',
+      );
+    }
+
+    if (tool.requiresConfirmation) {
+      final approved = await _askConfirmation(tool, call);
+      if (!approved) {
+        return _ToolOutcome(
+          content: _errorPayload('用户拒绝执行 ${tool.name}，本次调用已取消。'),
+          isError: true,
+          display: '用户已取消',
+        );
       }
-      await _persistAssistantMessage(sessionId, reply);
-      state = const ChatStreamState();
-    } on AppException catch (error) {
-      state = ChatStreamState(error: error.message);
+    }
+
+    state = state.copyWith(activeToolName: tool.name);
+    try {
+      final result = await tool.execute(call.arguments);
+      return _ToolOutcome(
+        content: result.toJsonString(),
+        isError: result.isError,
+        display: result.isError ? '执行失败' : '已完成',
+      );
     } catch (error) {
-      state = ChatStreamState(error: '$error');
+      return _ToolOutcome(
+        content: _errorPayload('工具执行异常：$error'),
+        isError: true,
+        display: '执行失败',
+      );
     } finally {
-      _subscription = null;
-      _completer = null;
-      _pending = null;
+      state = state.copyWith(clearActiveTool: true);
     }
   }
 
-  /// 中止当前流式输出；已经收到的部分会保留并落库。
-  ///
-  /// 实现要点：取消订阅后必须结束正在等待的 completer，否则 [send] 会一直挂着。
+  /// 与 [AiToolResult] 保持一致的错误结构，便于回灌给模型、也便于 UI 判断失败。
+  static String _errorPayload(String message) =>
+      jsonEncode(<String, Object?>{'error': message});
+
+  Future<bool> _askConfirmation(AiTool tool, AiToolCall call) async {
+    final completer = Completer<bool>();
+    _confirmation = completer;
+    state = state.copyWith(
+      pendingConfirmation: PendingToolConfirmation(
+        toolName: tool.name,
+        category: tool.category,
+        arguments: call.arguments,
+      ),
+    );
+    // 卡片上的"确认/取消"由 UI 调用 resolveConfirmation。
+    final approved = await completer.future;
+    state = state.copyWith(clearConfirmation: true);
+    return approved;
+  }
+
+  /// 把落库的消息转成发给模型的消息（含工具调用与工具结果）。
+  static List<AiMessage> _toAiMessages(
+    List<ChatMessage> history,
+    AiPersona? persona,
+  ) {
+    final messages = <AiMessage>[
+      if ((persona?.systemPrompt ?? '').trim().isNotEmpty)
+        AiMessage.system(persona!.systemPrompt!.trim()),
+    ];
+
+    // 控制上下文长度：只带最近 40 条。
+    final recent = history.length <= 40
+        ? history
+        : history.sublist(history.length - 40);
+    for (final message in recent) {
+      switch (message.role) {
+        case ChatRole.user:
+          messages.add(AiMessage.user(message.content));
+        case ChatRole.assistant:
+          messages.add(
+            AiMessage(
+              role: AiRole.assistant,
+              content: message.content,
+              toolCalls: message.requestedToolCalls
+                  .map(
+                    (ChatToolCall call) => AiToolCall(
+                      id: call.id,
+                      name: call.name,
+                      argumentsJson: call.argumentsJson,
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
+          );
+        case ChatRole.tool:
+          messages.add(
+            AiMessage.toolResult(
+              toolCallId: message.toolCallId ?? '',
+              content: message.toolResult ?? message.content,
+            ),
+          );
+        case ChatRole.system:
+          break;
+      }
+    }
+    return messages;
+  }
+
+  /// 中止当前输出；已经收到的文本会保留并落库。
   Future<void> cancel() async {
     final subscription = _subscription;
     if (subscription == null) return;
@@ -240,7 +469,6 @@ class ChatController extends Notifier<ChatStreamState> {
     if (completer != null && !completer.isCompleted) {
       completer.complete();
     }
-    // 等 send() 自己把已收到的部分落库，避免两条路径重复写入。
     await _pending;
   }
 
@@ -269,7 +497,6 @@ class ChatController extends Notifier<ChatStreamState> {
         updatedAt: clock.now(),
       ),
     );
-    // 会话变了 → activePersonaProvider 需要重新解析。
     ref.invalidate(chatSessionProvider);
   }
 
@@ -278,7 +505,11 @@ class ChatController extends Notifier<ChatStreamState> {
     state = state.copyWith(clearError: true);
   }
 
-  Future<void> _persistAssistantMessage(String sessionId, String content) async {
+  Future<void> _persistAssistantMessage(
+    String sessionId,
+    String content, {
+    List<AiToolCall> toolCalls = const <AiToolCall>[],
+  }) async {
     final repository = ref.read(chatRepositoryProvider);
     final clock = ref.read(clockProvider);
     await repository.upsertMessage(
@@ -287,22 +518,61 @@ class ChatController extends Notifier<ChatStreamState> {
         sessionId: sessionId,
         role: ChatRole.assistant,
         content: content,
+        requestedToolCalls: toolCalls
+            .map(
+              (AiToolCall call) => ChatToolCall(
+                id: call.id,
+                name: call.name,
+                argumentsJson: call.argumentsJson,
+              ),
+            )
+            .toList(growable: false),
         createdAt: clock.now(),
       ),
     );
-    final session = await repository.findSession(sessionId);
-    if (session != null) {
-      final now = clock.now();
-      await repository.upsertSession(
-        ChatSession(
-          id: session.id,
-          title: session.title,
-          personaId: session.personaId,
-          createdAt: session.createdAt,
-          updatedAt: now,
+    await _touchSession(sessionId);
+  }
+
+  Future<void> _persistToolMessage(
+    String sessionId,
+    AiToolCall call,
+    _ToolOutcome outcome,
+  ) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    await repository.upsertMessage(
+      ChatMessage(
+        id: generateId('msg', now: clock.now()),
+        sessionId: sessionId,
+        role: ChatRole.tool,
+        content: outcome.display,
+        toolCallId: call.id,
+        toolResult: outcome.content,
+        toolCall: ToolCallInfo(
+          toolName: call.name,
+          status:
+              outcome.isError ? ToolCallStatus.failed : ToolCallStatus.succeeded,
+          summary: outcome.display,
         ),
-      );
-    }
+        createdAt: clock.now(),
+      ),
+    );
+  }
+
+  Future<void> _touchSession(String sessionId) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final session = await repository.findSession(sessionId);
+    if (session == null) return;
+    await repository.upsertSession(
+      ChatSession(
+        id: session.id,
+        title: session.title,
+        personaId: session.personaId,
+        createdAt: session.createdAt,
+        updatedAt: clock.now(),
+      ),
+    );
   }
 }
 

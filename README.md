@@ -2,15 +2,15 @@
 
 本地优先的 AI 日历 / 倒计时 / 提醒应用，Android 与 Windows 双端共用一套 Flutter 代码。
 
-> 当前状态：**Phase 7（AI 人设）已完成**：日程 / 倒计时 / 通知 / AI 聊天之外，
-> 人设可以自由创建、编辑、删除并在聊天页切换；工具调用（Phase 8）待做。
+> 当前状态：**Phase 8（AI Tool Calling）已完成**：AI 已经可以真正读写你的日程 / 倒计时 / 提醒，
+> 带工具权限控制与危险操作二次确认；上下文优化（Phase 9）与后续阶段待做。
 
 平台验证状态（2026-10-06）：
 
 | 平台 | analyze | test | 构建 | 运行 |
 | --- | --- | --- | --- | --- |
-| Android | ✅ | ✅ 123/123 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、"进程结束后系统闹钟仍在"、AI 真实流式聊天、人设增删改 |
-| Windows | ✅ | ✅ 123/123 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 可见性待你空闲时确认 |
+| Android | ✅ | ✅ 144/144 | ✅ `flutter build apk --debug` / `--release` | ✅ 模拟器实测：日程 / 倒计时增删改、拖拽排序、通知投递、闹钟跨进程存活、AI 流式聊天、人设 CRUD、**AI 真实创建日程** |
+| Windows | ✅ | ✅ 144/144 | ✅ `flutter build windows` | ✅ 运行实测（桌面鼠标拖动排序）；系统 Toast 可见性待你空闲时确认 |
 
 ## 项目介绍
 
@@ -41,6 +41,9 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
   真实聊天与逐字输出，会话与消息落库
 - **AI 人设**：人设 CRUD（名称 / 身份 / 头像 / 性格 / 说话方式 / 称呼 / 系统提示词 / 温度）、
   聊天页切换人设、头像支持 emoji / 单字 / 图片路径或 URL
+- **AI Tool Calling**：15 个工具（时间 / 日程查询与增删改 / 倒计时 / 提醒 / 搜索 / 汇总）、
+  工具权限开关（查询 / 创建 / 修改 / 删除，删除默认关闭）、危险操作二次确认、
+  工具结果回灌给模型（绝不"嘴上说创建成功"）
 
 计划中（尚未实现，按阶段推进）
 
@@ -54,6 +57,7 @@ Toki 的目标是把「日历 + 倒计时 + 提醒 + 可自定义人设的 AI �
 | Phase 5 | Android 本地通知 / Windows Toast、提醒排期 | ✅ |
 | Phase 6 | AI Provider（OpenAI Compatible）+ 流式聊天 | ✅ |
 | Phase 7 | AI 人设 CRUD 与聊天页切换 | ✅ |
+| Phase 8 | AI Tool Calling + 工具权限 + 危险操作确认 | ✅ |
 | Phase 6-8 | AI Provider、Persona、Tool Calling + 权限 | ⏳ |
 | Phase 9-13 | Context、聊天自定义、主题编辑器、备份、质量优化 | ⏳ |
 
@@ -301,6 +305,30 @@ adb reverse tcp:11434 tcp:11434          # Android 模拟器/真机：把端口�
 system prompt——`chat_sessions.persona_id` 记录当前会话选用的人设；删除人设前会先把引用它的会话置空，
 否则会撞 `chat_sessions.persona_id` 的外键约束（这个坑有专门的回归测试）。
 
+### AI 工具调用（Phase 8）
+
+AI 不能碰数据库，只能通过工具层操作；工具执行结果会原样回灌给模型，模型再据此回答。
+
+| 工具 | 类别 | 说明 |
+| --- | --- | --- |
+| `get_current_time` | 查询 | 当前时间 / 星期 / 时区偏移（推算"明天下午"前必须先调它） |
+| `get_today_events` / `get_events` / `search_events` / `get_calendar_summary` | 查询 | 今日、范围、关键词、汇总 |
+| `create_event` / `update_event` / `delete_event` | 创建 / 修改 / 删除 | 日程；带 `reminder_minutes` 时会同步提醒行 |
+| `get_countdowns` / `create_countdown` / `update_countdown` / `delete_countdown` | 查询 / 创建 / 修改 / 删除 | 倒计时，查询结果含剩余天数 |
+| `create_reminder` / `update_reminder` / `delete_reminder` | 创建 / 修改 / 删除 | 独立提醒 |
+
+* **权限**：设置 → AI 权限里有四个开关（查询 / 创建 / 修改 / 删除）。**删除默认关闭**；
+  被拒绝的工具会返回"未授权"，模型必须如实告诉用户，而不是假装完成。
+  人设的 `enabled_tools` 非空时会进一步收窄可用工具。
+* **二次确认**：删除类工具（以及 `update_event` / `update_countdown` / `update_reminder` 这类可能改坏数据
+  的操作）会先弹确认框，列出工具与参数；拒绝后工具返回"用户拒绝"，数据不动。
+* **时间必须明确**：工具只接受 ISO-8601 时间；模型给模糊时间会被工具拒绝并提示重新给出明确时间
+  （规格 §20 的"时间解析必须明确"）。
+* **失败不掩盖**：工具异常 / 参数错误 / 找不到 id 都会以 `{"error": ...}` 回灌；聊天里显示
+  "工具调用 · 修改日程 — 执行失败"。
+* **循环上限**：一次用户输入最多 5 轮"模型 → 工具 → 模型"，避免模型反复调用停不下来。
+* 调试：`tool/inspect_device_db.dart` 可以把设备数据库拉下来直接看 AI 到底写了什么。
+
 ## 通知说明（Phase 5）
 
 * **抽象**：业务层只依赖 `NotificationService`（`initialize` / `requestPermission` /
@@ -336,7 +364,7 @@ flutter analyze
 flutter test
 ```
 
-当前 123 个测试，覆盖：
+当前 144 个测试，覆盖：
 
 * 领域：倒计时拆分（跨天 / 跨月 / 跨年 / 已过去）、日历事件命中判定
 * 领域·时间：时区混用、夏令时（春季 23 小时 / 秋季 25 小时）、目标时间正好是现在
@@ -357,6 +385,13 @@ flutter test
 * 界面·AI：未配置时的提示与入口、发送后逐字显示回复、错误横幅、清空对话
 * 人设：设置页新建 / 编辑 / 删除、删除时清理会话引用（外键回归）、
   聊天页切换人设并让后续请求带上新的 system prompt
+* 工具层：15 个工具的注册与执行（创建/修改/删除/查询/搜索/汇总/倒计时/提醒）、
+  非法时间与缺失参数的报错、id 不存在不抛异常、删除类工具标记为需确认
+* 工具权限：默认关闭删除；关闭创建后不再暴露创建工具；人设 `enabled_tools` 收窄可用工具；
+  工具定义是标准 function calling 结构
+* 工具循环：模型请求 `create_event` → 数据真的落库 + 消息序列 user/assistant/tool/assistant +
+  第二次请求带上工具结果；未授权删除 → 数据不变且模型收到"未授权"；
+  授权后用户拒绝确认 → 不删除；用户确认 → 真删除
 
 > 数据库测试跑在 Dart VM 上，需要 sqlite3 动态库：第一次运行前先执行一次 `flutter build windows`
 > （测试会自动把 `sqlite3.dll` 缓存到 `.dart_tool/`，`flutter clean` 不会删）。

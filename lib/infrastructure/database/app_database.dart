@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -49,7 +49,10 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          // v1 是初始版本，尚无升级路径；后续版本在这里按 from → to 增量迁移。
+          if (from < 2) {
+            // v2：聊天消息增加 tool_call_id（AI 工具调用需要）。
+            await m.addColumn(chatMessages, chatMessages.toolCallId);
+          }
         },
         beforeOpen: (OpeningDetails details) async {
           // 打开外键约束（SQLite 默认关闭）。

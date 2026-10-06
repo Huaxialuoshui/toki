@@ -21,6 +21,10 @@ class AppSettingsStore {
   static const String _firstLaunchSeenKey = 'settings.firstLaunchSeen';
   static const String _scheduledNotificationIdsKey =
       'settings.scheduledNotificationIds';
+  static const String _aiAllowReadKey = 'settings.ai.allowRead';
+  static const String _aiAllowCreateKey = 'settings.ai.allowCreate';
+  static const String _aiAllowUpdateKey = 'settings.ai.allowUpdate';
+  static const String _aiAllowDeleteKey = 'settings.ai.allowDelete';
 
   /// 语言代码；返回 null 表示"跟随系统"。
   String? readLocaleCode() => _preferences.getString(_localeKey);
@@ -87,6 +91,22 @@ class AppSettingsStore {
 
   Future<void> clearScheduledNotificationIds() =>
       _preferences.remove(_scheduledNotificationIdsKey);
+
+  bool? readAiAllowRead() => _preferences.getBool(_aiAllowReadKey);
+  Future<void> writeAiAllowRead(bool value) =>
+      _preferences.setBool(_aiAllowReadKey, value);
+
+  bool? readAiAllowCreate() => _preferences.getBool(_aiAllowCreateKey);
+  Future<void> writeAiAllowCreate(bool value) =>
+      _preferences.setBool(_aiAllowCreateKey, value);
+
+  bool? readAiAllowUpdate() => _preferences.getBool(_aiAllowUpdateKey);
+  Future<void> writeAiAllowUpdate(bool value) =>
+      _preferences.setBool(_aiAllowUpdateKey, value);
+
+  bool? readAiAllowDelete() => _preferences.getBool(_aiAllowDeleteKey);
+  Future<void> writeAiAllowDelete(bool value) =>
+      _preferences.setBool(_aiAllowDeleteKey, value);
 }
 
 /// 必须在 `main()` 中 override（见 `lib/main.dart`）。

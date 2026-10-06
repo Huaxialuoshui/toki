@@ -68,6 +68,10 @@ class ChatMessages extends Table {
   TextColumn get role => textEnum<ChatRole>()();
   TextColumn get content => text()();
   TextColumn get toolName => text().nullable()();
+
+  /// OpenAI 协议里 `role=tool` 的消息必须带 `tool_call_id`。
+  TextColumn get toolCallId => text().nullable()();
+
   TextColumn get toolArguments => text().nullable()();
   TextColumn get toolResult => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();

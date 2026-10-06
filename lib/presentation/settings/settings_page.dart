@@ -14,6 +14,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
 import 'ai_persona_section.dart';
+import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
@@ -155,6 +156,12 @@ class SettingsPage extends ConsumerWidget {
           const AiPersonaSection(),
           const SizedBox(height: 16),
           SectionHeader(
+            title: l10n.aiPermissionSection,
+            icon: Icons.verified_user_outlined,
+          ),
+          const _AiPermissionCard(),
+          const SizedBox(height: 16),
+          SectionHeader(
             title: l10n.settingsNotificationSection,
             icon: Icons.notifications_active_outlined,
           ),
@@ -238,6 +245,57 @@ class _FieldLabel extends StatelessWidget {
 }
 
 /// 通知设置：权限状态 + 请求权限 + 发送测试通知。
+/// AI 工具权限开关（查询 / 创建 / 修改 / 删除）。
+class _AiPermissionCard extends ConsumerWidget {
+  const _AiPermissionCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final permissions = ref.watch(toolPermissionsProvider);
+    final controller = ref.read(toolPermissionsProvider.notifier);
+
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.aiPermissionRead),
+            value: permissions.allowRead,
+            onChanged: controller.setRead,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.aiPermissionCreate),
+            value: permissions.allowCreate,
+            onChanged: controller.setCreate,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.aiPermissionUpdate),
+            value: permissions.allowUpdate,
+            onChanged: controller.setUpdate,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.aiPermissionDelete),
+            subtitle: Text(
+              l10n.aiPermissionHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            value: permissions.allowDelete,
+            onChanged: controller.setDelete,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _NotificationCard extends ConsumerStatefulWidget {
   const _NotificationCard();
 

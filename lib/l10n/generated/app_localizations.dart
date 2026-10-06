@@ -668,8 +668,8 @@ abstract class AppLocalizations {
   /// No description provided for @aiToolRunning.
   ///
   /// In en, this message translates to:
-  /// **'Looking up your schedule…'**
-  String get aiToolRunning;
+  /// **'Running: {tool}'**
+  String aiToolRunning(String tool);
 
   /// No description provided for @aiToolDone.
   ///
@@ -958,6 +958,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage personas'**
   String get aiManagePersonas;
+
+  /// No description provided for @aiPermissionSection.
+  ///
+  /// In en, this message translates to:
+  /// **'AI permissions'**
+  String get aiPermissionSection;
+
+  /// No description provided for @aiPermissionRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read calendar & countdowns'**
+  String get aiPermissionRead;
+
+  /// No description provided for @aiPermissionCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create events / countdowns'**
+  String get aiPermissionCreate;
+
+  /// No description provided for @aiPermissionUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify existing items'**
+  String get aiPermissionUpdate;
+
+  /// No description provided for @aiPermissionDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete items (dangerous)'**
+  String get aiPermissionDelete;
+
+  /// No description provided for @aiPermissionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Refused tools are reported back to the assistant. Deletions always ask for your confirmation.'**
+  String get aiPermissionHint;
+
+  /// No description provided for @aiToolConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow this action?'**
+  String get aiToolConfirmTitle;
+
+  /// No description provided for @aiToolConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The assistant wants to run {tool} with:'**
+  String aiToolConfirmBody(String tool);
+
+  /// No description provided for @aiToolConfirmAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get aiToolConfirmAllow;
+
+  /// No description provided for @aiToolConfirmDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Deny'**
+  String get aiToolConfirmDeny;
+
+  /// No description provided for @aiToolGetCurrentTime.
+  ///
+  /// In en, this message translates to:
+  /// **'checking the time'**
+  String get aiToolGetCurrentTime;
+
+  /// No description provided for @aiToolGetTodayEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'reading today\'s schedule'**
+  String get aiToolGetTodayEvents;
+
+  /// No description provided for @aiToolGetEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'reading your schedule'**
+  String get aiToolGetEvents;
+
+  /// No description provided for @aiToolSearchEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'searching your events'**
+  String get aiToolSearchEvents;
+
+  /// No description provided for @aiToolSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'summarising your schedule'**
+  String get aiToolSummary;
+
+  /// No description provided for @aiToolCreateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'creating an event'**
+  String get aiToolCreateEvent;
+
+  /// No description provided for @aiToolUpdateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'updating an event'**
+  String get aiToolUpdateEvent;
+
+  /// No description provided for @aiToolDeleteEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'deleting an event'**
+  String get aiToolDeleteEvent;
+
+  /// No description provided for @aiToolGetCountdowns.
+  ///
+  /// In en, this message translates to:
+  /// **'reading countdowns'**
+  String get aiToolGetCountdowns;
+
+  /// No description provided for @aiToolCreateCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'creating a countdown'**
+  String get aiToolCreateCountdown;
+
+  /// No description provided for @aiToolUpdateCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'updating a countdown'**
+  String get aiToolUpdateCountdown;
+
+  /// No description provided for @aiToolDeleteCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'deleting a countdown'**
+  String get aiToolDeleteCountdown;
+
+  /// No description provided for @aiToolCreateReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'creating a reminder'**
+  String get aiToolCreateReminder;
+
+  /// No description provided for @aiToolUpdateReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'updating a reminder'**
+  String get aiToolUpdateReminder;
+
+  /// No description provided for @aiToolDeleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'deleting a reminder'**
+  String get aiToolDeleteReminder;
 
   /// No description provided for @settingsAppearance.
   ///

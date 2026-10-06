@@ -29,7 +29,23 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 1);
+    // 从 v1 快照建库，再迁移到当前版本（v2）并校验结构一致。
+    await verifier.migrateAndValidate(database, 2);
+  });
+
+  test('v1 → v2 迁移会补上 chat_messages.tool_call_id', () async {
+    final connection = await verifier.startAt(1);
+    final database = AppDatabase(connection);
+    addTearDown(database.close);
+
+    await database.customStatement('PRAGMA foreign_keys = OFF');
+    await verifier.migrateAndValidate(database, 2);
+
+    final columns = await database
+        .customSelect('PRAGMA table_info(chat_messages)')
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+    expect(columns, contains('tool_call_id'));
   });
 
   test('从空库创建后，9 张表全部存在', () async {

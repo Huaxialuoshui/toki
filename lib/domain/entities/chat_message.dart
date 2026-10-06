@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 /// 聊天角色（规格 §5 的 `ChatMessage.role`）。
@@ -35,6 +37,54 @@ class ToolCallInfo {
   int get hashCode => Object.hash(toolName, status, summary);
 }
 
+/// 助手请求调用的一次工具（落库时序列化进 `tool_arguments`）。
+@immutable
+class ChatToolCall {
+  const ChatToolCall({
+    required this.id,
+    required this.name,
+    required this.argumentsJson,
+  });
+
+  final String id;
+  final String name;
+  final String argumentsJson;
+
+  Map<String, Object?> toJson() => <String, Object?>{
+        'id': id,
+        'name': name,
+        'arguments': argumentsJson,
+      };
+
+  static ChatToolCall? fromJson(Object? raw) {
+    if (raw is! Map) return null;
+    return ChatToolCall(
+      id: raw['id']?.toString() ?? '',
+      name: raw['name']?.toString() ?? '',
+      argumentsJson: raw['arguments']?.toString() ?? '',
+    );
+  }
+
+  /// 从 `tool_arguments` 文本解析出工具调用列表。
+  static List<ChatToolCall> parseList(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return const <ChatToolCall>[];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return const <ChatToolCall>[];
+      return decoded
+          .map(ChatToolCall.fromJson)
+          .whereType<ChatToolCall>()
+          .toList(growable: false);
+    } on FormatException {
+      return const <ChatToolCall>[];
+    }
+  }
+
+  static String encodeList(List<ChatToolCall> calls) => jsonEncode(
+        calls.map((ChatToolCall call) => call.toJson()).toList(growable: false),
+      );
+}
+
 /// 聊天消息。
 @immutable
 class ChatMessage {
@@ -45,6 +95,9 @@ class ChatMessage {
     required this.content,
     required this.createdAt,
     this.toolCall,
+    this.toolCallId,
+    this.requestedToolCalls = const <ChatToolCall>[],
+    this.toolResult,
     this.isStreaming = false,
   });
 
@@ -53,6 +106,15 @@ class ChatMessage {
   final ChatRole role;
   final String content;
   final ToolCallInfo? toolCall;
+
+  /// `role == tool` 时对应的工具调用 id。
+  final String? toolCallId;
+
+  /// `role == assistant` 时请求调用的工具。
+  final List<ChatToolCall> requestedToolCalls;
+
+  /// `role == tool` 时的原始结果（JSON 串）。
+  final String? toolResult;
 
   /// 流式输出中（Phase 6 使用；Phase 1 只用于渲染风格）。
   final bool isStreaming;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/persona_avatar.dart';
+import '../widgets/tool_labels.dart';
 
 /// AI 聊天页：真实调用已配置的 AI 服务商，逐字流式输出并落库。
 class AiPage extends ConsumerStatefulWidget {
@@ -59,6 +62,18 @@ class _AiPageState extends ConsumerState<AiPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
+    // 危险工具需要用户确认：状态里出现 pendingConfirmation 时弹确认框。
+    ref.listen<ChatStreamState>(chatControllerProvider, (
+      ChatStreamState? previous,
+      ChatStreamState next,
+    ) {
+      final pending = next.pendingConfirmation;
+      if (pending != null && previous?.pendingConfirmation == null) {
+        unawaited(_showToolConfirmation(pending));
+      }
+    });
+
     final now = ref.watch(clockProvider).now();
     final persona = ref.watch(activePersonaProvider) ??
         buildFallbackPersona(now: now, l10n: l10n);
@@ -127,6 +142,21 @@ class _AiPageState extends ConsumerState<AiPage> {
                   ),
           ),
           const SizedBox(height: 8),
+          if (stream.activeToolName != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                l10n.aiToolRunning(
+                  toolLabel(l10n, stream.activeToolName!),
+                ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                    ),
+              ),
+            ),
           _Composer(
             controller: _composer,
             personaName: persona.name,
@@ -178,6 +208,48 @@ class _AiPageState extends ConsumerState<AiPage> {
     messenger?.showSnackBar(
       SnackBar(content: Text(l10n.aiPersonaSwitched(persona.name))),
     );
+  }
+
+  /// 危险操作的二次确认。
+  Future<void> _showToolConfirmation(PendingToolConfirmation pending) async {
+    final l10n = context.l10n;
+    final controller = ref.read(chatControllerProvider.notifier);
+    if (!mounted) return;
+
+    final approved = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.aiToolConfirmTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              l10n.aiToolConfirmBody(toolLabel(l10n, pending.toolName)),
+            ),
+            const SizedBox(height: 12),
+            for (final entry in pending.arguments.entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('• ${entry.key}: ${entry.value}'),
+              ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.aiToolConfirmDeny),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.aiToolConfirmAllow),
+          ),
+        ],
+      ),
+    );
+
+    controller.resolveConfirmation(approved ?? false);
   }
 }
 
@@ -379,6 +451,11 @@ class _MessageView extends StatelessWidget {
     final locale = context.localeCode;
     final isUser = message.role == ChatRole.user;
 
+    // 只请求工具、没有文字的助手消息不渲染成空气泡（它仍然需要留在历史里）。
+    if (!isUser && message.content.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
@@ -528,8 +605,8 @@ class _ToolCallView extends StatelessWidget {
               const SizedBox(width: 10),
               Flexible(
                 child: Text(
-                  '${l10n.aiToolCallLabel} · ${tool?.toolName ?? ''} — '
-                  '${message.content}',
+                  '${l10n.aiToolCallLabel} · '
+                  '${toolLabel(l10n, tool?.toolName ?? '')} — ${message.content}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),

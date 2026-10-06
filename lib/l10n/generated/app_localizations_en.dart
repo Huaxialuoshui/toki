@@ -310,7 +310,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiToolCallLabel => 'Tool call';
 
   @override
-  String get aiToolRunning => 'Looking up your schedule…';
+  String aiToolRunning(String tool) {
+    return 'Running: $tool';
+  }
 
   @override
   String get aiToolDone => 'Done';
@@ -461,6 +463,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiManagePersonas => 'Manage personas';
+
+  @override
+  String get aiPermissionSection => 'AI permissions';
+
+  @override
+  String get aiPermissionRead => 'Read calendar & countdowns';
+
+  @override
+  String get aiPermissionCreate => 'Create events / countdowns';
+
+  @override
+  String get aiPermissionUpdate => 'Modify existing items';
+
+  @override
+  String get aiPermissionDelete => 'Delete items (dangerous)';
+
+  @override
+  String get aiPermissionHint => 'Refused tools are reported back to the assistant. Deletions always ask for your confirmation.';
+
+  @override
+  String get aiToolConfirmTitle => 'Allow this action?';
+
+  @override
+  String aiToolConfirmBody(String tool) {
+    return 'The assistant wants to run $tool with:';
+  }
+
+  @override
+  String get aiToolConfirmAllow => 'Allow';
+
+  @override
+  String get aiToolConfirmDeny => 'Deny';
+
+  @override
+  String get aiToolGetCurrentTime => 'checking the time';
+
+  @override
+  String get aiToolGetTodayEvents => 'reading today\'s schedule';
+
+  @override
+  String get aiToolGetEvents => 'reading your schedule';
+
+  @override
+  String get aiToolSearchEvents => 'searching your events';
+
+  @override
+  String get aiToolSummary => 'summarising your schedule';
+
+  @override
+  String get aiToolCreateEvent => 'creating an event';
+
+  @override
+  String get aiToolUpdateEvent => 'updating an event';
+
+  @override
+  String get aiToolDeleteEvent => 'deleting an event';
+
+  @override
+  String get aiToolGetCountdowns => 'reading countdowns';
+
+  @override
+  String get aiToolCreateCountdown => 'creating a countdown';
+
+  @override
+  String get aiToolUpdateCountdown => 'updating a countdown';
+
+  @override
+  String get aiToolDeleteCountdown => 'deleting a countdown';
+
+  @override
+  String get aiToolCreateReminder => 'creating a reminder';
+
+  @override
+  String get aiToolUpdateReminder => 'updating a reminder';
+
+  @override
+  String get aiToolDeleteReminder => 'deleting a reminder';
 
   @override
   String get settingsAppearance => 'Appearance';
