@@ -542,6 +542,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiToolDeleteReminder => 'deleting a reminder';
 
   @override
+  String get chatAppearanceSection => 'Chat appearance';
+
+  @override
+  String get chatBackground => 'Chat background';
+
+  @override
+  String get chatBackgroundSolid => 'Solid';
+
+  @override
+  String get chatBackgroundGradient => 'Gradient';
+
+  @override
+  String get chatBackgroundImage => 'Image';
+
+  @override
+  String get chatBackgroundPickImage => 'Choose image';
+
+  @override
+  String get chatBackgroundClearImage => 'Clear image';
+
+  @override
+  String get chatBackgroundImageHint => 'Local path or image URL';
+
+  @override
+  String get chatBackgroundOpacity => 'Image opacity';
+
+  @override
+  String get chatBackgroundBlur => 'Background blur';
+
+  @override
+  String get chatOverlayOpacity => 'Dark overlay';
+
+  @override
+  String get chatUserAvatar => 'My avatar';
+
+  @override
+  String get chatUserAvatarHint => 'Emoji, a single character, or an image path';
+
+  @override
+  String get chatBubbleOpacity => 'Bubble opacity';
+
+  @override
+  String get chatBubbleRadius => 'Bubble radius';
+
+  @override
+  String get chatFontScale => 'Chat font size';
+
+  @override
+  String get chatAnimation => 'Message animation';
+
+  @override
+  String get chatAppearanceReset => 'Reset appearance';
+
+  @override
+  String get chatAppearancePreview => 'Preview';
+
+  @override
+  String get chatPreviewMessage => 'This is a preview bubble';
+
+  @override
+  String get chatBackgroundColor => 'Colour';
+
+  @override
+  String get chatGradientColors => 'Gradient colours';
+
+  @override
   String get settingsAppearance => 'Appearance';
 
   @override

@@ -6,14 +6,19 @@ import 'package:go_router/go_router.dart';
 
 import '../../application/ai/chat_controller.dart';
 import '../../application/ai/ai_providers.dart';
+import '../../application/ai/chat_appearance_controller.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/chat_message.dart';
+import '../../domain/entities/chat_appearance.dart';
+import '../../domain/entities/glass_style.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
+import '../widgets/chat_background.dart';
+import '../widgets/image_source.dart';
 import '../widgets/persona_avatar.dart';
 import '../widgets/tool_labels.dart';
 
@@ -85,6 +90,7 @@ class _AiPageState extends ConsumerState<AiPage> {
             const <ChatMessage>[];
     final stream = ref.watch(chatControllerProvider);
     final config = ref.watch(activeAiConfigProvider);
+    final appearance = ref.watch(chatAppearanceProvider);
     final personas =
         ref.watch(personasProvider).valueOrNull ?? const <AiPersona>[];
 
@@ -121,25 +127,47 @@ class _AiPageState extends ConsumerState<AiPage> {
                   ref.read(chatControllerProvider.notifier).clearError(),
             ),
           Expanded(
-            child: messages.isEmpty && !stream.isStreaming
-                ? _EmptyConversation(persona: persona)
-                : ListView.builder(
-                    controller: _scroll,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: messages.length + (stream.isStreaming ? 1 : 0),
-                    itemBuilder: (BuildContext context, int index) {
-                      if (index >= messages.length) {
-                        return _StreamingBubble(
-                          text: stream.streamingText,
-                          persona: persona,
-                        );
-                      }
-                      return _MessageView(
-                        message: messages[index],
-                        persona: persona,
-                      );
-                    },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: ChatBackground(
+                config: appearance.background,
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(appearance.fontScale),
                   ),
+                  child: messages.isEmpty && !stream.isStreaming
+                      ? _EmptyConversation(persona: persona)
+                      : ListView.builder(
+                          controller: _scroll,
+                          padding: const EdgeInsets.all(8),
+                          itemCount:
+                              messages.length + (stream.isStreaming ? 1 : 0),
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index >= messages.length) {
+                              return _AnimatedMessage(
+                                key: const ValueKey<String>('streaming'),
+                                enabled: appearance.animationEnabled,
+                                child: _StreamingBubble(
+                                  text: stream.streamingText,
+                                  persona: persona,
+                                ),
+                              );
+                            }
+                            final message = messages[index];
+                            return _AnimatedMessage(
+                              key: ValueKey<String>(message.id),
+                              enabled: appearance.animationEnabled,
+                              child: _MessageView(
+                                message: message,
+                                persona: persona,
+                                appearance: appearance,
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           if (stream.activeToolName != null)
@@ -436,10 +464,15 @@ class _EmptyConversation extends StatelessWidget {
 }
 
 class _MessageView extends StatelessWidget {
-  const _MessageView({required this.message, required this.persona});
+  const _MessageView({
+    required this.message,
+    required this.persona,
+    required this.appearance,
+  });
 
   final ChatMessage message;
   final AiPersona persona;
+  final ChatAppearanceConfig appearance;
 
   @override
   Widget build(BuildContext context) {
@@ -455,6 +488,19 @@ class _MessageView extends StatelessWidget {
     if (!isUser && message.content.trim().isEmpty) {
       return const SizedBox.shrink();
     }
+
+    final style = GlassStyle(
+      opacity: appearance.bubbleOpacity,
+      blurAmount: 0,
+      borderRadius: appearance.bubbleRadius,
+      tintColor: isUser ? theme.colorScheme.primary : theme.colorScheme.surface,
+      borderColor: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+    );
+
+    // 用户头像（设置了才显示）。
+    final userAvatar = _UserAvatar(avatar: appearance.userAvatar, radius: 14);
+    final showUserAvatar =
+        isUser && (appearance.userAvatar ?? '').trim().isNotEmpty;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -472,10 +518,8 @@ class _MessageView extends StatelessWidget {
               ],
               Flexible(
                 child: GlassCard(
+                  style: style,
                   padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-                  color: isUser
-                      ? theme.colorScheme.primary.withValues(alpha: 0.16)
-                      : null,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -495,6 +539,10 @@ class _MessageView extends StatelessWidget {
                   ),
                 ),
               ),
+              if (showUserAvatar) ...<Widget>[
+                const SizedBox(width: 8),
+                userAvatar,
+              ],
             ],
           ),
         ),
@@ -567,6 +615,76 @@ class _AssistantAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PersonaAvatar(persona: persona, radius: 14);
+  }
+}
+
+/// 用户头像：emoji / 单个字 / 图片路径或 URL。
+class _UserAvatar extends StatelessWidget {
+  const _UserAvatar({required this.avatar, this.radius = 14});
+
+  final String? avatar;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final value = (avatar ?? '').trim();
+    final image = resolveImageProvider(value);
+    final background = theme.colorScheme.secondary.withValues(alpha: 0.18);
+
+    if (image != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: background,
+        foregroundImage: image,
+        onForegroundImageError: (_, __) {},
+        child: Text('我', style: theme.textTheme.labelMedium),
+      );
+    }
+
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: background,
+      child: Text(
+        value.isEmpty ? '我' : value,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: theme.colorScheme.secondary,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+/// 消息入场动画（可关闭）。
+class _AnimatedMessage extends StatelessWidget {
+  const _AnimatedMessage({
+    super.key,
+    required this.child,
+    required this.enabled,
+  });
+
+  final Widget child;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      builder: (BuildContext context, double value, Widget? inner) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 8),
+            child: inner,
+          ),
+        );
+      },
+      child: child,
+    );
   }
 }
 

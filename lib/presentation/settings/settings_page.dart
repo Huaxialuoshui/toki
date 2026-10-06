@@ -14,6 +14,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
 import 'ai_persona_section.dart';
+import 'chat_appearance_section.dart';
 import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
@@ -160,6 +161,12 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.verified_user_outlined,
           ),
           const _AiPermissionCard(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.chatAppearanceSection,
+            icon: Icons.chat_bubble_outline,
+          ),
+          const ChatAppearanceSection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsNotificationSection,

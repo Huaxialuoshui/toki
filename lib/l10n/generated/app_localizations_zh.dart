@@ -542,6 +542,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiToolDeleteReminder => '删除提醒';
 
   @override
+  String get chatAppearanceSection => '聊天外观';
+
+  @override
+  String get chatBackground => '聊天背景';
+
+  @override
+  String get chatBackgroundSolid => '纯色';
+
+  @override
+  String get chatBackgroundGradient => '渐变';
+
+  @override
+  String get chatBackgroundImage => '图片';
+
+  @override
+  String get chatBackgroundPickImage => '选择图片';
+
+  @override
+  String get chatBackgroundClearImage => '清除图片';
+
+  @override
+  String get chatBackgroundImageHint => '本地路径或图片 URL';
+
+  @override
+  String get chatBackgroundOpacity => '图片透明度';
+
+  @override
+  String get chatBackgroundBlur => '背景模糊';
+
+  @override
+  String get chatOverlayOpacity => '暗色遮罩';
+
+  @override
+  String get chatUserAvatar => '我的头像';
+
+  @override
+  String get chatUserAvatarHint => 'emoji、单个字，或图片路径';
+
+  @override
+  String get chatBubbleOpacity => '气泡透明度';
+
+  @override
+  String get chatBubbleRadius => '气泡圆角';
+
+  @override
+  String get chatFontScale => '聊天字号';
+
+  @override
+  String get chatAnimation => '消息动画';
+
+  @override
+  String get chatAppearanceReset => '恢复默认外观';
+
+  @override
+  String get chatAppearancePreview => '预览';
+
+  @override
+  String get chatPreviewMessage => '这是一条预览气泡';
+
+  @override
+  String get chatBackgroundColor => '颜色';
+
+  @override
+  String get chatGradientColors => '渐变颜色';
+
+  @override
   String get settingsAppearance => '外观';
 
   @override

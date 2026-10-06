@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/ai_persona.dart';
+import 'image_source.dart';
 
 /// 人设头像。
 ///
@@ -18,31 +17,13 @@ class PersonaAvatar extends StatelessWidget {
   final AiPersona persona;
   final double radius;
 
-  static bool _isNetwork(String value) =>
-      value.startsWith('http://') || value.startsWith('https://');
-
-  static bool _isFileLike(String value) {
-    if (value.contains(Platform.pathSeparator) || value.contains('/')) return true;
-    final lower = value.toLowerCase();
-    return lower.endsWith('.png') ||
-        lower.endsWith('.jpg') ||
-        lower.endsWith('.jpeg') ||
-        lower.endsWith('.webp') ||
-        lower.endsWith('.gif');
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final background = theme.colorScheme.primary.withValues(alpha: 0.14);
     final avatar = persona.avatar?.trim() ?? '';
 
-    ImageProvider? image;
-    if (avatar.isNotEmpty && _isNetwork(avatar)) {
-      image = NetworkImage(avatar);
-    } else if (avatar.isNotEmpty && _isFileLike(avatar)) {
-      image = FileImage(File(avatar));
-    }
+    final image = resolveImageProvider(avatar);
 
     if (image != null) {
       return CircleAvatar(

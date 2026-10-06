@@ -1109,6 +1109,138 @@ abstract class AppLocalizations {
   /// **'deleting a reminder'**
   String get aiToolDeleteReminder;
 
+  /// No description provided for @chatAppearanceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat appearance'**
+  String get chatAppearanceSection;
+
+  /// No description provided for @chatBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat background'**
+  String get chatBackground;
+
+  /// No description provided for @chatBackgroundSolid.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid'**
+  String get chatBackgroundSolid;
+
+  /// No description provided for @chatBackgroundGradient.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient'**
+  String get chatBackgroundGradient;
+
+  /// No description provided for @chatBackgroundImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get chatBackgroundImage;
+
+  /// No description provided for @chatBackgroundPickImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose image'**
+  String get chatBackgroundPickImage;
+
+  /// No description provided for @chatBackgroundClearImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear image'**
+  String get chatBackgroundClearImage;
+
+  /// No description provided for @chatBackgroundImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Local path or image URL'**
+  String get chatBackgroundImageHint;
+
+  /// No description provided for @chatBackgroundOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Image opacity'**
+  String get chatBackgroundOpacity;
+
+  /// No description provided for @chatBackgroundBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Background blur'**
+  String get chatBackgroundBlur;
+
+  /// No description provided for @chatOverlayOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark overlay'**
+  String get chatOverlayOpacity;
+
+  /// No description provided for @chatUserAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'My avatar'**
+  String get chatUserAvatar;
+
+  /// No description provided for @chatUserAvatarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Emoji, a single character, or an image path'**
+  String get chatUserAvatarHint;
+
+  /// No description provided for @chatBubbleOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Bubble opacity'**
+  String get chatBubbleOpacity;
+
+  /// No description provided for @chatBubbleRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Bubble radius'**
+  String get chatBubbleRadius;
+
+  /// No description provided for @chatFontScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat font size'**
+  String get chatFontScale;
+
+  /// No description provided for @chatAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Message animation'**
+  String get chatAnimation;
+
+  /// No description provided for @chatAppearanceReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset appearance'**
+  String get chatAppearanceReset;
+
+  /// No description provided for @chatAppearancePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get chatAppearancePreview;
+
+  /// No description provided for @chatPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a preview bubble'**
+  String get chatPreviewMessage;
+
+  /// No description provided for @chatBackgroundColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get chatBackgroundColor;
+
+  /// No description provided for @chatGradientColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient colours'**
+  String get chatGradientColors;
+
   /// No description provided for @settingsAppearance.
   ///
   /// In en, this message translates to:

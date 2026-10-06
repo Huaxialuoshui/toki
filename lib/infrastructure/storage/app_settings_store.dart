@@ -25,6 +25,7 @@ class AppSettingsStore {
   static const String _aiAllowCreateKey = 'settings.ai.allowCreate';
   static const String _aiAllowUpdateKey = 'settings.ai.allowUpdate';
   static const String _aiAllowDeleteKey = 'settings.ai.allowDelete';
+  static const String _chatAppearanceKey = 'settings.chatAppearance';
 
   /// 语言代码；返回 null 表示"跟随系统"。
   String? readLocaleCode() => _preferences.getString(_localeKey);
@@ -107,6 +108,12 @@ class AppSettingsStore {
   bool? readAiAllowDelete() => _preferences.getBool(_aiAllowDeleteKey);
   Future<void> writeAiAllowDelete(bool value) =>
       _preferences.setBool(_aiAllowDeleteKey, value);
+
+  /// 聊天外观（背景 / 头像 / 气泡 / 字号 / 动画），JSON 字符串。
+  String? readChatAppearance() => _preferences.getString(_chatAppearanceKey);
+
+  Future<void> writeChatAppearance(String json) =>
+      _preferences.setString(_chatAppearanceKey, json);
 }
 
 /// 必须在 `main()` 中 override（见 `lib/main.dart`）。
