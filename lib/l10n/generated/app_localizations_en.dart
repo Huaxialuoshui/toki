@@ -98,6 +98,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherClearCity => 'Clear';
 
   @override
+  String get weatherUseCurrentLocation => 'Use current location';
+
+  @override
+  String get weatherLocationUsed => 'Current location saved';
+
+  @override
+  String get weatherLocationFailed => 'Location failed';
+
+  @override
+  String get weatherNoLocations =>
+      'No saved locations yet — add a city or use your current location.';
+
+  @override
+  String get weatherDetailTitle => 'Weather';
+
+  @override
+  String get weatherHourly => 'Next hours';
+
+  @override
+  String get weatherDaily => 'Next days';
+
+  @override
+  String get weatherToday => 'Today';
+
+  @override
+  String get weatherNoForecast => 'No forecast data';
+
+  @override
   String get digestSection => 'Daily briefings';
 
   @override

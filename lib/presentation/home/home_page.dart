@@ -21,6 +21,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
 import 'daily_digest_card.dart';
+import 'weather_detail_sheet.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/persona_avatar.dart';
@@ -197,6 +198,8 @@ class _WeatherCardBody extends ConsumerWidget {
     final weather = ref.watch(weatherProvider).valueOrNull;
 
     return GlassCard(
+      // 点一下看逐小时 / 多日预报。
+      onTap: weather == null ? null : () => showWeatherDetail(context),
       child: Row(
         children: <Widget>[
           Icon(

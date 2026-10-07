@@ -272,6 +272,60 @@ abstract class AppLocalizations {
   /// **'Clear'**
   String get weatherClearCity;
 
+  /// No description provided for @weatherUseCurrentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use current location'**
+  String get weatherUseCurrentLocation;
+
+  /// No description provided for @weatherLocationUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location saved'**
+  String get weatherLocationUsed;
+
+  /// No description provided for @weatherLocationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Location failed'**
+  String get weatherLocationFailed;
+
+  /// No description provided for @weatherNoLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved locations yet — add a city or use your current location.'**
+  String get weatherNoLocations;
+
+  /// No description provided for @weatherDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get weatherDetailTitle;
+
+  /// No description provided for @weatherHourly.
+  ///
+  /// In en, this message translates to:
+  /// **'Next hours'**
+  String get weatherHourly;
+
+  /// No description provided for @weatherDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Next days'**
+  String get weatherDaily;
+
+  /// No description provided for @weatherToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get weatherToday;
+
+  /// No description provided for @weatherNoForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast data'**
+  String get weatherNoForecast;
+
   /// No description provided for @digestSection.
   ///
   /// In en, this message translates to:

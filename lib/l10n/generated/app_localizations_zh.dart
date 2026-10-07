@@ -96,6 +96,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherClearCity => '清除';
 
   @override
+  String get weatherUseCurrentLocation => '使用当前位置';
+
+  @override
+  String get weatherLocationUsed => '已保存当前位置';
+
+  @override
+  String get weatherLocationFailed => '定位失败';
+
+  @override
+  String get weatherNoLocations => '还没有保存的位置，可以添加城市或用当前位置。';
+
+  @override
+  String get weatherDetailTitle => '天气';
+
+  @override
+  String get weatherHourly => '未来几小时';
+
+  @override
+  String get weatherDaily => '未来几天';
+
+  @override
+  String get weatherToday => '今天';
+
+  @override
+  String get weatherNoForecast => '暂无预报数据';
+
+  @override
   String get digestSection => 'AI 每日简报';
 
   @override
