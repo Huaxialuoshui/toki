@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/chat_appearance.dart';
+import '../../infrastructure/storage/local_image_store.dart';
+import 'image_edit_button.dart';
 
 /// 背景配置编辑器：纯色 / 渐变 / 图片 + 透明度 / 模糊 / 遮罩。
 ///
@@ -105,7 +107,9 @@ class BackgroundEditor extends StatelessWidget {
         ],
         if (config.type == ChatBackgroundType.image) ...<Widget>[
           _Label(text: l10n.chatBackgroundImage),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: <Widget>[
               OutlinedButton.icon(
                 key: ValueKey<String>('$imageKeyPrefix-pick'),
@@ -113,13 +117,19 @@ class BackgroundEditor extends StatelessWidget {
                   final file = await ImagePicker()
                       .pickImage(source: ImageSource.gallery);
                   if (file == null) return;
-                  onChanged(config.copyWith(imagePath: file.path));
+                  final saved = await persistPickedImage(file.path);
+                  onChanged(config.copyWith(imagePath: saved));
                 },
                 icon: const Icon(Icons.image_outlined, size: 18),
                 label: Text(l10n.chatBackgroundPickImage),
               ),
               if (config.hasImage) ...<Widget>[
-                const SizedBox(width: 8),
+                ImageEditButton(
+                  keyPrefix: imageKeyPrefix,
+                  path: config.imagePath,
+                  onEdited: (String edited) =>
+                      onChanged(config.copyWith(imagePath: edited)),
+                ),
                 TextButton(
                   onPressed: () => onChanged(config.copyWith(clearImage: true)),
                   child: Text(l10n.chatBackgroundClearImage),

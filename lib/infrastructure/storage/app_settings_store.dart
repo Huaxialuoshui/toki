@@ -33,6 +33,7 @@ class AppSettingsStore {
   static const String _widgetConfigKey = 'settings.widgetConfig';
   static const String _appBackgroundKey = 'settings.appBackground';
   static const String _iconStyleKey = 'settings.iconStyle';
+  static const String _appIconKey = 'settings.appIcon';
   static const String _digestMorningKey = 'settings.digest.morning';
   static const String _digestEveningKey = 'settings.digest.evening';
 
@@ -174,6 +175,13 @@ class AppSettingsStore {
 
   Future<void> writeIconStyle(String value) =>
       _preferences.setString(_iconStyleKey, value);
+
+  /// 自定义应用图标的图片路径（本机文件；空表示用默认图标）。
+  String? readAppIcon() => _preferences.getString(_appIconKey);
+
+  Future<void> writeAppIcon(String? path) => path == null
+      ? _preferences.remove(_appIconKey)
+      : _preferences.setString(_appIconKey, path);
 
   /// AI 每日计划 / 每日总结开关（规格 §14），默认都关闭。
   bool readMorningDigestEnabled() =>

@@ -31,6 +31,9 @@ dependencies:
   timezone: ^0.10.1
   dio: ^5.11.1
   image_picker: 1.2.0
+  # 自定义应用图标（Windows）：需要 toNativeUtf16 / malloc 调 Win32 的
+  # FindWindowW / LoadImageW / SendMessageW。纯 Dart，且早已是传递依赖。
+  ffi: ^2.1.3
 
 dev_dependencies:
   flutter_test:

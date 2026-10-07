@@ -138,6 +138,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get iconStyleFilled => 'Filled';
 
   @override
+  String get appIcon => 'App icon';
+
+  @override
+  String get appIconHint => 'Use your own picture as the icon. Android: swaps the icon in Recents and creates a home-screen shortcut with this picture (the system asks for confirmation — tap Add; the launcher-drawn app icon itself cannot be changed from inside the app). Windows: swaps the window and taskbar icon; the exe\'s own icon needs a rebuild.';
+
+  @override
+  String get appIconPick => 'Choose image';
+
+  @override
+  String get appIconApply => 'Apply to system';
+
+  @override
+  String get appIconReset => 'Restore default';
+
+  @override
+  String get appIconApplied => 'Recents icon updated';
+
+  @override
+  String get appIconAppliedShortcut => 'Applied — tap Add when the system asks to create the shortcut';
+
+  @override
+  String get appIconResetDone => 'Default icon restored';
+
+  @override
+  String get appIconFailed => 'Could not set the app icon';
+
+  @override
+  String get editImage => 'Edit with system tool';
+
+  @override
+  String get editImageDone => 'Image updated';
+
+  @override
+  String get editImageUnchanged => 'No changes were made';
+
+  @override
+  String get editImageFailed => 'Could not open the image editor';
+
+  @override
   String get digestSection => 'Daily briefings';
 
   @override

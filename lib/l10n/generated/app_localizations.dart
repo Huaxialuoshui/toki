@@ -353,6 +353,84 @@ abstract class AppLocalizations {
   /// **'Filled'**
   String get iconStyleFilled;
 
+  /// No description provided for @appIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'App icon'**
+  String get appIcon;
+
+  /// No description provided for @appIconHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own picture as the icon. Android: swaps the icon in Recents and creates a home-screen shortcut with this picture (the system asks for confirmation — tap Add; the launcher-drawn app icon itself cannot be changed from inside the app). Windows: swaps the window and taskbar icon; the exe\'s own icon needs a rebuild.'**
+  String get appIconHint;
+
+  /// No description provided for @appIconPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose image'**
+  String get appIconPick;
+
+  /// No description provided for @appIconApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to system'**
+  String get appIconApply;
+
+  /// No description provided for @appIconReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore default'**
+  String get appIconReset;
+
+  /// No description provided for @appIconApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Recents icon updated'**
+  String get appIconApplied;
+
+  /// No description provided for @appIconAppliedShortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied — tap Add when the system asks to create the shortcut'**
+  String get appIconAppliedShortcut;
+
+  /// No description provided for @appIconResetDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Default icon restored'**
+  String get appIconResetDone;
+
+  /// No description provided for @appIconFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set the app icon'**
+  String get appIconFailed;
+
+  /// No description provided for @editImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit with system tool'**
+  String get editImage;
+
+  /// No description provided for @editImageDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Image updated'**
+  String get editImageDone;
+
+  /// No description provided for @editImageUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes were made'**
+  String get editImageUnchanged;
+
+  /// No description provided for @editImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the image editor'**
+  String get editImageFailed;
+
   /// No description provided for @digestSection.
   ///
   /// In en, this message translates to:

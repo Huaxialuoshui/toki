@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider 共享路径（规格：调用系统图片编辑器）。
+
+  图片编辑前会先复制一份到 cache/edit/，再把 content:// URI 交给系统编辑器；
+  编辑器改完写回的还是这份缓存文件，应用再把它复制成新的图片文件。
+  只暴露 cache/edit/，不暴露整个私有目录。
+-->
+<paths>
+    <cache-path name="edit" path="edit/" />
+</paths>

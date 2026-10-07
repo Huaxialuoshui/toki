@@ -7,9 +7,11 @@ import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/chat_appearance.dart';
 import '../../domain/entities/avatar_config.dart';
+import '../../infrastructure/storage/local_image_store.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/chat_background.dart';
 import '../widgets/avatar_editor.dart';
+import '../widgets/image_edit_button.dart';
 
 /// 设置页的「聊天外观」区块：直接编辑并实时预览（规格 §10 / §12）。
 class ChatAppearanceSection extends ConsumerWidget {
@@ -106,12 +108,20 @@ class ChatAppearanceSection extends ConsumerWidget {
                       source: ImageSource.gallery,
                     );
                     if (file == null) return;
+                    final saved = await persistPickedImage(file.path);
                     controller.updateBackground(
-                      background.copyWith(imagePath: file.path),
+                      background.copyWith(imagePath: saved),
                     );
                   },
                   icon: const Icon(Icons.image_outlined, size: 18),
                   label: Text(l10n.chatBackgroundPickImage),
+                ),
+                ImageEditButton(
+                  keyPrefix: 'chat-bg',
+                  path: background.imagePath,
+                  onEdited: (String edited) => controller.updateBackground(
+                    background.copyWith(imagePath: edited),
+                  ),
                 ),
                 if (background.hasImage)
                   TextButton(

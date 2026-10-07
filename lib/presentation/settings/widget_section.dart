@@ -9,6 +9,7 @@ import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/widget_config.dart';
 import '../../infrastructure/device/device_channel.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../widgets/image_edit_button.dart';
 
 /// 设置页的「桌面小组件」区块（Android）。
 ///
@@ -109,7 +110,10 @@ class _WidgetSectionState extends ConsumerState<WidgetSection> {
           ],
           if (config.skin == WidgetSkin.image) ...<Widget>[
             _Label(l10n.widgetBackgroundImage),
-            Row(
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: <Widget>[
                 OutlinedButton.icon(
                   key: const ValueKey<String>('widget-pick-image'),
@@ -117,8 +121,13 @@ class _WidgetSectionState extends ConsumerState<WidgetSection> {
                   icon: const Icon(Icons.image_outlined, size: 18),
                   label: Text(l10n.widgetPickImage),
                 ),
+                ImageEditButton(
+                  keyPrefix: 'widget',
+                  path: config.imagePath,
+                  onEdited: (String edited) =>
+                      _update(config.copyWith(imagePath: edited)),
+                ),
                 if ((config.imagePath ?? '').isNotEmpty) ...<Widget>[
-                  const SizedBox(width: 8),
                   TextButton(
                     onPressed: () => _update(config.copyWith(clearImage: true)),
                     child: Text(l10n.widgetClearImage),

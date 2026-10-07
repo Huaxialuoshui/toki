@@ -138,6 +138,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get iconStyleFilled => '实心';
 
   @override
+  String get appIcon => '应用图标';
+
+  @override
+  String get appIconHint => '用自己的图片做图标。Android：换掉「最近任务」里的图标，并生成一个带这张图的桌面快捷方式（系统会弹一次确认，点「添加」即可；桌面原图标由启动器绘制，改不了）。Windows：换掉窗口标题栏与任务栏图标，exe 自身的图标需要重新打包。';
+
+  @override
+  String get appIconPick => '选择图片';
+
+  @override
+  String get appIconApply => '应用到系统';
+
+  @override
+  String get appIconReset => '恢复默认';
+
+  @override
+  String get appIconApplied => '已换掉最近任务里的图标';
+
+  @override
+  String get appIconAppliedShortcut => '已应用；系统弹出确认框时点「添加」即可';
+
+  @override
+  String get appIconResetDone => '已恢复默认图标';
+
+  @override
+  String get appIconFailed => '设置应用图标失败';
+
+  @override
+  String get editImage => '用系统工具编辑';
+
+  @override
+  String get editImageDone => '图片已更新';
+
+  @override
+  String get editImageUnchanged => '图片没有改动';
+
+  @override
+  String get editImageFailed => '打开图片编辑器失败';
+
+  @override
   String get digestSection => 'AI 每日简报';
 
   @override

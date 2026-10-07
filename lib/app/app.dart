@@ -34,6 +34,8 @@ class TokiApp extends ConsumerWidget {
     ref.watch(reminderAutoSyncProvider);
     // 日程 / 倒计时 / 小组件外观一变，就把状态推给原生桌面小组件。
     ref.watch(widgetAutoSyncProvider);
+    // Windows 每次启动都会回到 exe 里的默认图标，所以启动时补一次自定义图标。
+    ref.watch(appIconStartupProvider);
 
     final resolution = ref.watch(themeResolutionProvider);
     final locale = ref.watch(localeControllerProvider);

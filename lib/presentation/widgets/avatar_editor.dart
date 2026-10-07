@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/avatar_config.dart';
+import '../../infrastructure/storage/local_image_store.dart';
+import 'image_edit_button.dart';
 import 'image_source.dart';
 
 /// 打开头像编辑器；取消时返回 null。
@@ -126,9 +128,11 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
     try {
       final file = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (file == null) return;
-      _image.text = file.path;
+      // 头像长期要用，别把 cache 里的临时文件当正本。
+      final saved = await persistPickedImage(file.path);
+      _image.text = saved;
       setState(() {
-        _draft = _draft.copyWith(kind: AvatarKind.image, value: file.path);
+        _draft = _draft.copyWith(kind: AvatarKind.image, value: saved);
       });
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -233,13 +237,24 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
                 ),
               ],
               if (_draft.kind == AvatarKind.image) ...<Widget>[
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: <Widget>[
                     OutlinedButton.icon(
                       key: const ValueKey<String>('avatar-pick-image'),
                       onPressed: _busy ? null : _pickImage,
                       icon: const Icon(Icons.image_outlined, size: 18),
                       label: Text(l10n.avatarPickImage),
+                    ),
+                    ImageEditButton(
+                      keyPrefix: 'avatar',
+                      path:
+                          _draft.kind == AvatarKind.image ? _image.text : null,
+                      onEdited: (String edited) => setState(() {
+                        _image.text = edited;
+                        _draft = _draft.copyWith(value: edited);
+                      }),
                     ),
                   ],
                 ),
