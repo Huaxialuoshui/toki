@@ -9,6 +9,7 @@ import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/avatar_config.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../widgets/image_edit_button.dart';
 import '../widgets/persona_avatar.dart';
 import '../widgets/avatar_editor.dart';
 
@@ -290,10 +291,12 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Row(
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: <Widget>[
                             AvatarPreview(config: _avatarConfig, radius: 22),
-                            const SizedBox(width: 12),
                             OutlinedButton.icon(
                               key:
                                   const ValueKey<String>('persona-avatar-edit'),
@@ -303,6 +306,18 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
                                 size: 18,
                               ),
                               label: Text(l10n.avatarChange),
+                            ),
+                            // 头像是本地图片时，直接开系统编辑器改这张图。
+                            ImageEditButton(
+                              keyPrefix: 'persona-avatar',
+                              path: _avatarConfig.isImage
+                                  ? _avatarConfig.value
+                                  : null,
+                              onEdited: (String edited) => setState(() {
+                                _avatarConfig =
+                                    _avatarConfig.copyWith(value: edited);
+                                _avatar.text = edited;
+                              }),
                             ),
                           ],
                         ),

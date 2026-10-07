@@ -50,6 +50,37 @@ class AiPersona {
   /// 头像在未设置时使用的显示首字。
   String get avatarInitial => name.isEmpty ? '?' : name.substring(0, 1);
 
+  AiPersona copyWith({
+    String? name,
+    String? avatar,
+    bool clearAvatar = false,
+    int? avatarColor,
+    bool clearAvatarColor = false,
+    String? description,
+    String? personality,
+    String? speakingStyle,
+    String? userNickname,
+    String? systemPrompt,
+    List<String>? enabledTools,
+    double? temperature,
+    DateTime? updatedAt,
+  }) =>
+      AiPersona(
+        id: id,
+        name: name ?? this.name,
+        avatar: clearAvatar ? null : (avatar ?? this.avatar),
+        avatarColor: clearAvatarColor ? null : (avatarColor ?? this.avatarColor),
+        description: description ?? this.description,
+        personality: personality ?? this.personality,
+        speakingStyle: speakingStyle ?? this.speakingStyle,
+        userNickname: userNickname ?? this.userNickname,
+        systemPrompt: systemPrompt ?? this.systemPrompt,
+        enabledTools: enabledTools ?? this.enabledTools,
+        temperature: temperature ?? this.temperature,
+        createdAt: createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

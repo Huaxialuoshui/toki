@@ -177,6 +177,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editImageFailed => 'Could not open the image editor';
 
   @override
+  String get aiAvatarMenu => 'Avatars';
+
+  @override
+  String get aiAvatarMine => 'My avatar';
+
+  @override
+  String get aiAvatarAssistant => 'Assistant avatar';
+
+  @override
+  String get aiAvatarSaved => 'Avatar updated';
+
+  @override
+  String get aiAvatarOnlyLocal => 'Only local images can be edited with the system editor';
+
+  @override
   String get digestSection => 'Daily briefings';
 
   @override

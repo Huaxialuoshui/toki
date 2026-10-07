@@ -8,8 +8,10 @@ import 'package:go_router/go_router.dart';
 import '../../application/ai/chat_controller.dart';
 import '../../application/ai/ai_providers.dart';
 import '../../application/ai/chat_appearance_controller.dart';
+import '../../application/ai/persona_actions.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
+import '../../domain/entities/avatar_config.dart';
 import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/ai_provider_config.dart';
 import '../../domain/entities/chat_message.dart';
@@ -22,6 +24,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../../shared/widgets/markdown_text.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/chat_background.dart';
+import '../widgets/avatar_editor.dart';
 import '../widgets/image_source.dart';
 import '../widgets/persona_avatar.dart';
 import '../widgets/tool_labels.dart';
@@ -368,6 +371,14 @@ class _AiPageState extends ConsumerState<AiPage> {
           onManage: () => context.go('/settings'),
         ),
         const SizedBox(width: 8),
+        _AvatarMenu(
+          persona: persona,
+          isPersonaPersisted:
+              personas.any((AiPersona item) => item.id == persona.id),
+          onEditMine: _editMyAvatar,
+          onEditPersona: () => _editPersonaAvatar(persona),
+        ),
+        const SizedBox(width: 8),
         IconButton(
           key: const ValueKey<String>('ai-sessions'),
           onPressed: () => _showSessions(),
@@ -508,6 +519,62 @@ class _AiPageState extends ConsumerState<AiPage> {
     );
   }
 
+  /// 聊天页直接改「我的头像」——打开的就是设置页那套头像编辑器
+  /// （表情 / 单字 / 图片 + 底色，图片档里还有「用系统工具编辑」）。
+  Future<void> _editMyAvatar() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final appearance = ref.read(chatAppearanceProvider);
+    final current = AvatarConfig.fromLegacy(
+      appearance.userAvatar,
+      color: appearance.userAvatarColor,
+    );
+    final result = await showAvatarEditor(
+      context,
+      initial: current,
+      title: l10n.aiAvatarMine,
+    );
+    if (result == null || !mounted) return;
+    final controller = ref.read(chatAppearanceProvider.notifier);
+    controller.setUserAvatar(result.isEmpty ? null : result.value);
+    controller.setUserAvatarColor(result.color);
+    messenger?.showSnackBar(SnackBar(content: Text(l10n.aiAvatarSaved)));
+  }
+
+  /// 聊天页直接改「助手头像」（写回人设）。内置的兜底人设不落库，所以不提供编辑。
+  Future<void> _editPersonaAvatar(AiPersona persona) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final personas =
+        ref.read(personasProvider).valueOrNull ?? const <AiPersona>[];
+    if (!personas.any((AiPersona item) => item.id == persona.id)) {
+      messenger?.showSnackBar(
+        SnackBar(content: Text(l10n.aiAvatarOnlyLocal)),
+      );
+      return;
+    }
+    final result = await showAvatarEditor(
+      context,
+      initial: AvatarConfig.fromLegacy(
+        persona.avatar,
+        color: persona.avatarColor,
+      ),
+      title: l10n.aiAvatarAssistant,
+    );
+    if (result == null || !mounted) return;
+    await ref.read(personaActionsProvider).save(
+          persona.copyWith(
+            avatar: result.isEmpty ? null : result.value,
+            clearAvatar: result.isEmpty,
+            avatarColor: result.color,
+            clearAvatarColor: result.color == null,
+            updatedAt: ref.read(clockProvider).now(),
+          ),
+        );
+    if (!mounted) return;
+    messenger?.showSnackBar(SnackBar(content: Text(l10n.aiAvatarSaved)));
+  }
+
   /// 危险操作的二次确认。
   Future<void> _showToolConfirmation(PendingToolConfirmation pending) async {
     final l10n = context.l10n;
@@ -552,6 +619,83 @@ class _AiPageState extends ConsumerState<AiPage> {
 }
 
 /// 人设切换器：列出全部人设 + 「管理人设」入口。
+/// 头像菜单：聊天页直接改「我的头像 / 助手头像」。
+///
+/// 两个入口打开的都是同一个人头编辑器（表情 / 单字 / 图片 + 底色），
+/// 图片档里带「用系统工具编辑」，所以从聊天页也能一路改到系统编辑器。
+class _AvatarMenu extends ConsumerWidget {
+  const _AvatarMenu({
+    required this.persona,
+    required this.isPersonaPersisted,
+    required this.onEditMine,
+    required this.onEditPersona,
+  });
+
+  final AiPersona persona;
+  final bool isPersonaPersisted;
+  final VoidCallback onEditMine;
+  final VoidCallback onEditPersona;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final appearance = ref.watch(chatAppearanceProvider);
+    return PopupMenuButton<Object>(
+      key: const ValueKey<String>('ai-avatar-menu'),
+      tooltip: l10n.aiAvatarMenu,
+      icon: CircleAvatar(
+        radius: 14,
+        backgroundColor: Colors.transparent,
+        child: AvatarPreview(
+          config: AvatarConfig.fromLegacy(
+            appearance.userAvatar,
+            color: appearance.userAvatarColor,
+          ),
+          radius: 14,
+          fallback: '我',
+        ),
+      ),
+      onSelected: (Object value) {
+        if (value == 'mine') {
+          onEditMine();
+        } else if (value == 'persona') {
+          onEditPersona();
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<Object>>[
+        PopupMenuItem<Object>(
+          value: 'mine',
+          child: Row(
+            children: <Widget>[
+              AvatarPreview(
+                config: AvatarConfig.fromLegacy(
+                  appearance.userAvatar,
+                  color: appearance.userAvatarColor,
+                ),
+                radius: 12,
+                fallback: '我',
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(l10n.aiAvatarMine)),
+            ],
+          ),
+        ),
+        PopupMenuItem<Object>(
+          value: 'persona',
+          enabled: isPersonaPersisted,
+          child: Row(
+            children: <Widget>[
+              PersonaAvatar(persona: persona, radius: 12),
+              const SizedBox(width: 10),
+              Expanded(child: Text(l10n.aiAvatarAssistant)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _PersonaSwitcher extends StatelessWidget {
   const _PersonaSwitcher({
     required this.personas,

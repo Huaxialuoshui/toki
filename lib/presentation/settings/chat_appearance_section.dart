@@ -195,6 +195,17 @@ class ChatAppearanceSection extends ConsumerWidget {
                 icon: const Icon(Icons.face_retouching_natural, size: 18),
                 label: Text(l10n.avatarChange),
               ),
+              // 头像是本地图片时，直接开系统编辑器改这张图。
+              ImageEditButton(
+                keyPrefix: 'user-avatar',
+                path: AvatarConfig.fromLegacy(
+                  appearance.userAvatar,
+                  color: appearance.userAvatarColor,
+                ).isImage
+                    ? appearance.userAvatar
+                    : null,
+                onEdited: controller.setUserAvatar,
+              ),
             ],
           ),
           const SizedBox(height: 10),

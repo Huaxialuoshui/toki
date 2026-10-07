@@ -431,6 +431,36 @@ abstract class AppLocalizations {
   /// **'Could not open the image editor'**
   String get editImageFailed;
 
+  /// No description provided for @aiAvatarMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatars'**
+  String get aiAvatarMenu;
+
+  /// No description provided for @aiAvatarMine.
+  ///
+  /// In en, this message translates to:
+  /// **'My avatar'**
+  String get aiAvatarMine;
+
+  /// No description provided for @aiAvatarAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant avatar'**
+  String get aiAvatarAssistant;
+
+  /// No description provided for @aiAvatarSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar updated'**
+  String get aiAvatarSaved;
+
+  /// No description provided for @aiAvatarOnlyLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Only local images can be edited with the system editor'**
+  String get aiAvatarOnlyLocal;
+
   /// No description provided for @digestSection.
   ///
   /// In en, this message translates to:

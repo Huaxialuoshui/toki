@@ -124,17 +124,18 @@ class BackgroundEditor extends StatelessWidget {
                 label: Text(l10n.chatBackgroundPickImage),
               ),
               if (config.hasImage) ...<Widget>[
-                ImageEditButton(
-                  keyPrefix: imageKeyPrefix,
-                  path: config.imagePath,
-                  onEdited: (String edited) =>
-                      onChanged(config.copyWith(imagePath: edited)),
-                ),
                 TextButton(
                   onPressed: () => onChanged(config.copyWith(clearImage: true)),
                   child: Text(l10n.chatBackgroundClearImage),
                 ),
               ],
+              // 和聊天背景 / 小组件保持一致：图片档里始终有这个按钮（没图时置灰）。
+              ImageEditButton(
+                keyPrefix: imageKeyPrefix,
+                path: config.imagePath,
+                onEdited: (String edited) =>
+                    onChanged(config.copyWith(imagePath: edited)),
+              ),
             ],
           ),
           const SizedBox(height: 8),

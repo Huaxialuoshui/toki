@@ -79,7 +79,14 @@ void main() {
     await tester.tap(find.byTooltip('Send'));
     await tester.pumpAndSettle();
 
-    expect(find.text('🐱'), findsOneWidget);
+    // 消息列表里的用户气泡旁挂着这个头像（顶栏的「头像」菜单里也有一份）。
+    expect(
+      find.descendant(
+        of: find.byType(ListView),
+        matching: find.text('🐱'),
+      ),
+      findsOneWidget,
+    );
   });
 
   tokiWidgetTest('没有自定义外观时使用默认纯色背景', (tester) async {

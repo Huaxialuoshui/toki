@@ -177,6 +177,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editImageFailed => '打开图片编辑器失败';
 
   @override
+  String get aiAvatarMenu => '头像';
+
+  @override
+  String get aiAvatarMine => '我的头像';
+
+  @override
+  String get aiAvatarAssistant => '助手头像';
+
+  @override
+  String get aiAvatarSaved => '头像已更新';
+
+  @override
+  String get aiAvatarOnlyLocal => '只有本地图片才能用系统编辑器修改';
+
+  @override
   String get digestSection => 'AI 每日简报';
 
   @override
