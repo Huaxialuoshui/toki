@@ -568,6 +568,8 @@ class _PersonaSwitcher extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    // 窄屏只显示头像，避免顶栏把标题挤成竖排。
+    final compact = MediaQuery.sizeOf(context).width < 600;
 
     return PopupMenuButton<Object>(
       tooltip: l10n.aiPersona,
@@ -605,15 +607,20 @@ class _PersonaSwitcher extends StatelessWidget {
         ),
       ],
       child: GlassCard(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 8 : 12,
+          vertical: 8,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             PersonaAvatar(persona: active, radius: 12),
-            const SizedBox(width: 8),
-            Text(active.name, style: theme.textTheme.labelLarge),
-            const SizedBox(width: 4),
-            const Icon(Icons.arrow_drop_down, size: 18),
+            if (!compact) ...<Widget>[
+              const SizedBox(width: 8),
+              Text(active.name, style: theme.textTheme.labelLarge),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_drop_down, size: 18),
+            ],
           ],
         ),
       ),
@@ -639,6 +646,8 @@ class _ProviderSwitcher extends StatelessWidget {
     final theme = Theme.of(context);
     final matches = providers.where((AiProviderConfig p) => p.id == activeId);
     final active = matches.isEmpty ? null : matches.first;
+    // 窄屏（手机）上顶栏空间有限：只留一个图标，名字放进菜单里。
+    final compact = MediaQuery.sizeOf(context).width < 600;
 
     return PopupMenuButton<String>(
       key: const ValueKey<String>('ai-provider-switcher'),
@@ -675,7 +684,10 @@ class _ProviderSwitcher extends StatelessWidget {
           ),
       ],
       child: GlassCard(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 8 : 10,
+          vertical: 8,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -684,17 +696,19 @@ class _ProviderSwitcher extends StatelessWidget {
               size: 16,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
-            const SizedBox(width: 6),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 120),
-              child: Text(
-                active?.model ?? l10n.aiNoProviderShort,
-                style: theme.textTheme.labelMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            if (!compact) ...<Widget>[
+              const SizedBox(width: 6),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: Text(
+                  active?.model ?? l10n.aiNoProviderShort,
+                  style: theme.textTheme.labelMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_drop_down, size: 16),
+              const Icon(Icons.arrow_drop_down, size: 16),
+            ],
           ],
         ),
       ),
