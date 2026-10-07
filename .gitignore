@@ -46,3 +46,4 @@ app.*.map.json
 
 # 本地打包产物（安装包不进版本库，需要时分发即可）
 /dist/
+package.log

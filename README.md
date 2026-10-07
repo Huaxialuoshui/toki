@@ -264,6 +264,14 @@ package.bat check nopause   :: 组合使用；nopause = 结束不等待按键（
 → `flutter pub get` → 打 APK → 打 Windows release → 复制/压缩 → 生成安装包 → 打印带体积的产物清单。
 任一步失败会**停下来并提示常见原因**（签名缺失、没装 VS C++ 工作负载、网络问题），不会产出半个包。
 
+实现上：`package.bat` 只是一层**纯 ASCII 启动器**（避免中文/代码页把批处理解析搞崩），
+真正的逻辑在 `tool/package.ps1`。全过程**实时打屏 + 同时写进 `package.log`**，
+结束后窗口会停在「PACKAGING DONE / PACKAGING FAILED」那一屏（不想停就加 `nopause`）。
+
+> 双击没反应 / 窗口一闪而过？先看同目录的 `package.log`（它一定会被写出来，能看到卡在哪一步）；
+> 也可以打开 cmd 手动跑 `cd /d <项目目录> && package.bat`，这样报错会留在窗口里。
+> 想直接跑核心脚本：`powershell -ExecutionPolicy Bypass -File tool\package.ps1`。
+
 产物（`dist/` **不进版本库**，已在 `.gitignore` 排除）：
 
 | 平台 | 文件 | 说明 |
