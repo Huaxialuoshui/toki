@@ -132,7 +132,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncLocalTitle => '仅本机';
 
   @override
-  String get syncLocalSubtitle => '第一版是本地优先：数据都在本机数据库里。WebDAV / 自建服务器 / 云同步会复用同一个 SyncService 接口，属于后续阶段。';
+  String get syncLocalSubtitle =>
+      '第一版是本地优先：数据都在本机数据库里。WebDAV / 自建服务器 / 云同步会复用同一个 SyncService 接口，属于后续阶段。';
 
   @override
   String get syncNow => '检查本地数据';
@@ -169,7 +170,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePhaseBannerTitle => 'Phase 2 · 本地数据库';
 
   @override
-  String get homePhaseBannerBody => '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
+  String get homePhaseBannerBody =>
+      '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
 
   @override
   String get homePhaseBannerDismiss => '知道了';
@@ -553,6 +555,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiMessageDelete => '删除这条消息';
 
   @override
+  String get aiReasoningTitle => '推理过程';
+
+  @override
+  String aiReasoningShow(int count) {
+    return '已思考 $count 字 · 点击查看';
+  }
+
+  @override
+  String get aiReasoningHide => '收起推理过程';
+
+  @override
+  String get aiThinkingHard => '正在思考…';
+
+  @override
   String get aiEditMessageTitle => '编辑消息';
 
   @override
@@ -700,7 +716,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiPersonaAvatarHint => '可以填 emoji、1 个字，或图片路径 / URL';
 
   @override
-  String get aiPersonaDefaultPrompt => '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
+  String get aiPersonaDefaultPrompt =>
+      '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
 
   @override
   String aiPersonaSwitched(String name) {
@@ -1036,7 +1053,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsNotificationSection => '通知提醒';
 
   @override
-  String get settingsNotificationSectionSubtitle => 'Android 用系统本地通知，Windows 用系统 Toast';
+  String get settingsNotificationSectionSubtitle =>
+      'Android 用系统本地通知，Windows 用系统 Toast';
 
   @override
   String get settingsNotificationPermission => '通知权限';
@@ -1090,7 +1108,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsBackupSectionSubtitle => '带版本控制的 JSON 导入导出（Phase 12）';
 
   @override
-  String get backupIntro => '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
+  String get backupIntro =>
+      '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
 
   @override
   String get backupIncludeApiKeys => '导出时包含 API Key';
@@ -1194,7 +1213,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsProjectPath => '项目路径';
 
   @override
-  String get settingsPhaseNote => 'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
+  String get settingsPhaseNote =>
+      'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
 
   @override
   String get mockEventDefense => '毕业设计答辩';

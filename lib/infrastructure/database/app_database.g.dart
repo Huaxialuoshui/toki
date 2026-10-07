@@ -2162,6 +2162,12 @@ class $AiPersonasTable extends AiPersonas
   late final GeneratedColumn<String> avatar = GeneratedColumn<String>(
       'avatar', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _avatarColorMeta =
+      const VerificationMeta('avatarColor');
+  @override
+  late final GeneratedColumn<int> avatarColor = GeneratedColumn<int>(
+      'avatar_color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _descriptionMeta =
       const VerificationMeta('description');
   @override
@@ -2223,6 +2229,7 @@ class $AiPersonasTable extends AiPersonas
         id,
         name,
         avatar,
+        avatarColor,
         description,
         personality,
         speakingStyle,
@@ -2257,6 +2264,12 @@ class $AiPersonasTable extends AiPersonas
     if (data.containsKey('avatar')) {
       context.handle(_avatarMeta,
           avatar.isAcceptableOrUnknown(data['avatar']!, _avatarMeta));
+    }
+    if (data.containsKey('avatar_color')) {
+      context.handle(
+          _avatarColorMeta,
+          avatarColor.isAcceptableOrUnknown(
+              data['avatar_color']!, _avatarColorMeta));
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -2321,6 +2334,8 @@ class $AiPersonasTable extends AiPersonas
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       avatar: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}avatar']),
+      avatarColor: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}avatar_color']),
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       personality: attachedDatabase.typeMapping
@@ -2356,6 +2371,9 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
   final String id;
   final String name;
   final String? avatar;
+
+  /// 头像底色（ARGB int），配合 emoji / 单字头像使用。
+  final int? avatarColor;
   final String? description;
   final String? personality;
   final String? speakingStyle;
@@ -2369,6 +2387,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       {required this.id,
       required this.name,
       this.avatar,
+      this.avatarColor,
       this.description,
       this.personality,
       this.speakingStyle,
@@ -2385,6 +2404,9 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || avatar != null) {
       map['avatar'] = Variable<String>(avatar);
+    }
+    if (!nullToAbsent || avatarColor != null) {
+      map['avatar_color'] = Variable<int>(avatarColor);
     }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
@@ -2417,6 +2439,9 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       name: Value(name),
       avatar:
           avatar == null && nullToAbsent ? const Value.absent() : Value(avatar),
+      avatarColor: avatarColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarColor),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -2446,6 +2471,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       avatar: serializer.fromJson<String?>(json['avatar']),
+      avatarColor: serializer.fromJson<int?>(json['avatarColor']),
       description: serializer.fromJson<String?>(json['description']),
       personality: serializer.fromJson<String?>(json['personality']),
       speakingStyle: serializer.fromJson<String?>(json['speakingStyle']),
@@ -2464,6 +2490,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'avatar': serializer.toJson<String?>(avatar),
+      'avatarColor': serializer.toJson<int?>(avatarColor),
       'description': serializer.toJson<String?>(description),
       'personality': serializer.toJson<String?>(personality),
       'speakingStyle': serializer.toJson<String?>(speakingStyle),
@@ -2480,6 +2507,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           {String? id,
           String? name,
           Value<String?> avatar = const Value.absent(),
+          Value<int?> avatarColor = const Value.absent(),
           Value<String?> description = const Value.absent(),
           Value<String?> personality = const Value.absent(),
           Value<String?> speakingStyle = const Value.absent(),
@@ -2493,6 +2521,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
         id: id ?? this.id,
         name: name ?? this.name,
         avatar: avatar.present ? avatar.value : this.avatar,
+        avatarColor: avatarColor.present ? avatarColor.value : this.avatarColor,
         description: description.present ? description.value : this.description,
         personality: personality.present ? personality.value : this.personality,
         speakingStyle:
@@ -2511,6 +2540,8 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       avatar: data.avatar.present ? data.avatar.value : this.avatar,
+      avatarColor:
+          data.avatarColor.present ? data.avatarColor.value : this.avatarColor,
       description:
           data.description.present ? data.description.value : this.description,
       personality:
@@ -2540,6 +2571,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('avatar: $avatar, ')
+          ..write('avatarColor: $avatarColor, ')
           ..write('description: $description, ')
           ..write('personality: $personality, ')
           ..write('speakingStyle: $speakingStyle, ')
@@ -2558,6 +2590,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       id,
       name,
       avatar,
+      avatarColor,
       description,
       personality,
       speakingStyle,
@@ -2574,6 +2607,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.avatar == this.avatar &&
+          other.avatarColor == this.avatarColor &&
           other.description == this.description &&
           other.personality == this.personality &&
           other.speakingStyle == this.speakingStyle &&
@@ -2589,6 +2623,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<String?> avatar;
+  final Value<int?> avatarColor;
   final Value<String?> description;
   final Value<String?> personality;
   final Value<String?> speakingStyle;
@@ -2603,6 +2638,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.avatar = const Value.absent(),
+    this.avatarColor = const Value.absent(),
     this.description = const Value.absent(),
     this.personality = const Value.absent(),
     this.speakingStyle = const Value.absent(),
@@ -2618,6 +2654,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     required String id,
     required String name,
     this.avatar = const Value.absent(),
+    this.avatarColor = const Value.absent(),
     this.description = const Value.absent(),
     this.personality = const Value.absent(),
     this.speakingStyle = const Value.absent(),
@@ -2637,6 +2674,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? avatar,
+    Expression<int>? avatarColor,
     Expression<String>? description,
     Expression<String>? personality,
     Expression<String>? speakingStyle,
@@ -2652,6 +2690,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (avatar != null) 'avatar': avatar,
+      if (avatarColor != null) 'avatar_color': avatarColor,
       if (description != null) 'description': description,
       if (personality != null) 'personality': personality,
       if (speakingStyle != null) 'speaking_style': speakingStyle,
@@ -2669,6 +2708,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       {Value<String>? id,
       Value<String>? name,
       Value<String?>? avatar,
+      Value<int?>? avatarColor,
       Value<String?>? description,
       Value<String?>? personality,
       Value<String?>? speakingStyle,
@@ -2683,6 +2723,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       id: id ?? this.id,
       name: name ?? this.name,
       avatar: avatar ?? this.avatar,
+      avatarColor: avatarColor ?? this.avatarColor,
       description: description ?? this.description,
       personality: personality ?? this.personality,
       speakingStyle: speakingStyle ?? this.speakingStyle,
@@ -2707,6 +2748,9 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     }
     if (avatar.present) {
       map['avatar'] = Variable<String>(avatar.value);
+    }
+    if (avatarColor.present) {
+      map['avatar_color'] = Variable<int>(avatarColor.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -2748,6 +2792,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('avatar: $avatar, ')
+          ..write('avatarColor: $avatarColor, ')
           ..write('description: $description, ')
           ..write('personality: $personality, ')
           ..write('speakingStyle: $speakingStyle, ')
@@ -3725,6 +3770,12 @@ class $ChatMessagesTable extends ChatMessages
   late final GeneratedColumn<String> toolResult = GeneratedColumn<String>(
       'tool_result', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _reasoningContentMeta =
+      const VerificationMeta('reasoningContent');
+  @override
+  late final GeneratedColumn<String> reasoningContent = GeneratedColumn<String>(
+      'reasoning_content', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -3741,6 +3792,7 @@ class $ChatMessagesTable extends ChatMessages
         toolCallId,
         toolArguments,
         toolResult,
+        reasoningContent,
         createdAt
       ];
   @override
@@ -3792,6 +3844,12 @@ class $ChatMessagesTable extends ChatMessages
           toolResult.isAcceptableOrUnknown(
               data['tool_result']!, _toolResultMeta));
     }
+    if (data.containsKey('reasoning_content')) {
+      context.handle(
+          _reasoningContentMeta,
+          reasoningContent.isAcceptableOrUnknown(
+              data['reasoning_content']!, _reasoningContentMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -3824,6 +3882,8 @@ class $ChatMessagesTable extends ChatMessages
           .read(DriftSqlType.string, data['${effectivePrefix}tool_arguments']),
       toolResult: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}tool_result']),
+      reasoningContent: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}reasoning_content']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -3849,6 +3909,10 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
   final String? toolCallId;
   final String? toolArguments;
   final String? toolResult;
+
+  /// 思考模型的内部推理（MiMo / DeepSeek-R1 的 `reasoning_content`）。
+  /// 多轮工具调用时会原样回传给模型；界面默认不展示。
+  final String? reasoningContent;
   final DateTime createdAt;
   const ChatMessageRow(
       {required this.id,
@@ -3859,6 +3923,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       this.toolCallId,
       this.toolArguments,
       this.toolResult,
+      this.reasoningContent,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3882,6 +3947,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
     if (!nullToAbsent || toolResult != null) {
       map['tool_result'] = Variable<String>(toolResult);
     }
+    if (!nullToAbsent || reasoningContent != null) {
+      map['reasoning_content'] = Variable<String>(reasoningContent);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -3904,6 +3972,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       toolResult: toolResult == null && nullToAbsent
           ? const Value.absent()
           : Value(toolResult),
+      reasoningContent: reasoningContent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reasoningContent),
       createdAt: Value(createdAt),
     );
   }
@@ -3921,6 +3992,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       toolCallId: serializer.fromJson<String?>(json['toolCallId']),
       toolArguments: serializer.fromJson<String?>(json['toolArguments']),
       toolResult: serializer.fromJson<String?>(json['toolResult']),
+      reasoningContent: serializer.fromJson<String?>(json['reasoningContent']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -3937,6 +4009,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
       'toolCallId': serializer.toJson<String?>(toolCallId),
       'toolArguments': serializer.toJson<String?>(toolArguments),
       'toolResult': serializer.toJson<String?>(toolResult),
+      'reasoningContent': serializer.toJson<String?>(reasoningContent),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -3950,6 +4023,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           Value<String?> toolCallId = const Value.absent(),
           Value<String?> toolArguments = const Value.absent(),
           Value<String?> toolResult = const Value.absent(),
+          Value<String?> reasoningContent = const Value.absent(),
           DateTime? createdAt}) =>
       ChatMessageRow(
         id: id ?? this.id,
@@ -3961,6 +4035,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
         toolArguments:
             toolArguments.present ? toolArguments.value : this.toolArguments,
         toolResult: toolResult.present ? toolResult.value : this.toolResult,
+        reasoningContent: reasoningContent.present
+            ? reasoningContent.value
+            : this.reasoningContent,
         createdAt: createdAt ?? this.createdAt,
       );
   ChatMessageRow copyWithCompanion(ChatMessagesCompanion data) {
@@ -3977,6 +4054,9 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           : this.toolArguments,
       toolResult:
           data.toolResult.present ? data.toolResult.value : this.toolResult,
+      reasoningContent: data.reasoningContent.present
+          ? data.reasoningContent.value
+          : this.reasoningContent,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -3992,6 +4072,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           ..write('toolCallId: $toolCallId, ')
           ..write('toolArguments: $toolArguments, ')
           ..write('toolResult: $toolResult, ')
+          ..write('reasoningContent: $reasoningContent, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -3999,7 +4080,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
 
   @override
   int get hashCode => Object.hash(id, sessionId, role, content, toolName,
-      toolCallId, toolArguments, toolResult, createdAt);
+      toolCallId, toolArguments, toolResult, reasoningContent, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4012,6 +4093,7 @@ class ChatMessageRow extends DataClass implements Insertable<ChatMessageRow> {
           other.toolCallId == this.toolCallId &&
           other.toolArguments == this.toolArguments &&
           other.toolResult == this.toolResult &&
+          other.reasoningContent == this.reasoningContent &&
           other.createdAt == this.createdAt);
 }
 
@@ -4024,6 +4106,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
   final Value<String?> toolCallId;
   final Value<String?> toolArguments;
   final Value<String?> toolResult;
+  final Value<String?> reasoningContent;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const ChatMessagesCompanion({
@@ -4035,6 +4118,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     this.toolCallId = const Value.absent(),
     this.toolArguments = const Value.absent(),
     this.toolResult = const Value.absent(),
+    this.reasoningContent = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -4047,6 +4131,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     this.toolCallId = const Value.absent(),
     this.toolArguments = const Value.absent(),
     this.toolResult = const Value.absent(),
+    this.reasoningContent = const Value.absent(),
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -4063,6 +4148,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     Expression<String>? toolCallId,
     Expression<String>? toolArguments,
     Expression<String>? toolResult,
+    Expression<String>? reasoningContent,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -4075,6 +4161,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       if (toolCallId != null) 'tool_call_id': toolCallId,
       if (toolArguments != null) 'tool_arguments': toolArguments,
       if (toolResult != null) 'tool_result': toolResult,
+      if (reasoningContent != null) 'reasoning_content': reasoningContent,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -4089,6 +4176,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       Value<String?>? toolCallId,
       Value<String?>? toolArguments,
       Value<String?>? toolResult,
+      Value<String?>? reasoningContent,
       Value<DateTime>? createdAt,
       Value<int>? rowid}) {
     return ChatMessagesCompanion(
@@ -4100,6 +4188,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
       toolCallId: toolCallId ?? this.toolCallId,
       toolArguments: toolArguments ?? this.toolArguments,
       toolResult: toolResult ?? this.toolResult,
+      reasoningContent: reasoningContent ?? this.reasoningContent,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -4133,6 +4222,9 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
     if (toolResult.present) {
       map['tool_result'] = Variable<String>(toolResult.value);
     }
+    if (reasoningContent.present) {
+      map['reasoning_content'] = Variable<String>(reasoningContent.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -4153,6 +4245,7 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
           ..write('toolCallId: $toolCallId, ')
           ..write('toolArguments: $toolArguments, ')
           ..write('toolResult: $toolResult, ')
+          ..write('reasoningContent: $reasoningContent, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -6860,6 +6953,7 @@ typedef $$AiPersonasTableCreateCompanionBuilder = AiPersonasCompanion Function({
   required String id,
   required String name,
   Value<String?> avatar,
+  Value<int?> avatarColor,
   Value<String?> description,
   Value<String?> personality,
   Value<String?> speakingStyle,
@@ -6875,6 +6969,7 @@ typedef $$AiPersonasTableUpdateCompanionBuilder = AiPersonasCompanion Function({
   Value<String> id,
   Value<String> name,
   Value<String?> avatar,
+  Value<int?> avatarColor,
   Value<String?> description,
   Value<String?> personality,
   Value<String?> speakingStyle,
@@ -6924,6 +7019,9 @@ class $$AiPersonasTableFilterComposer
 
   ColumnFilters<String> get avatar => $composableBuilder(
       column: $table.avatar, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get avatarColor => $composableBuilder(
+      column: $table.avatarColor, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
@@ -6994,6 +7092,9 @@ class $$AiPersonasTableOrderingComposer
   ColumnOrderings<String> get avatar => $composableBuilder(
       column: $table.avatar, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get avatarColor => $composableBuilder(
+      column: $table.avatarColor, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
@@ -7043,6 +7144,9 @@ class $$AiPersonasTableAnnotationComposer
 
   GeneratedColumn<String> get avatar =>
       $composableBuilder(column: $table.avatar, builder: (column) => column);
+
+  GeneratedColumn<int> get avatarColor => $composableBuilder(
+      column: $table.avatarColor, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
@@ -7120,6 +7224,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> avatar = const Value.absent(),
+            Value<int?> avatarColor = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> personality = const Value.absent(),
             Value<String?> speakingStyle = const Value.absent(),
@@ -7135,6 +7240,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             id: id,
             name: name,
             avatar: avatar,
+            avatarColor: avatarColor,
             description: description,
             personality: personality,
             speakingStyle: speakingStyle,
@@ -7150,6 +7256,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             required String id,
             required String name,
             Value<String?> avatar = const Value.absent(),
+            Value<int?> avatarColor = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> personality = const Value.absent(),
             Value<String?> speakingStyle = const Value.absent(),
@@ -7165,6 +7272,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             id: id,
             name: name,
             avatar: avatar,
+            avatarColor: avatarColor,
             description: description,
             personality: personality,
             speakingStyle: speakingStyle,
@@ -7858,6 +7966,7 @@ typedef $$ChatMessagesTableCreateCompanionBuilder = ChatMessagesCompanion
   Value<String?> toolCallId,
   Value<String?> toolArguments,
   Value<String?> toolResult,
+  Value<String?> reasoningContent,
   required DateTime createdAt,
   Value<int> rowid,
 });
@@ -7871,6 +7980,7 @@ typedef $$ChatMessagesTableUpdateCompanionBuilder = ChatMessagesCompanion
   Value<String?> toolCallId,
   Value<String?> toolArguments,
   Value<String?> toolResult,
+  Value<String?> reasoningContent,
   Value<DateTime> createdAt,
   Value<int> rowid,
 });
@@ -7927,6 +8037,10 @@ class $$ChatMessagesTableFilterComposer
   ColumnFilters<String> get toolResult => $composableBuilder(
       column: $table.toolResult, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get reasoningContent => $composableBuilder(
+      column: $table.reasoningContent,
+      builder: (column) => ColumnFilters(column));
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
@@ -7982,6 +8096,10 @@ class $$ChatMessagesTableOrderingComposer
   ColumnOrderings<String> get toolResult => $composableBuilder(
       column: $table.toolResult, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get reasoningContent => $composableBuilder(
+      column: $table.reasoningContent,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -8035,6 +8153,9 @@ class $$ChatMessagesTableAnnotationComposer
 
   GeneratedColumn<String> get toolResult => $composableBuilder(
       column: $table.toolResult, builder: (column) => column);
+
+  GeneratedColumn<String> get reasoningContent => $composableBuilder(
+      column: $table.reasoningContent, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -8091,6 +8212,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             Value<String?> toolCallId = const Value.absent(),
             Value<String?> toolArguments = const Value.absent(),
             Value<String?> toolResult = const Value.absent(),
+            Value<String?> reasoningContent = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -8103,6 +8225,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             toolCallId: toolCallId,
             toolArguments: toolArguments,
             toolResult: toolResult,
+            reasoningContent: reasoningContent,
             createdAt: createdAt,
             rowid: rowid,
           ),
@@ -8115,6 +8238,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             Value<String?> toolCallId = const Value.absent(),
             Value<String?> toolArguments = const Value.absent(),
             Value<String?> toolResult = const Value.absent(),
+            Value<String?> reasoningContent = const Value.absent(),
             required DateTime createdAt,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -8127,6 +8251,7 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
             toolCallId: toolCallId,
             toolArguments: toolArguments,
             toolResult: toolResult,
+            reasoningContent: reasoningContent,
             createdAt: createdAt,
             rowid: rowid,
           ),

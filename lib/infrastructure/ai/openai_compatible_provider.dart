@@ -114,12 +114,14 @@ class OpenAiCompatibleProvider implements AiProvider {
     final first = choices.first;
     final message = first is Map ? first['message'] : null;
     final content = message is Map ? message['content'] : null;
+    final reasoning = message is Map ? message['reasoning_content'] : null;
     return AiResponse(
       content: content is String ? content : '',
       finishReason: first is Map && first['finish_reason'] is String
           ? first['finish_reason'] as String
           : null,
       toolCalls: _toolCallsOf(message is Map ? message['tool_calls'] : null),
+      reasoning: reasoning is String ? reasoning : null,
     );
   }
 
@@ -185,6 +187,12 @@ class OpenAiCompatibleProvider implements AiProvider {
       }
 
       _collectToolCalls(payload, builders);
+
+      // 思考模型的增量推理（MiMo / DeepSeek-R1 等）：单独累积，不进正文。
+      final reasoning = _reasoningOf(payload);
+      if (reasoning != null && reasoning.isNotEmpty) {
+        yield AiResponseChunk(reasoning: reasoning);
+      }
 
       final delta = _deltaOf(payload);
       if (delta == null) continue;
@@ -275,6 +283,25 @@ class OpenAiCompatibleProvider implements AiProvider {
       final message = first['message'];
       if (message is Map && message['content'] is String) {
         return message['content'] as String;
+      }
+      return null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// 从一个 data 负载里取出增量思考内容（没有就返回 null）。
+  static String? _reasoningOf(String payload) {
+    try {
+      final decoded = jsonDecode(payload);
+      if (decoded is! Map) return null;
+      final choices = decoded['choices'];
+      if (choices is! List || choices.isEmpty) return null;
+      final first = choices.first;
+      if (first is! Map) return null;
+      final delta = first['delta'];
+      if (delta is Map && delta['reasoning_content'] is String) {
+        return delta['reasoning_content'] as String;
       }
       return null;
     } on FormatException {

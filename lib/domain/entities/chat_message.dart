@@ -98,6 +98,7 @@ class ChatMessage {
     this.toolCallId,
     this.requestedToolCalls = const <ChatToolCall>[],
     this.toolResult,
+    this.reasoningContent,
     this.isStreaming = false,
   });
 
@@ -116,6 +117,10 @@ class ChatMessage {
   /// `role == tool` 时的原始结果（JSON 串）。
   final String? toolResult;
 
+  /// 思考模型的内部推理（MiMo / DeepSeek-R1）。多轮工具调用时会回传，
+  /// 界面默认折叠展示。
+  final String? reasoningContent;
+
   /// 流式输出中（Phase 6 使用；Phase 1 只用于渲染风格）。
   final bool isStreaming;
 
@@ -127,6 +132,7 @@ class ChatMessage {
     String? toolCallId,
     List<ChatToolCall>? requestedToolCalls,
     String? toolResult,
+    String? reasoningContent,
     bool? isStreaming,
   }) {
     return ChatMessage(
@@ -139,6 +145,7 @@ class ChatMessage {
       toolCallId: toolCallId ?? this.toolCallId,
       requestedToolCalls: requestedToolCalls ?? this.requestedToolCalls,
       toolResult: toolResult ?? this.toolResult,
+      reasoningContent: reasoningContent ?? this.reasoningContent,
       isStreaming: isStreaming ?? this.isStreaming,
     );
   }

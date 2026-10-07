@@ -896,6 +896,10 @@ class _MessageView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         MarkdownText(message.content),
+                        if ((message.reasoningContent ?? '').trim().isNotEmpty)
+                          _ReasoningDisclosure(
+                            reasoning: message.reasoningContent!,
+                          ),
                         const SizedBox(height: 4),
                         Text(
                           DateFormats.time(message.createdAt, locale),
@@ -982,6 +986,85 @@ class _AssistantAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PersonaAvatar(persona: persona, radius: 14);
+  }
+}
+
+/// 思考模型的推理过程：默认收起，点一下展开。
+///
+/// 规格 §12 要求"不要把复杂内容直接摊给用户看"，所以默认只显示一行提示。
+class _ReasoningDisclosure extends StatefulWidget {
+  const _ReasoningDisclosure({required this.reasoning});
+
+  final String reasoning;
+
+  @override
+  State<_ReasoningDisclosure> createState() => _ReasoningDisclosureState();
+}
+
+class _ReasoningDisclosureState extends State<_ReasoningDisclosure> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurface.withValues(alpha: 0.6);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          InkWell(
+            key: const ValueKey<String>('ai-reasoning-toggle'),
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    size: 14,
+                    color: muted,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _expanded
+                        ? l10n.aiReasoningHide
+                        : l10n.aiReasoningShow(widget.reasoning.length),
+                    style: theme.textTheme.labelSmall?.copyWith(color: muted),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(8),
+                border: Border(
+                  left: BorderSide(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: SelectableText(
+                widget.reasoning,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

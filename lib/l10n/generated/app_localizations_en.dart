@@ -40,7 +40,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeWeatherPlaceholder => 'Weather';
 
   @override
-  String get homeWeatherHint => 'Weather integration is reserved for a later phase';
+  String get homeWeatherHint =>
+      'Weather integration is reserved for a later phase';
 
   @override
   String homeWeatherDetail(String city, String min, String max) {
@@ -60,7 +61,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherSection => 'Weather';
 
   @override
-  String get weatherSectionSubtitle => 'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.';
+  String get weatherSectionSubtitle =>
+      'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.';
 
   @override
   String get weatherClear => 'Clear';
@@ -99,7 +101,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get digestSection => 'Daily briefings';
 
   @override
-  String get digestSectionSubtitle => 'Ask the assistant to write a morning plan and an evening recap. Off by default; generated at most once per day.';
+  String get digestSectionSubtitle =>
+      'Ask the assistant to write a morning plan and an evening recap. Off by default; generated at most once per day.';
 
   @override
   String get digestMorningToggle => 'Morning plan';
@@ -132,7 +135,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncLocalTitle => 'This device only';
 
   @override
-  String get syncLocalSubtitle => 'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.';
+  String get syncLocalSubtitle =>
+      'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.';
 
   @override
   String get syncNow => 'Check local data';
@@ -169,7 +173,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePhaseBannerTitle => 'Phase 2 · local database';
 
   @override
-  String get homePhaseBannerBody => 'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.';
+  String get homePhaseBannerBody =>
+      'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.';
 
   @override
   String get homePhaseBannerDismiss => 'Got it';
@@ -443,7 +448,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarAllDay => 'All day';
 
   @override
-  String get calendarReadOnlyHint => 'Read-only in this phase — creating and editing events arrives in Phase 3';
+  String get calendarReadOnlyHint =>
+      'Read-only in this phase — creating and editing events arrives in Phase 3';
 
   @override
   String get calendarEventDetail => 'Event detail';
@@ -477,7 +483,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiSend => 'Send';
 
   @override
-  String get aiMockNotice => 'Mock conversation — the AI provider is not connected in this phase';
+  String get aiMockNotice =>
+      'Mock conversation — the AI provider is not connected in this phase';
 
   @override
   String get aiToolCallLabel => 'Tool call';
@@ -497,13 +504,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiMockToolSummary => 'Found 4 events';
 
   @override
-  String get aiMockAssistant => 'You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.';
+  String get aiMockAssistant =>
+      'You have 4 events next week. The thesis defense on Wednesday at 15:00 is the one worth preparing for.';
 
   @override
   String get aiNoProvider => 'No AI provider configured yet';
 
   @override
-  String get aiNoProviderHint => 'Add a Base URL and model in Settings to start chatting.';
+  String get aiNoProviderHint =>
+      'Add a Base URL and model in Settings to start chatting.';
 
   @override
   String get aiOpenSettings => 'Open settings';
@@ -535,7 +544,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiDeleteSession => 'Delete chat';
 
   @override
-  String get aiDeleteSessionConfirm => 'Delete this chat and all of its messages?';
+  String get aiDeleteSessionConfirm =>
+      'Delete this chat and all of its messages?';
 
   @override
   String get aiMessageCopy => 'Copy';
@@ -551,6 +561,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiMessageDelete => 'Delete message';
+
+  @override
+  String get aiReasoningTitle => 'Reasoning';
+
+  @override
+  String aiReasoningShow(int count) {
+    return 'Thought for $count characters · tap to view';
+  }
+
+  @override
+  String get aiReasoningHide => 'Hide reasoning';
+
+  @override
+  String get aiThinkingHard => 'Thinking…';
 
   @override
   String get aiEditMessageTitle => 'Edit message';
@@ -594,7 +618,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aiNoModels => 'The provider returned no models. Use manual input below.';
+  String get aiNoModels =>
+      'The provider returned no models. Use manual input below.';
 
   @override
   String get aiFetchModelsFailed => 'Could not fetch models';
@@ -606,7 +631,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiModelManual => 'Enter manually';
 
   @override
-  String get aiModelManualHint => 'Type the model name if the provider has no model list.';
+  String get aiModelManualHint =>
+      'Type the model name if the provider has no model list.';
 
   @override
   String aiModelSelected(String model) {
@@ -661,7 +687,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiHideKey => 'Hide';
 
   @override
-  String get aiKeyStoredLocally => 'Stored only on this device, never written to logs.';
+  String get aiKeyStoredLocally =>
+      'Stored only on this device, never written to logs.';
 
   @override
   String get aiPersonaSectionTitle => 'Personas';
@@ -697,10 +724,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPersonaAvatar => 'Avatar';
 
   @override
-  String get aiPersonaAvatarHint => 'An emoji, a single character, or an image path/URL';
+  String get aiPersonaAvatarHint =>
+      'An emoji, a single character, or an image path/URL';
 
   @override
-  String get aiPersonaDefaultPrompt => 'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
+  String get aiPersonaDefaultPrompt =>
+      'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
 
   @override
   String aiPersonaSwitched(String name) {
@@ -726,7 +755,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPermissionDelete => 'Delete items (dangerous)';
 
   @override
-  String get aiPermissionHint => 'Refused tools are reported back to the assistant. Deletions always ask for your confirmation.';
+  String get aiPermissionHint =>
+      'Refused tools are reported back to the assistant. Deletions always ask for your confirmation.';
 
   @override
   String get aiToolConfirmTitle => 'Allow this action?';
@@ -824,7 +854,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatUserAvatar => 'My avatar';
 
   @override
-  String get chatUserAvatarHint => 'Emoji, a single character, or an image path';
+  String get chatUserAvatarHint =>
+      'Emoji, a single character, or an image path';
 
   @override
   String get chatBubbleOpacity => 'Bubble opacity';
@@ -905,7 +936,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeEditorAreas => 'Per-area colours';
 
   @override
-  String get themeEditorAreasHint => 'Optional. Leave any of them on \"Default\" to follow the theme colours above.';
+  String get themeEditorAreasHint =>
+      'Optional. Leave any of them on \"Default\" to follow the theme colours above.';
 
   @override
   String get themeAreaNavBar => 'Nav bar';
@@ -982,7 +1014,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePreviewCardTitle => 'Sample card';
 
   @override
-  String get themePreviewCardBody => 'This is how cards, buttons and text will look.';
+  String get themePreviewCardBody =>
+      'This is how cards, buttons and text will look.';
 
   @override
   String get themePreviewAction => 'Primary action';
@@ -1030,13 +1063,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAiSection => 'AI & providers';
 
   @override
-  String get settingsAiSectionSubtitle => 'Provider, persona and tool permissions (Phase 6-8)';
+  String get settingsAiSectionSubtitle =>
+      'Provider, persona and tool permissions (Phase 6-8)';
 
   @override
   String get settingsNotificationSection => 'Notifications';
 
   @override
-  String get settingsNotificationSectionSubtitle => 'System notifications on Android, toasts on Windows';
+  String get settingsNotificationSectionSubtitle =>
+      'System notifications on Android, toasts on Windows';
 
   @override
   String get settingsNotificationPermission => 'Permission';
@@ -1054,7 +1089,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsNotificationExactAlarm => 'Allow precise reminders';
 
   @override
-  String get settingsNotificationExactAlarmHint => 'Without it the system may delay reminders by a few minutes.';
+  String get settingsNotificationExactAlarmHint =>
+      'Without it the system may delay reminders by a few minutes.';
 
   @override
   String get settingsNotificationTest => 'Send a test notification';
@@ -1087,16 +1123,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBackupSection => 'Backup & restore';
 
   @override
-  String get settingsBackupSectionSubtitle => 'Versioned JSON export and import (Phase 12)';
+  String get settingsBackupSectionSubtitle =>
+      'Versioned JSON export and import (Phase 12)';
 
   @override
-  String get backupIntro => 'Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.';
+  String get backupIntro =>
+      'Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.';
 
   @override
   String get backupIncludeApiKeys => 'Include API keys';
 
   @override
-  String get backupIncludeApiKeysHint => 'Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.';
+  String get backupIncludeApiKeysHint =>
+      'Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.';
 
   @override
   String get backupExport => 'Export backup';
@@ -1141,13 +1180,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupModeReplace => 'Replace';
 
   @override
-  String get backupModeReplaceHint => 'Delete local data first, then write the backup';
+  String get backupModeReplaceHint =>
+      'Delete local data first, then write the backup';
 
   @override
   String get backupModeMerge => 'Merge';
 
   @override
-  String get backupModeMergeHint => 'Keep local data; same ids are overwritten, new ones are added';
+  String get backupModeMergeHint =>
+      'Keep local data; same ids are overwritten, new ones are added';
 
   @override
   String backupRestored(int count) {
@@ -1167,16 +1208,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupErrorNotBackup => 'That is not a Toki backup file.';
 
   @override
-  String get backupErrorFormatVersion => 'This backup was created by a newer version of Toki.';
+  String get backupErrorFormatVersion =>
+      'This backup was created by a newer version of Toki.';
 
   @override
-  String get backupErrorSchemaVersion => 'This backup comes from a newer database version.';
+  String get backupErrorSchemaVersion =>
+      'This backup comes from a newer database version.';
 
   @override
   String get backupErrorMissingTables => 'This backup has no data section.';
 
   @override
-  String get backupErrorCorrupted => 'This backup is damaged and cannot be restored.';
+  String get backupErrorCorrupted =>
+      'This backup is damaged and cannot be restored.';
 
   @override
   String get settingsAbout => 'About';
@@ -1194,7 +1238,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsProjectPath => 'Project path';
 
   @override
-  String get settingsPhaseNote => 'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.';
+  String get settingsPhaseNote =>
+      'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.';
 
   @override
   String get mockEventDefense => 'Thesis defense';
@@ -1227,10 +1272,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mockPersonaDescription => 'Personal schedule assistant';
 
   @override
-  String get mockPersonaPersonality => 'Gentle and lively, occasionally nudging you to stop procrastinating';
+  String get mockPersonaPersonality =>
+      'Gentle and lively, occasionally nudging you to stop procrastinating';
 
   @override
-  String get mockPersonaSpeakingStyle => 'Short and natural, never overly formal';
+  String get mockPersonaSpeakingStyle =>
+      'Short and natural, never overly formal';
 
   @override
   String get mockPersonaNickname => 'you';

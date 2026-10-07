@@ -166,6 +166,7 @@ extension AiPersonaRowMapper on AiPersonaRow {
         id: id,
         name: name,
         avatar: avatar,
+        avatarColor: avatarColor,
         description: description,
         personality: personality,
         speakingStyle: speakingStyle,
@@ -183,6 +184,7 @@ AiPersonasCompanion aiPersonaToCompanion(AiPersona persona) =>
       id: Value<String>(persona.id),
       name: Value<String>(persona.name),
       avatar: Value<String?>(persona.avatar),
+      avatarColor: Value<int?>(persona.avatarColor),
       description: Value<String?>(persona.description),
       personality: Value<String?>(persona.personality),
       speakingStyle: Value<String?>(persona.speakingStyle),
@@ -259,6 +261,7 @@ extension ChatMessageRowMapper on ChatMessageRow {
             ? ChatToolCall.parseList(toolArguments)
             : const <ChatToolCall>[],
         toolResult: toolResult,
+        reasoningContent: reasoningContent,
         toolCall: toolName == null
             ? null
             : ToolCallInfo(
@@ -297,6 +300,7 @@ ChatMessagesCompanion chatMessageToCompanion(ChatMessage message) =>
             : ChatToolCall.encodeList(message.requestedToolCalls),
       ),
       toolResult: Value<String?>(message.toolResult),
+      reasoningContent: Value<String?>(message.reasoningContent),
       createdAt: Value<DateTime>(message.createdAt),
     );
 

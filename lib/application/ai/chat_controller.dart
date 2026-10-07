@@ -49,6 +49,7 @@ class ChatStreamState {
     this.error,
     this.pendingConfirmation,
     this.activeToolName,
+    this.streamingReasoning = '',
   });
 
   final bool isStreaming;
@@ -65,6 +66,9 @@ class ChatStreamState {
   /// 正在执行的工具名（用于"正在创建日程…"）。
   final String? activeToolName;
 
+  /// 正在流式输出的思考内容（思考模型；界面默认折叠，不展开显示）。
+  final String streamingReasoning;
+
   ChatStreamState copyWith({
     bool? isStreaming,
     String? streamingText,
@@ -74,6 +78,7 @@ class ChatStreamState {
     bool clearConfirmation = false,
     String? activeToolName,
     bool clearActiveTool = false,
+    String? streamingReasoning,
   }) {
     return ChatStreamState(
       isStreaming: isStreaming ?? this.isStreaming,
@@ -84,6 +89,7 @@ class ChatStreamState {
           : (pendingConfirmation ?? this.pendingConfirmation),
       activeToolName:
           clearActiveTool ? null : (activeToolName ?? this.activeToolName),
+      streamingReasoning: streamingReasoning ?? this.streamingReasoning,
     );
   }
 }
@@ -189,10 +195,17 @@ final aiProviderFactoryProvider =
 
 /// 单轮流式结果。
 class _TurnResult {
-  const _TurnResult({required this.text, required this.toolCalls});
+  const _TurnResult({
+    required this.text,
+    required this.toolCalls,
+    this.reasoning,
+  });
 
   final String text;
   final List<AiToolCall> toolCalls;
+
+  /// 思考模型这一轮的内部推理（没有则为空）。
+  final String? reasoning;
 }
 
 /// 工具执行结果（给模型看的内容 + 给用户看的摘要）。
@@ -326,7 +339,11 @@ class ChatController extends Notifier<ChatStreamState> {
             state = const ChatStreamState(error: 'empty');
             return;
           }
-          await _persistAssistantMessage(session.id, reply);
+          await _persistAssistantMessage(
+            session.id,
+            reply,
+            reasoning: turn.reasoning,
+          );
           state = const ChatStreamState();
           return;
         }
@@ -336,6 +353,7 @@ class ChatController extends Notifier<ChatStreamState> {
           session.id,
           turn.text.trim(),
           toolCalls: turn.toolCalls,
+          reasoning: turn.reasoning,
         );
 
         // 2) 依次执行工具，并把结果落库（模型下一轮会看到）
@@ -378,6 +396,7 @@ class ChatController extends Notifier<ChatStreamState> {
     AiChatRequest request,
   ) async {
     final buffer = StringBuffer();
+    final reasoningBuffer = StringBuffer();
     final completer = Completer<void>();
     _completer = completer;
     var toolCalls = const <AiToolCall>[];
@@ -386,6 +405,12 @@ class ChatController extends Notifier<ChatStreamState> {
       (AiResponseChunk chunk) {
         if (chunk.toolCalls.isNotEmpty) {
           toolCalls = chunk.toolCalls;
+        }
+        if (chunk.reasoning.isNotEmpty) {
+          reasoningBuffer.write(chunk.reasoning);
+          state = state.copyWith(
+            streamingReasoning: reasoningBuffer.toString(),
+          );
         }
         if (chunk.delta.isNotEmpty) {
           buffer.write(chunk.delta);
@@ -402,7 +427,12 @@ class ChatController extends Notifier<ChatStreamState> {
     );
 
     await completer.future;
-    return _TurnResult(text: buffer.toString(), toolCalls: toolCalls);
+    final reasoning = reasoningBuffer.toString().trim();
+    return _TurnResult(
+      text: buffer.toString(),
+      toolCalls: toolCalls,
+      reasoning: reasoning.isEmpty ? null : reasoning,
+    );
   }
 
   /// 权限检查 → 危险操作二次确认 → 执行。
@@ -515,6 +545,8 @@ class ChatController extends Notifier<ChatStreamState> {
             AiMessage(
               role: AiRole.assistant,
               content: message.content,
+              // 思考模型：把历史推理原样回传（官方建议），能明显改善多轮工具调用。
+              reasoning: message.reasoningContent,
               toolCalls: message.requestedToolCalls
                   .map(
                     (ChatToolCall call) => AiToolCall(
@@ -727,6 +759,7 @@ class ChatController extends Notifier<ChatStreamState> {
     String sessionId,
     String content, {
     List<AiToolCall> toolCalls = const <AiToolCall>[],
+    String? reasoning,
   }) async {
     final repository = ref.read(chatRepositoryProvider);
     final clock = ref.read(clockProvider);
@@ -736,6 +769,7 @@ class ChatController extends Notifier<ChatStreamState> {
         sessionId: sessionId,
         role: ChatRole.assistant,
         content: content,
+        reasoningContent: reasoning,
         requestedToolCalls: toolCalls
             .map(
               (AiToolCall call) => ChatToolCall(

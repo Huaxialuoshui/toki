@@ -281,6 +281,17 @@
   "aiMessageEdit": "Edit and resend",
   "aiMessageRegenerate": "Regenerate",
   "aiMessageDelete": "Delete message",
+  "aiReasoningTitle": "Reasoning",
+  "aiReasoningShow": "Thought for {count} characters · tap to view",
+  "@aiReasoningShow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiReasoningHide": "Hide reasoning",
+  "aiThinkingHard": "Thinking…",
   "aiEditMessageTitle": "Edit message",
   "aiSwitchProvider": "AI provider",
   "aiNoProviderShort": "No provider",

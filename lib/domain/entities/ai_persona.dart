@@ -12,6 +12,7 @@ class AiPersona {
     required this.createdAt,
     required this.updatedAt,
     this.avatar,
+    this.avatarColor,
     this.description,
     this.personality,
     this.speakingStyle,
@@ -26,6 +27,9 @@ class AiPersona {
 
   /// 头像标识：本地资源路径或网络地址，Phase 7 支持自定义。
   final String? avatar;
+
+  /// 头像底色（ARGB int）；为空时用主题色。
+  final int? avatarColor;
 
   final String? description;
   final String? personality;
@@ -53,6 +57,7 @@ class AiPersona {
         other.id == id &&
         other.name == name &&
         other.avatar == avatar &&
+        other.avatarColor == avatarColor &&
         other.description == description &&
         other.personality == personality &&
         other.speakingStyle == speakingStyle &&
@@ -69,6 +74,7 @@ class AiPersona {
         id,
         name,
         avatar,
+        avatarColor,
         description,
         personality,
         speakingStyle,

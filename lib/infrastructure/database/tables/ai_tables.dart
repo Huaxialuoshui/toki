@@ -9,6 +9,9 @@ class AiPersonas extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get avatar => text().nullable()();
+
+  /// 头像底色（ARGB int），配合 emoji / 单字头像使用。
+  IntColumn get avatarColor => integer().nullable()();
   TextColumn get description => text().nullable()();
   TextColumn get personality => text().nullable()();
   TextColumn get speakingStyle => text().nullable()();
@@ -79,6 +82,10 @@ class ChatMessages extends Table {
 
   TextColumn get toolArguments => text().nullable()();
   TextColumn get toolResult => text().nullable()();
+
+  /// 思考模型的内部推理（MiMo / DeepSeek-R1 的 `reasoning_content`）。
+  /// 多轮工具调用时会原样回传给模型；界面默认不展示。
+  TextColumn get reasoningContent => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 
   @override

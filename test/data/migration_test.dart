@@ -30,7 +30,7 @@ void main() {
     addTearDown(database.close);
 
     // 从 v1 快照建库，再迁移到当前版本并校验结构一致。
-    await verifier.migrateAndValidate(database, 5);
+    await verifier.migrateAndValidate(database, 6);
   });
 
   test('v1 → v2 迁移会补上 chat_messages.tool_call_id', () async {
@@ -39,7 +39,7 @@ void main() {
     addTearDown(database.close);
 
     await database.customStatement('PRAGMA foreign_keys = OFF');
-    await verifier.migrateAndValidate(database, 5);
+    await verifier.migrateAndValidate(database, 6);
 
     final columns = await database
         .customSelect('PRAGMA table_info(chat_messages)')
@@ -53,7 +53,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 5);
+    await verifier.migrateAndValidate(database, 6);
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -67,7 +67,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 5);
+    await verifier.migrateAndValidate(database, 6);
 
     Future<List<String>> columnsOf(String table) => database
         .customSelect('PRAGMA table_info($table)')
@@ -91,7 +91,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 5);
+    await verifier.migrateAndValidate(database, 6);
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -108,7 +108,24 @@ void main() {
     );
   });
 
+  test('v5 → v6 迁移会补上思考内容与人设头像底色', () async {
+    final connection = await verifier.startAt(5);
+    final database = AppDatabase(connection);
+    addTearDown(database.close);
+
+    await verifier.migrateAndValidate(database, 6);
+
+    Future<List<String>> columnsOf(String table) => database
+        .customSelect('PRAGMA table_info($table)')
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+
+    expect(await columnsOf('chat_messages'), contains('reasoning_content'));
+    expect(await columnsOf('ai_personas'), contains('avatar_color'));
+  });
+
   test('从空库创建后，10 张表全部存在', () async {
+    // 注意：这里只是确认表都在，列级校验交给 migrateAndValidate。
     final database = AppDatabase.memory();
     addTearDown(database.close);
 

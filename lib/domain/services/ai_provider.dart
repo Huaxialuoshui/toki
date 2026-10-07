@@ -13,6 +13,7 @@ class AiMessage {
     required this.content,
     this.toolCallId,
     this.toolCalls = const <AiToolCall>[],
+    this.reasoning,
   });
 
   const AiMessage.system(String content)
@@ -37,6 +38,11 @@ class AiMessage {
   /// `role == assistant` 时模型请求调用的工具。
   final List<AiToolCall> toolCalls;
 
+  /// 思考模型的内部推理（MiMo / DeepSeek-R1 等返回的 `reasoning_content`）。
+  ///
+  /// 官方建议多轮工具调用时把它原样回传以获得最佳表现；界面默认不展示。
+  final String? reasoning;
+
   String get roleName => switch (role) {
         AiRole.system => 'system',
         AiRole.user => 'user',
@@ -52,6 +58,9 @@ class AiMessage {
           'tool_calls': toolCalls
               .map((AiToolCall call) => call.toJson())
               .toList(growable: false),
+        // OpenAI 兼容的思考模型扩展：回传历史推理内容（为空时不带这个字段）。
+        if (reasoning != null && reasoning!.trim().isNotEmpty)
+          'reasoning_content': reasoning,
       };
 }
 
@@ -143,6 +152,7 @@ class AiResponse {
     required this.content,
     this.finishReason,
     this.toolCalls = const <AiToolCall>[],
+    this.reasoning,
   });
 
   final String content;
@@ -150,6 +160,9 @@ class AiResponse {
 
   /// 非流式响应里的工具调用。
   final List<AiToolCall> toolCalls;
+
+  /// 非流式响应里的思考内容。
+  final String? reasoning;
 }
 
 /// 流式回复的一块增量。
@@ -159,6 +172,7 @@ class AiResponseChunk {
     this.delta = '',
     this.done = false,
     this.toolCalls = const <AiToolCall>[],
+    this.reasoning = '',
   });
 
   /// 本次新增的文本（可能为空字符串）。
@@ -169,6 +183,12 @@ class AiResponseChunk {
 
   /// 模型在这一轮请求调用的工具（流结束时一次性给出完整参数）。
   final List<AiToolCall> toolCalls;
+
+  /// 本次新增的思考文本（可能为空字符串；界面按需展示）。
+  final String reasoning;
+
+  /// 这一块是不是只有思考内容（没有正文）。
+  bool get isReasoningOnly => reasoning.isNotEmpty && delta.isEmpty;
 }
 
 /// AI 服务抽象（规格 §1）。
