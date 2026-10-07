@@ -6,6 +6,11 @@
     <!-- 重启后重新排期已安排的提醒 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- 联网：AI 服务商（OpenAI 兼容接口）与天气（Open-Meteo）都需要。
+         Flutter 模板只在 debug/profile 清单里声明它，release 包必须在这里再声明一次，
+         否则打包出来的 APK 完全没有网络权限（AI 与天气都会静默失败）。 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:label="toki"

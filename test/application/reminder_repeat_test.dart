@@ -163,4 +163,50 @@ void main() {
     expect(notifications.cancelled.length, scheduled);
     expect(settings.readScheduledNotificationIds(), isEmpty);
   });
+
+  test('重复日程反复同步不会产生重复通知（幂等）', () async {
+    await setUpScheduler(DateTime(2026, 10, 6, 8));
+    await addEventWithReminder(
+      eventId: 'e-daily',
+      start: DateTime(2026, 10, 6, 9),
+      repeatRule: 'daily',
+    );
+
+    await scheduler.sync();
+    final firstIds = notifications.scheduled
+        .map((ScheduledNotification item) => item.id)
+        .toList()
+      ..sort();
+
+    await scheduler.sync();
+    await scheduler.sync();
+
+    final secondIds = notifications.scheduled
+        .map((ScheduledNotification item) => item.id)
+        .toList()
+      ..sort();
+    expect(secondIds, firstIds, reason: '同一批发生对应同一批通知 id');
+    expect(
+      notifications.scheduled.length,
+      ReminderScheduler.maxOccurrencesPerReminder,
+    );
+  });
+
+  test('每天重复不会超过单条提醒的排期上限', () async {
+    await setUpScheduler(DateTime(2026, 10, 6, 8));
+    await addEventWithReminder(
+      eventId: 'e-forever',
+      start: DateTime(2026, 10, 6, 9),
+      repeatRule: 'daily',
+    );
+
+    await scheduler.sync();
+
+    expect(
+      notifications.scheduled.length,
+      lessThanOrEqualTo(ReminderScheduler.maxOccurrencesPerReminder),
+    );
+    // 30 天视野 + 每天一次 = 正好 30 条
+    expect(notifications.scheduled.length, 30);
+  });
 }

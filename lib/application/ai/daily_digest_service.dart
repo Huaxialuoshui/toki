@@ -60,6 +60,8 @@ class DailyDigestService {
 
   /// 强制生成（手动点击 / 重新生成）。
   Future<DailyDigest> generate(DailyDigestKind kind) async {
+    // 刚启动时服务商配置的流可能还没出值，先等首帧，否则会误判成"没有配置"。
+    await _ref.read(aiProvidersProvider.future);
     final config = _ref.read(activeAiConfigProvider);
     if (config == null) {
       throw const AppException('还没有配置 AI 服务商');

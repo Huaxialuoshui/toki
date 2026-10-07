@@ -153,4 +153,37 @@ void main() {
     await service.setEnabled(DailyDigestKind.evening, false);
     expect(store.readEveningDigestEnabled(), isFalse);
   });
+
+  test('数据库是空的也能生成（不因没有日程而崩）', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final preferences = await SharedPreferences.getInstance();
+    final emptyDatabase = AppDatabase.memory();
+    final emptyAi = FakeAiProvider(chunks: <String>['## 今日计划\n- 今天没有安排']);
+    final emptyContainer = ProviderContainer(
+      overrides: <Override>[
+        sharedPreferencesProvider.overrideWithValue(preferences),
+        clockProvider.overrideWithValue(clock),
+        appDatabaseProvider.overrideWithValue(emptyDatabase),
+        aiProviderFactoryProvider.overrideWithValue(() => emptyAi),
+        aiProviderBuilderProvider.overrideWithValue((_) => emptyAi),
+        aiProvidersProvider.overrideWith(
+          (Ref ref) => Stream<List<AiProviderConfig>>.value(
+            <AiProviderConfig>[aiConfig()],
+          ),
+        ),
+      ],
+    );
+    addTearDown(() async {
+      emptyContainer.dispose();
+      await emptyDatabase.close();
+    });
+    await emptyContainer.read(aiProvidersProvider.future);
+
+    final digest = await emptyContainer
+        .read(dailyDigestServiceProvider)
+        .generate(DailyDigestKind.morning);
+
+    expect(digest.content, contains('今日计划'));
+    expect(emptyAi.requests, hasLength(1));
+  });
 }

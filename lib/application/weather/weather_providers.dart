@@ -40,8 +40,9 @@ final weatherProvider = FutureProvider<WeatherSnapshot?>((ref) async {
     final fresh = await ref.watch(weatherServiceProvider).fetch(city);
     await store.writeWeatherCache(jsonEncode(fresh.toJson()));
     return fresh;
-  } on Object {
+  } on Object catch (error) {
     // 网络失败不打扰用户：有旧数据就先用旧的。
+    debugPrint('获取天气失败（$city）：$error');
     return cached;
   }
 });
