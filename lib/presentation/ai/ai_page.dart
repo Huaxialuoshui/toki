@@ -399,6 +399,7 @@ class _AiPageState extends ConsumerState<AiPage> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: ChatBackground(
+                key: const ValueKey<String>('ai-chat-background'),
                 config: appearance.background,
                 child: MediaQuery(
                   data: MediaQuery.of(context).copyWith(

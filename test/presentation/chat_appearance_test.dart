@@ -43,8 +43,9 @@ void main() {
     );
     await openAi(tester);
 
+    // 注意：应用级背景也是一个 ChatBackground，所以这里按 key 取聊天页那个。
     final background = tester.widget<ChatBackground>(
-      find.byType(ChatBackground).first,
+      find.byKey(const ValueKey<String>('ai-chat-background')),
     );
     expect(background.config.type, ChatBackgroundType.gradient);
     expect(background.config.gradientColors, <int>[0xFF112233, 0xFF445566]);
@@ -100,7 +101,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final gradient = find.text('Gradient').first;
+    // 设置页里有两个"Gradient"（应用级背景 + 聊天外观），所以精确定位聊天那一组。
+    final gradient = find.descendant(
+      of: find.byKey(const ValueKey<String>('chat-background-type')),
+      matching: find.text('Gradient'),
+    );
     await tester.scrollUntilVisible(
       gradient,
       280,
@@ -112,7 +117,7 @@ void main() {
 
     // 预览区使用同一份配置
     final background = tester.widget<ChatBackground>(
-      find.byType(ChatBackground).first,
+      find.byKey(const ValueKey<String>('chat-preview-background')),
     );
     expect(background.config.type, ChatBackgroundType.gradient);
     expect(find.text('This is a preview bubble'), findsOneWidget);

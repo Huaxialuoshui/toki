@@ -42,7 +42,11 @@ void main() {
         .tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(ChoiceChip, '中文'));
+    // 设置页越来越长，语言区块在测试视口外，先滚动到可见位置再点。
+    final chineseChip = find.widgetWithText(ChoiceChip, '中文');
+    await tester.ensureVisible(chineseChip);
+    await tester.pumpAndSettle();
+    await tester.tap(chineseChip);
     await tester.pumpAndSettle();
 
     expect(find.text('设置'), findsWidgets);

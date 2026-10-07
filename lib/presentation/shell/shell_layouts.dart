@@ -30,6 +30,8 @@ class MobileShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: kMobileShellKey,
+      // 透明：让应用级背景（纯色 / 渐变 / 图片）透上来。
+      backgroundColor: Colors.transparent,
       body: SafeArea(child: body),
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
@@ -66,6 +68,8 @@ class TabletShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: kTabletShellKey,
+      // 透明：让应用级背景（纯色 / 渐变 / 图片）透上来。
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Row(
           children: <Widget>[
@@ -117,6 +121,8 @@ class DesktopShell extends StatelessWidget {
 
     return Scaffold(
       key: kDesktopShellKey,
+      // 透明：让应用级背景（纯色 / 渐变 / 图片）透上来。
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Row(
           children: <Widget>[

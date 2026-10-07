@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../application/settings/settings_controller.dart';
+import '../application/appearance/app_appearance_providers.dart';
 import '../application/app_startup.dart';
 import '../application/notification/reminder_sync.dart';
 import '../application/theme/theme_controller.dart';
 import '../application/widget/widget_controller.dart';
 import '../application/theme/theme_mapper.dart';
 import '../core/extensions/l10n_extension.dart';
+import '../domain/entities/chat_appearance.dart';
 import '../domain/entities/glass_style.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../shared/widgets/glass_card.dart';
 import '../shared/widgets/theme_config_scope.dart';
+import '../presentation/widgets/chat_background.dart';
 import 'router.dart';
 
 /// 应用根组件。
@@ -35,6 +38,8 @@ class TokiApp extends ConsumerWidget {
     final resolution = ref.watch(themeResolutionProvider);
     final locale = ref.watch(localeControllerProvider);
     final router = ref.watch(goRouterProvider);
+    // 应用级背景：纯色 / 渐变 / 图片（默认是"透明纯色"，等于没有额外背景）。
+    final appBackground = ref.watch(appBackgroundProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -64,17 +69,27 @@ class TokiApp extends ConsumerWidget {
           ThemeMode.system => MediaQuery.platformBrightnessOf(context),
         };
         final config = resolution.configFor(brightness);
-        return ThemeConfigScope(
-          config: config,
-          child: GlassTheme(
-            style: GlassStyle.fromThemeConfig(config),
-            // 字号缩放在这里生效：ThemeData 的文本样式在部分平台没有显式 fontSize，
-            // 用 textScaler 才能对所有文字生效。
-            child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(config.fontScale),
+        // 未设置应用背景时，用主题的背景色垫底，视觉效果和以前完全一致。
+        // 设置过之后，桌面 / 移动端的三套 Shell 都是透明 Scaffold，
+        // 所以自定义背景（纯色 / 渐变 / 图片）会从页面下方透出来。
+        final background = appBackground.isUnset
+            ? ChatBackgroundConfig.fromColor(config.backgroundColor)
+            : appBackground;
+        return ChatBackground(
+          key: const ValueKey<String>('app-background'),
+          config: background,
+          child: ThemeConfigScope(
+            config: config,
+            child: GlassTheme(
+              style: GlassStyle.fromThemeConfig(config),
+              // 字号缩放在这里生效：ThemeData 的文本样式在部分平台没有显式 fontSize，
+              // 用 textScaler 才能对所有文字生效。
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(config.fontScale),
+                ),
+                child: child ?? const SizedBox.shrink(),
               ),
-              child: child ?? const SizedBox.shrink(),
             ),
           ),
         );

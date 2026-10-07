@@ -30,6 +30,7 @@ class ChatAppearanceSection extends ConsumerWidget {
         children: <Widget>[
           _Label(text: l10n.chatBackground),
           SegmentedButton<ChatBackgroundType>(
+            key: const ValueKey<String>('chat-background-type'),
             segments: <ButtonSegment<ChatBackgroundType>>[
               ButtonSegment<ChatBackgroundType>(
                 value: ChatBackgroundType.solid,
@@ -252,6 +253,7 @@ class _Preview extends StatelessWidget {
       child: SizedBox(
         height: 120,
         child: ChatBackground(
+          key: const ValueKey<String>('chat-preview-background'),
           config: appearance.background,
           child: Padding(
             padding: const EdgeInsets.all(12),

@@ -31,6 +31,8 @@ class AppSettingsStore {
   static const String _weatherCacheKey = 'settings.weatherCache';
   static const String _weatherLocationsKey = 'settings.weatherLocations';
   static const String _widgetConfigKey = 'settings.widgetConfig';
+  static const String _appBackgroundKey = 'settings.appBackground';
+  static const String _iconStyleKey = 'settings.iconStyle';
   static const String _digestMorningKey = 'settings.digest.morning';
   static const String _digestEveningKey = 'settings.digest.evening';
 
@@ -160,6 +162,18 @@ class AppSettingsStore {
 
   Future<void> writeWidgetConfig(String json) =>
       _preferences.setString(_widgetConfigKey, json);
+
+  /// 应用级背景（JSON），复用聊天背景的配置结构。
+  String? readAppBackground() => _preferences.getString(_appBackgroundKey);
+
+  Future<void> writeAppBackground(String json) =>
+      _preferences.setString(_appBackgroundKey, json);
+
+  /// 图标风格：`outlined` / `filled`。
+  String? readIconStyle() => _preferences.getString(_iconStyleKey);
+
+  Future<void> writeIconStyle(String value) =>
+      _preferences.setString(_iconStyleKey, value);
 
   /// AI 每日计划 / 每日总结开关（规格 §14），默认都关闭。
   bool readMorningDigestEnabled() =>

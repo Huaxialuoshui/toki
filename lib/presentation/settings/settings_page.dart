@@ -16,6 +16,7 @@ import '../../domain/entities/theme_config.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
+import 'app_appearance_section.dart';
 import 'ai_persona_section.dart';
 import 'backup_section.dart';
 import 'calendar_category_section.dart';
@@ -195,6 +196,12 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.appBackground,
+            icon: Icons.wallpaper_outlined,
+          ),
+          const AppAppearanceSection(),
           const SizedBox(height: 24),
           SectionHeader(
             title: l10n.settingsLanguage,

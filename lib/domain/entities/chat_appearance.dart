@@ -21,6 +21,18 @@ class ChatBackgroundConfig {
     this.overlayOpacity = 0,
   });
 
+  /// 用 Flutter 的 [Color] 直接构造一个纯色背景（ARGB 换算见 [argbOf]）。
+  ChatBackgroundConfig.fromColor(Color color)
+      : this(type: ChatBackgroundType.solid, solidColor: argbOf(color));
+
+  /// `Color` → ARGB int。Flutter 3.27 里 `Color.value` 已废弃、
+  /// `toARGB32()` 还不存在，所以统一用分量访问器换算。
+  static int argbOf(Color color) =>
+      ((color.a * 255).round() << 24) |
+      ((color.r * 255).round() << 16) |
+      ((color.g * 255).round() << 8) |
+      (color.b * 255).round();
+
   final ChatBackgroundType type;
 
   /// 纯色背景（ARGB）。
@@ -43,6 +55,17 @@ class ChatBackgroundConfig {
   final double overlayOpacity;
 
   bool get hasImage => (imagePath ?? '').trim().isNotEmpty;
+
+  /// 是否为"没有设置过"的默认值（默认构造出来的那个）。
+  ///
+  /// 应用级背景用它来决定"用户到底配没配"：没配就沿用主题背景色。
+  bool get isUnset =>
+      type == ChatBackgroundType.solid &&
+      solidColor == 0x00000000 &&
+      !hasImage &&
+      blurAmount == 0 &&
+      overlayOpacity == 0 &&
+      imageOpacity == 1;
 
   Color get solid => Color(solidColor);
 

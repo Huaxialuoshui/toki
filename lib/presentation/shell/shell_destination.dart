@@ -17,37 +17,30 @@ class ShellDestination {
   final String label;
 }
 
-List<ShellDestination> buildShellDestinations(AppLocalizations l10n) {
+List<ShellDestination> buildShellDestinations(
+  AppLocalizations l10n, {
+  bool filledIcons = false,
+}) {
+  ShellDestination of(
+    String route,
+    IconData outlined,
+    IconData filled,
+    String label,
+  ) =>
+      ShellDestination(
+        route: route,
+        // 实心风格：选不选中都是实心；描边风格：未选中描边、选中实心。
+        icon: filledIcons ? filled : outlined,
+        selectedIcon: filled,
+        label: label,
+      );
+
   return <ShellDestination>[
-    ShellDestination(
-      route: '/home',
-      icon: Icons.dashboard_outlined,
-      selectedIcon: Icons.dashboard,
-      label: l10n.navHome,
-    ),
-    ShellDestination(
-      route: '/calendar',
-      icon: Icons.calendar_month_outlined,
-      selectedIcon: Icons.calendar_month,
-      label: l10n.navCalendar,
-    ),
-    ShellDestination(
-      route: '/countdown',
-      icon: Icons.timer_outlined,
-      selectedIcon: Icons.timer,
-      label: l10n.navCountdown,
-    ),
-    ShellDestination(
-      route: '/ai',
-      icon: Icons.auto_awesome_outlined,
-      selectedIcon: Icons.auto_awesome,
-      label: l10n.navAi,
-    ),
-    ShellDestination(
-      route: '/settings',
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
-      label: l10n.navSettings,
-    ),
+    of('/home', Icons.dashboard_outlined, Icons.dashboard, l10n.navHome),
+    of('/calendar', Icons.calendar_month_outlined, Icons.calendar_month,
+        l10n.navCalendar),
+    of('/countdown', Icons.timer_outlined, Icons.timer, l10n.navCountdown),
+    of('/ai', Icons.auto_awesome_outlined, Icons.auto_awesome, l10n.navAi),
+    of('/settings', Icons.settings_outlined, Icons.settings, l10n.navSettings),
   ];
 }

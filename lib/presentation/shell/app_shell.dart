@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/extensions/l10n_extension.dart';
+import '../../application/appearance/app_appearance_providers.dart';
 import 'shell_destination.dart';
 import 'shell_layouts.dart';
 
@@ -31,7 +32,10 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final destinations = buildShellDestinations(context.l10n);
+    final destinations = buildShellDestinations(
+      context.l10n,
+      filledIcons: ref.watch(appIconStyleProvider) == AppIconStyle.filled,
+    );
     final currentIndex = widget.navigationShell.currentIndex;
     final body = widget.navigationShell;
 
