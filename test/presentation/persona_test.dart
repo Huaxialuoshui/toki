@@ -104,7 +104,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, '阿蓝');
     await tester.enterText(
-      find.byType(TextFormField).at(6),
+      // 字段顺序：名称 / 身份 / 性格 / 说话方式 / 称呼 / 系统提示词
+      // （头像改成了"预览 + 更换"按钮，不再是一个输入框）
+      find.byType(TextFormField).at(5),
       '你是阿蓝，说话简短直接。',
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Save').last);

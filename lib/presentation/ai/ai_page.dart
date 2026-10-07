@@ -867,7 +867,11 @@ class _MessageView extends StatelessWidget {
     );
 
     // 用户头像（设置了才显示）。
-    final userAvatar = _UserAvatar(avatar: appearance.userAvatar, radius: 14);
+    final userAvatar = _UserAvatar(
+      avatar: appearance.userAvatar,
+      color: appearance.userAvatarColor,
+      radius: 14,
+    );
     final showUserAvatar =
         isUser && (appearance.userAvatar ?? '').trim().isNotEmpty;
 
@@ -1070,9 +1074,10 @@ class _ReasoningDisclosureState extends State<_ReasoningDisclosure> {
 
 /// 用户头像：emoji / 单个字 / 图片路径或 URL。
 class _UserAvatar extends StatelessWidget {
-  const _UserAvatar({required this.avatar, this.radius = 14});
+  const _UserAvatar({required this.avatar, this.color, this.radius = 14});
 
   final String? avatar;
+  final int? color;
   final double radius;
 
   @override
@@ -1080,7 +1085,9 @@ class _UserAvatar extends StatelessWidget {
     final theme = Theme.of(context);
     final value = (avatar ?? '').trim();
     final image = resolveImageProvider(value);
-    final background = theme.colorScheme.secondary.withValues(alpha: 0.18);
+    final background = color == null
+        ? theme.colorScheme.secondary.withValues(alpha: 0.18)
+        : Color(color!);
 
     if (image != null) {
       return CircleAvatar(

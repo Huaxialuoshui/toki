@@ -20,7 +20,10 @@ class PersonaAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final background = theme.colorScheme.primary.withValues(alpha: 0.14);
+    // 人设可以给自己的头像挑底色；没选就跟随主题。
+    final background = persona.avatarColor == null
+        ? theme.colorScheme.primary.withValues(alpha: 0.14)
+        : Color(persona.avatarColor!);
     final avatar = persona.avatar?.trim() ?? '';
 
     final image = resolveImageProvider(avatar);

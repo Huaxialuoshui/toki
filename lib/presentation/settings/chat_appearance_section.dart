@@ -6,8 +6,10 @@ import '../../application/ai/chat_appearance_controller.dart';
 import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/chat_appearance.dart';
+import '../../domain/entities/avatar_config.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/chat_background.dart';
+import '../widgets/avatar_editor.dart';
 
 /// 设置页的「聊天外观」区块：直接编辑并实时预览（规格 §10 / §12）。
 class ChatAppearanceSection extends ConsumerWidget {
@@ -151,16 +153,38 @@ class ChatAppearanceSection extends ConsumerWidget {
             ),
           const SizedBox(height: 10),
           _Label(text: l10n.chatUserAvatar),
-          TextField(
-            decoration: InputDecoration(
-              hintText: l10n.chatUserAvatarHint,
-              isDense: true,
-            ),
-            controller: TextEditingController(text: appearance.userAvatar)
-              ..selection = TextSelection.collapsed(
-                offset: (appearance.userAvatar ?? '').length,
+          Row(
+            children: <Widget>[
+              AvatarPreview(
+                config: AvatarConfig.fromLegacy(
+                  appearance.userAvatar,
+                  color: appearance.userAvatarColor,
+                ),
+                radius: 20,
+                fallback: '我',
               ),
-            onSubmitted: controller.setUserAvatar,
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                key: const ValueKey<String>('chat-avatar-edit'),
+                onPressed: () async {
+                  final result = await showAvatarEditor(
+                    context,
+                    initial: AvatarConfig.fromLegacy(
+                      appearance.userAvatar,
+                      color: appearance.userAvatarColor,
+                    ),
+                    title: l10n.chatUserAvatar,
+                  );
+                  if (result == null) return;
+                  controller.setUserAvatar(
+                    result.isEmpty ? null : result.value,
+                  );
+                  controller.setUserAvatarColor(result.color);
+                },
+                icon: const Icon(Icons.face_retouching_natural, size: 18),
+                label: Text(l10n.avatarChange),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           _SliderTile(

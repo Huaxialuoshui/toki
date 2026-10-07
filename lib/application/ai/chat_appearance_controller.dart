@@ -27,6 +27,13 @@ class ChatAppearanceController extends Notifier<ChatAppearanceConfig> {
             : state.copyWith(userAvatar: avatar.trim()),
       );
 
+  /// 用户头像底色（传 null 表示跟随主题色）。
+  void setUserAvatarColor(int? color) => _apply(
+        color == null
+            ? state.copyWith(clearUserAvatarColor: true)
+            : state.copyWith(userAvatarColor: color),
+      );
+
   void setBubbleOpacity(double value) =>
       _apply(state.copyWith(bubbleOpacity: value.clamp(0.4, 1).toDouble()));
 

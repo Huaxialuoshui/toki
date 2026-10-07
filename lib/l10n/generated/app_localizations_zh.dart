@@ -860,6 +860,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiPersonaAvatarHint => '可以填 emoji、1 个字，或图片路径 / URL';
 
   @override
+  String get avatarEditorTitle => '头像';
+
+  @override
+  String get avatarKindEmoji => '表情';
+
+  @override
+  String get avatarKindText => '文字';
+
+  @override
+  String get avatarKindImage => '图片';
+
+  @override
+  String get avatarPickEmoji => '挑一个表情';
+
+  @override
+  String get avatarEmojiHint => '也可以直接输入任意 emoji';
+
+  @override
+  String get avatarTextHint => '一到两个字';
+
+  @override
+  String get avatarPickImage => '从相册选择';
+
+  @override
+  String get avatarImageHint => '图片路径或 https 链接';
+
+  @override
+  String get avatarColor => '底色';
+
+  @override
+  String get avatarClear => '移除';
+
+  @override
+  String get avatarChange => '更换头像';
+
+  @override
   String get aiPersonaDefaultPrompt =>
       '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
 

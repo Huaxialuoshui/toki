@@ -150,6 +150,7 @@ class ChatAppearanceConfig {
   const ChatAppearanceConfig({
     this.background = const ChatBackgroundConfig(),
     this.userAvatar,
+    this.userAvatarColor,
     this.bubbleOpacity = 1,
     this.bubbleRadius = 18,
     this.fontScale = 1,
@@ -162,6 +163,9 @@ class ChatAppearanceConfig {
 
   /// 用户头像：emoji / 单个字 / 图片路径或 URL。
   final String? userAvatar;
+
+  /// 用户头像底色（ARGB int）；为空时用主题色。
+  final int? userAvatarColor;
 
   /// 气泡不透明度（0.4 - 1）。
   final double bubbleOpacity;
@@ -179,6 +183,8 @@ class ChatAppearanceConfig {
     ChatBackgroundConfig? background,
     String? userAvatar,
     bool clearUserAvatar = false,
+    int? userAvatarColor,
+    bool clearUserAvatarColor = false,
     double? bubbleOpacity,
     double? bubbleRadius,
     double? fontScale,
@@ -187,6 +193,9 @@ class ChatAppearanceConfig {
     return ChatAppearanceConfig(
       background: background ?? this.background,
       userAvatar: clearUserAvatar ? null : (userAvatar ?? this.userAvatar),
+      userAvatarColor: clearUserAvatarColor
+          ? null
+          : (userAvatarColor ?? this.userAvatarColor),
       bubbleOpacity: bubbleOpacity ?? this.bubbleOpacity,
       bubbleRadius: bubbleRadius ?? this.bubbleRadius,
       fontScale: fontScale ?? this.fontScale,
@@ -197,6 +206,7 @@ class ChatAppearanceConfig {
   Map<String, Object?> toJson() => <String, Object?>{
         'background': background.toJson(),
         'userAvatar': userAvatar,
+        'userAvatarColor': userAvatarColor,
         'bubbleOpacity': bubbleOpacity,
         'bubbleRadius': bubbleRadius,
         'fontScale': fontScale,
@@ -212,6 +222,7 @@ class ChatAppearanceConfig {
             )
           : const ChatBackgroundConfig(),
       userAvatar: json['userAvatar']?.toString(),
+      userAvatarColor: (json['userAvatarColor'] as num?)?.toInt(),
       bubbleOpacity: (json['bubbleOpacity'] as num?)?.toDouble() ?? 1,
       bubbleRadius: (json['bubbleRadius'] as num?)?.toDouble() ?? 18,
       fontScale: (json['fontScale'] as num?)?.toDouble() ?? 1,
@@ -238,6 +249,7 @@ class ChatAppearanceConfig {
     return other is ChatAppearanceConfig &&
         other.background == background &&
         other.userAvatar == userAvatar &&
+        other.userAvatarColor == userAvatarColor &&
         other.bubbleOpacity == bubbleOpacity &&
         other.bubbleRadius == bubbleRadius &&
         other.fontScale == fontScale &&
@@ -248,6 +260,7 @@ class ChatAppearanceConfig {
   int get hashCode => Object.hash(
         background,
         userAvatar,
+        userAvatarColor,
         bubbleOpacity,
         bubbleRadius,
         fontScale,

@@ -6,9 +6,11 @@ import '../../application/ai/persona_actions.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/id_generator.dart';
 import '../../domain/entities/ai_persona.dart';
+import '../../domain/entities/avatar_config.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/persona_avatar.dart';
+import '../widgets/avatar_editor.dart';
 
 /// 设置页的「AI 人设」区块：列出 / 新增 / 编辑 / 删除。
 class AiPersonaSection extends ConsumerWidget {
@@ -132,6 +134,26 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
   late final TextEditingController _name;
   late final TextEditingController _identity;
   late final TextEditingController _avatar;
+  late AvatarConfig _avatarConfig;
+
+  String? get _avatarValue =>
+      _avatarConfig.value.trim().isEmpty ? null : _avatarConfig.value.trim();
+
+  int? get _avatarColor => _avatarConfig.color;
+
+  Future<void> _editAvatar() async {
+    final result = await showAvatarEditor(
+      context,
+      initial: _avatarConfig,
+      title: context.l10n.aiPersonaAvatar,
+    );
+    if (result == null || !mounted) return;
+    setState(() {
+      _avatarConfig = result;
+      _avatar.text = result.value;
+    });
+  }
+
   late final TextEditingController _personality;
   late final TextEditingController _speakingStyle;
   late final TextEditingController _nickname;
@@ -149,6 +171,10 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
     _name = TextEditingController(text: persona?.name ?? '');
     _identity = TextEditingController(text: persona?.description ?? '');
     _avatar = TextEditingController(text: persona?.avatar ?? '');
+    _avatarConfig = AvatarConfig.fromLegacy(
+      persona?.avatar,
+      color: persona?.avatarColor,
+    );
     _personality = TextEditingController(text: persona?.personality ?? '');
     _speakingStyle = TextEditingController(text: persona?.speakingStyle ?? '');
     _nickname = TextEditingController(text: persona?.userNickname ?? '');
@@ -180,7 +206,8 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
     return AiPersona(
       id: persona?.id ?? generateId('persona', now: now),
       name: _name.text.trim(),
-      avatar: clean(_avatar),
+      avatar: _avatarValue,
+      avatarColor: _avatarColor,
       description: clean(_identity),
       personality: clean(_personality),
       speakingStyle: clean(_speakingStyle),
@@ -254,13 +281,30 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _avatar,
-                          decoration: InputDecoration(
-                            labelText: l10n.aiPersonaAvatar,
-                            helperText: l10n.aiPersonaAvatarHint,
-                            helperMaxLines: 2,
+                        // 头像不是"一个输入框"：表情 / 文字（带底色）/ 图片都能选。
+                        Text(
+                          l10n.aiPersonaAvatar,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: <Widget>[
+                            AvatarPreview(config: _avatarConfig, radius: 22),
+                            const SizedBox(width: 12),
+                            OutlinedButton.icon(
+                              key:
+                                  const ValueKey<String>('persona-avatar-edit'),
+                              onPressed: _busy ? null : _editAvatar,
+                              icon: const Icon(
+                                Icons.face_retouching_natural,
+                                size: 18,
+                              ),
+                              label: Text(l10n.avatarChange),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12),
                         TextFormField(

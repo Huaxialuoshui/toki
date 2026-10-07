@@ -875,6 +875,42 @@ class AppLocalizationsEn extends AppLocalizations {
       'An emoji, a single character, or an image path/URL';
 
   @override
+  String get avatarEditorTitle => 'Avatar';
+
+  @override
+  String get avatarKindEmoji => 'Emoji';
+
+  @override
+  String get avatarKindText => 'Letter';
+
+  @override
+  String get avatarKindImage => 'Image';
+
+  @override
+  String get avatarPickEmoji => 'Pick an emoji';
+
+  @override
+  String get avatarEmojiHint => 'Or type any emoji';
+
+  @override
+  String get avatarTextHint => 'One or two characters';
+
+  @override
+  String get avatarPickImage => 'Pick from gallery';
+
+  @override
+  String get avatarImageHint => 'Image path or https URL';
+
+  @override
+  String get avatarColor => 'Background colour';
+
+  @override
+  String get avatarClear => 'Remove';
+
+  @override
+  String get avatarChange => 'Change avatar';
+
+  @override
   String get aiPersonaDefaultPrompt =>
       'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
 

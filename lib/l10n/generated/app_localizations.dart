@@ -1700,6 +1700,78 @@ abstract class AppLocalizations {
   /// **'An emoji, a single character, or an image path/URL'**
   String get aiPersonaAvatarHint;
 
+  /// No description provided for @avatarEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatarEditorTitle;
+
+  /// No description provided for @avatarKindEmoji.
+  ///
+  /// In en, this message translates to:
+  /// **'Emoji'**
+  String get avatarKindEmoji;
+
+  /// No description provided for @avatarKindText.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter'**
+  String get avatarKindText;
+
+  /// No description provided for @avatarKindImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get avatarKindImage;
+
+  /// No description provided for @avatarPickEmoji.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an emoji'**
+  String get avatarPickEmoji;
+
+  /// No description provided for @avatarEmojiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or type any emoji'**
+  String get avatarEmojiHint;
+
+  /// No description provided for @avatarTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One or two characters'**
+  String get avatarTextHint;
+
+  /// No description provided for @avatarPickImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from gallery'**
+  String get avatarPickImage;
+
+  /// No description provided for @avatarImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Image path or https URL'**
+  String get avatarImageHint;
+
+  /// No description provided for @avatarColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Background colour'**
+  String get avatarColor;
+
+  /// No description provided for @avatarClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get avatarClear;
+
+  /// No description provided for @avatarChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change avatar'**
+  String get avatarChange;
+
   /// No description provided for @aiPersonaDefaultPrompt.
   ///
   /// In en, this message translates to:
