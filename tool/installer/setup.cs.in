@@ -1,0 +1,611 @@
+// Toki 的 Windows 安装包（单文件、不依赖任何第三方工具）。
+//
+// 用法（由 package.bat 自动编译并打包）：
+//   Toki-<version>-windows-x64-setup.exe                  → 图形界面安装
+//   Toki-<version>-windows-x64-setup.exe /silent          → 静默安装
+//   ... /silent /dir=D:\Somewhere\Toki /noshortcuts /noregistry
+//   Toki-<version>-windows-x64-setup.exe /uninstall /silent
+//
+// 它做的事情很朴素，但都是"安装"该有的：
+//   1. 把内嵌的 payload.zip（Flutter release 目录）解压到安装目录；
+//   2. 桌面 + 开始菜单快捷方式（可关）；
+//   3. 写一条 HKCU 卸载信息（无需管理员，出现在"设置 → 应用"里）；
+//   4. 复制自己到安装目录当 uninstall.exe，卸载时清干净。
+//
+// 版本号由 package.bat 在编译前替换 @VERSION@。
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using Microsoft.Win32;
+
+namespace TokiSetup
+{
+    internal static class Program
+    {
+        private const string AppName = "Toki";
+        private const string Version = "@VERSION@";
+        private const string PayloadName = "payload.zip";
+        private const string ExeName = "toki.exe";
+        private const string UninstallExeName = "uninstall.exe";
+        private const string ShortcutName = "Toki";
+        private const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Toki";
+
+        [STAThread]
+        private static int Main(string[] args)
+        {
+            var options = Options.Parse(args);
+
+            if (options.Uninstall)
+            {
+                return Uninstall(options);
+            }
+
+            if (options.Silent)
+            {
+                try
+                {
+                    Install(options, null);
+                    return 0;
+                }
+                catch (Exception error)
+                {
+                    Console.Error.WriteLine("安装失败：" + error.Message);
+                    return 1;
+                }
+            }
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            using (var form = new InstallerForm(options))
+            {
+                Application.Run(form);
+                return form.ExitCode;
+            }
+        }
+
+        private static string DefaultInstallDir()
+        {
+            var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(local, "Programs", AppName);
+        }
+
+        /// <summary>解压 payload、建快捷方式、写卸载信息。progress 为 null 表示静默。</summary>
+        internal static void Install(Options options, IProgress<int> progress)
+        {
+            var target = options.InstallDir;
+            Directory.CreateDirectory(target);
+
+            // 升级安装：先清掉旧的程序文件（data\ 里的用户设置不在安装目录，
+            // 存在 %APPDATA%\com.toki\toki，所以不会丢）。
+            foreach (var entry in Directory.GetFileSystemEntries(target))
+            {
+                var name = Path.GetFileName(entry);
+                if (string.Equals(name, UninstallExeName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                if (Directory.Exists(entry))
+                {
+                    Directory.Delete(entry, true);
+                }
+                else
+                {
+                    File.Delete(entry);
+                }
+            }
+
+            ExtractPayload(target, progress);
+
+            var exe = Path.Combine(target, ExeName);
+            if (!File.Exists(exe))
+            {
+                throw new FileNotFoundException("安装包里没有找到 " + ExeName);
+            }
+
+            if (options.CreateShortcuts)
+            {
+                CreateShortcut(
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), ShortcutName + ".lnk"),
+                    exe, target);
+                var programs = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    @"Microsoft\Windows\Start Menu\Programs");
+                CreateShortcut(Path.Combine(programs, ShortcutName + ".lnk"), exe, target);
+            }
+
+            if (options.WriteRegistry)
+            {
+                WriteUninstallEntry(target);
+            }
+
+            // 复制自己当卸载程序（从安装目录里跑，卸载才能删掉整个目录）。
+            try
+            {
+                var self = Assembly.GetExecutingAssembly().Location;
+                var uninstaller = Path.Combine(target, UninstallExeName);
+                if (!string.Equals(self, uninstaller, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(self, uninstaller, true);
+                }
+            }
+            catch (IOException)
+            {
+                // 卸载程序是可选项，复制失败不影响安装。
+            }
+
+            if (options.Launch)
+            {
+                Process.Start(new ProcessStartInfo(exe) { WorkingDirectory = target });
+            }
+        }
+
+        private static void ExtractPayload(string target, IProgress<int> progress)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            Stream payload = null;
+            foreach (var name in assembly.GetManifestResourceNames())
+            {
+                if (name.EndsWith(PayloadName, StringComparison.OrdinalIgnoreCase))
+                {
+                    payload = assembly.GetManifestResourceStream(name);
+                    break;
+                }
+            }
+            if (payload == null)
+            {
+                throw new InvalidOperationException("安装包损坏：找不到内嵌的 " + PayloadName);
+            }
+
+            using (payload)
+            using (var archive = new ZipArchive(payload, ZipArchiveMode.Read))
+            {
+                var total = archive.Entries.Count;
+                var done = 0;
+                foreach (var entry in archive.Entries)
+                {
+                    var relative = entry.FullName.Replace('/', Path.DirectorySeparatorChar);
+                    var destination = Path.Combine(target, relative);
+                    if (string.IsNullOrEmpty(entry.Name))
+                    {
+                        Directory.CreateDirectory(destination);
+                    }
+                    else
+                    {
+                        var folder = Path.GetDirectoryName(destination);
+                        if (!string.IsNullOrEmpty(folder))
+                        {
+                            Directory.CreateDirectory(folder);
+                        }
+                        using (var input = entry.Open())
+                        using (var output = File.Create(destination))
+                        {
+                            input.CopyTo(output);
+                        }
+                    }
+                    done++;
+                    if (progress != null && total > 0)
+                    {
+                        progress.Report((int)(done * 100L / total));
+                    }
+                }
+            }
+        }
+
+        private static void CreateShortcut(string linkPath, string targetPath, string workingDir)
+        {
+            var shellType = Type.GetTypeFromProgID("WScript.Shell");
+            if (shellType == null) return;
+            dynamic shell = Activator.CreateInstance(shellType);
+            try
+            {
+                dynamic link = shell.CreateShortcut(linkPath);
+                link.TargetPath = targetPath;
+                link.WorkingDirectory = workingDir;
+                link.IconLocation = targetPath + ",0";
+                link.Description = "Toki — 本地优先的 AI 日历提醒助手";
+                link.Save();
+            }
+            finally
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(shell);
+            }
+        }
+
+        private static void WriteUninstallEntry(string target)
+        {
+            using (var key = Registry.CurrentUser.CreateSubKey(UninstallKey))
+            {
+                if (key == null) return;
+                var exe = Path.Combine(target, ExeName);
+                var uninstaller = Path.Combine(target, UninstallExeName);
+                key.SetValue("DisplayName", AppName);
+                key.SetValue("DisplayVersion", Version);
+                key.SetValue("Publisher", "Toki");
+                key.SetValue("InstallLocation", target);
+                key.SetValue("DisplayIcon", exe);
+                key.SetValue("UninstallString", "\"" + uninstaller + "\" /uninstall");
+                key.SetValue("QuietUninstallString", "\"" + uninstaller + "\" /uninstall /silent");
+                key.SetValue("NoModify", 1, RegistryValueKind.DWord);
+                key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
+                try
+                {
+                    var sizeKb = 0L;
+                    foreach (var file in Directory.GetFiles(target, "*", SearchOption.AllDirectories))
+                    {
+                        sizeKb += new FileInfo(file).Length / 1024;
+                    }
+                    key.SetValue("EstimatedSize", (int)sizeKb, RegistryValueKind.DWord);
+                }
+                catch (IOException)
+                {
+                    // 体积只是显示用，算不出来就算了。
+                }
+            }
+        }
+
+        private static int Uninstall(Options options)
+        {
+            // 卸载时"安装在哪"优先看命令行 /dir=，其次看注册表，最后看自己所在的目录
+            // （uninstall.exe 就在安装目录里，这条最可靠）。
+            var target = ResolveInstallDir(options);
+            if (options.Silent)
+            {
+                RemoveShortcuts();
+                RemoveRegistryEntry();
+                DeleteInstallFiles(target);
+                // 静默卸载：进程马上就退出，等 3 秒足够。
+                ScheduleDirectoryDelete(target, 4);
+                return 0;
+            }
+
+            var answer = MessageBox.Show(
+                "确定要从这台电脑上卸载 " + AppName + " 吗？\n\n" + target,
+                AppName + " 卸载",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (answer != DialogResult.Yes) return 2;
+
+            RemoveShortcuts();
+            RemoveRegistryEntry();
+            DeleteInstallFiles(target);
+            // 图形卸载：用户还要点一下"已卸载"，等久一点更稳。
+            ScheduleDirectoryDelete(target, 8);
+            MessageBox.Show(
+                AppName + " 已卸载。",
+                AppName,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return 0;
+        }
+
+        private static string ResolveInstallDir(Options options)
+        {
+            if (options.InstallDirExplicit) return options.InstallDir;
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(UninstallKey))
+                {
+                    var location = key == null ? null : key.GetValue("InstallLocation") as string;
+                    if (!string.IsNullOrEmpty(location) && Directory.Exists(location))
+                    {
+                        return location;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // 注册表读不到也无所谓，接着用下一招。
+            }
+            try
+            {
+                var self = Assembly.GetExecutingAssembly().Location;
+                var folder = Path.GetDirectoryName(self);
+                if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
+                {
+                    return folder;
+                }
+            }
+            catch (Exception)
+            {
+                // 兜底用默认目录。
+            }
+            return DefaultInstallDir();
+        }
+
+        private static void RemoveShortcuts()
+        {
+            var desktop = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                ShortcutName + ".lnk");
+            var startMenu = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                @"Microsoft\Windows\Start Menu\Programs",
+                ShortcutName + ".lnk");
+            foreach (var link in new[] { desktop, startMenu })
+            {
+                try
+                {
+                    if (File.Exists(link)) File.Delete(link);
+                }
+                catch (IOException)
+                {
+                    // 快捷方式删不掉不阻塞卸载。
+                }
+            }
+        }
+
+        private static void RemoveRegistryEntry()
+        {
+            try
+            {
+                Registry.CurrentUser.DeleteSubKeyTree(UninstallKey, false);
+            }
+            catch (Exception)
+            {
+                // 同上，不是致命错误。
+            }
+        }
+
+        /// <summary>先自己删掉除 uninstall.exe 之外的东西（这个文件正被占用）。</summary>
+        private static void DeleteInstallFiles(string target)
+        {
+            if (!Directory.Exists(target)) return;
+            var self = Path.Combine(target, UninstallExeName);
+            foreach (var entry in Directory.GetFileSystemEntries(target))
+            {
+                if (string.Equals(entry, self, StringComparison.OrdinalIgnoreCase)) continue;
+                try
+                {
+                    if (Directory.Exists(entry))
+                    {
+                        Directory.Delete(entry, true);
+                    }
+                    else
+                    {
+                        File.Delete(entry);
+                    }
+                }
+                catch (Exception)
+                {
+                    // 单个文件删不掉（比如正在运行），交给稍后的 rmdir 收尾。
+                }
+            }
+        }
+
+        /// <summary>
+        /// 卸载程序自己就在安装目录里跑，删不掉自己那个 exe，所以交给 cmd 延迟收尾。
+        /// 注意工作目录要切到临时目录——否则 cmd 的当前目录正是要删的那个目录，rmdir 会失败。
+        /// </summary>
+        private static void ScheduleDirectoryDelete(string target, int delaySeconds)
+        {
+            var script = string.Format(
+                CultureInfo.InvariantCulture,
+                "/c cd /d \"{0}\" & ping -n {1} 127.0.0.1 >nul & rmdir /s /q \"{2}\"",
+                Path.GetTempPath(),
+                delaySeconds,
+                target);
+            try
+            {
+                Process.Start(new ProcessStartInfo("cmd.exe", script)
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    WorkingDirectory = Path.GetTempPath(),
+                });
+            }
+            catch (Exception)
+            {
+                // 删不掉的话用户手动删也行。
+            }
+        }
+
+        internal sealed class Options
+        {
+            public string InstallDir = DefaultInstallDir();
+            public bool InstallDirExplicit;
+            public bool Silent;
+            public bool Uninstall;
+            public bool Launch;
+            public bool CreateShortcuts = true;
+            public bool WriteRegistry = true;
+
+            public static Options Parse(string[] args)
+            {
+                var options = new Options();
+                foreach (var raw in args)
+                {
+                    var arg = raw.Trim();
+                    if (arg.Length == 0) continue;
+                    if (arg.Equals("/silent", StringComparison.OrdinalIgnoreCase) ||
+                        arg.Equals("-silent", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.Silent = true;
+                    }
+                    else if (arg.Equals("/uninstall", StringComparison.OrdinalIgnoreCase) ||
+                             arg.Equals("-uninstall", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.Uninstall = true;
+                    }
+                    else if (arg.Equals("/launch", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.Launch = true;
+                    }
+                    else if (arg.Equals("/noshortcuts", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.CreateShortcuts = false;
+                    }
+                    else if (arg.Equals("/noregistry", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.WriteRegistry = false;
+                    }
+                    else if (arg.StartsWith("/dir=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.InstallDir = arg.Substring(5).Trim('"');
+                        options.InstallDirExplicit = true;
+                    }
+                }
+                return options;
+            }
+        }
+
+        /// <summary>图形界面：选目录 → 进度条 → 完成。</summary>
+        private sealed class InstallerForm : Form
+        {
+            private readonly Options _options;
+            private readonly TextBox _dir;
+            private readonly CheckBox _shortcuts;
+            private readonly ProgressBar _progress;
+            private readonly Button _install;
+            private readonly Button _cancel;
+            private readonly Label _status;
+
+            public int ExitCode { get; private set; }
+
+            public InstallerForm(Options options)
+            {
+                _options = options;
+                Text = AppName + " " + Version + " 安装程序";
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MaximizeBox = false;
+                MinimizeBox = false;
+                StartPosition = FormStartPosition.CenterScreen;
+                ClientSize = new Size(520, 230);
+                Font = new Font("Microsoft YaHei UI", 9F);
+
+                var title = new Label
+                {
+                    Text = "把 " + AppName + " 安装到这台电脑",
+                    Font = new Font(Font.FontFamily, 12F, FontStyle.Bold),
+                    Location = new Point(18, 16),
+                    Size = new Size(480, 28),
+                };
+                var hint = new Label
+                {
+                    Text = "版本 " + Version + " · 本地优先的 AI 日历 / 倒计时 / 提醒（数据只存在本机）",
+                    Location = new Point(20, 46),
+                    Size = new Size(480, 20),
+                    ForeColor = Color.DimGray,
+                };
+                _dir = new TextBox
+                {
+                    Text = options.InstallDir,
+                    Location = new Point(20, 78),
+                    Size = new Size(480, 24),
+                };
+                _shortcuts = new CheckBox
+                {
+                    Text = "创建桌面与开始菜单快捷方式",
+                    Checked = true,
+                    Location = new Point(20, 110),
+                    Size = new Size(300, 24),
+                };
+                _progress = new ProgressBar
+                {
+                    Location = new Point(20, 142),
+                    Size = new Size(480, 16),
+                };
+                _status = new Label
+                {
+                    Text = "点「安装」开始",
+                    Location = new Point(20, 162),
+                    Size = new Size(480, 20),
+                    ForeColor = Color.DimGray,
+                };
+                _install = new Button
+                {
+                    Text = "安装",
+                    Location = new Point(330, 190),
+                    Size = new Size(82, 28),
+                };
+                _cancel = new Button
+                {
+                    Text = "取消",
+                    Location = new Point(418, 190),
+                    Size = new Size(82, 28),
+                    DialogResult = DialogResult.Cancel,
+                };
+
+                _install.Click += (sender, args) => StartInstall();
+                AcceptButton = _install;
+                CancelButton = _cancel;
+                Controls.AddRange(new Control[]
+                {
+                    title, hint, _dir, _shortcuts, _progress, _status, _install, _cancel,
+                });
+            }
+
+            private void StartInstall()
+            {
+                _install.Enabled = false;
+                _cancel.Enabled = false;
+                _dir.Enabled = false;
+                _shortcuts.Enabled = false;
+                _status.Text = "正在安装…";
+
+                var dir = _dir.Text.Trim().Trim('"');
+                if (dir.Length == 0)
+                {
+                    dir = DefaultInstallDir();
+                    _dir.Text = dir;
+                }
+                _options.InstallDir = dir;
+                _options.CreateShortcuts = _shortcuts.Checked;
+
+                var progress = new Progress<int>(value => _progress.Value = value);
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    try
+                    {
+                        Install(_options, progress);
+                        BeginInvoke(new Action(() =>
+                        {
+                            _progress.Value = 100;
+                            _status.Text = "安装完成";
+                            ExitCode = 0;
+                            var launch = MessageBox.Show(
+                                "安装完成！现在启动 " + AppName + " 吗？",
+                                AppName,
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Information);
+                            if (launch == DialogResult.Yes)
+                            {
+                                Process.Start(new ProcessStartInfo(
+                                    Path.Combine(_options.InstallDir, ExeName))
+                                {
+                                    WorkingDirectory = _options.InstallDir,
+                                });
+                            }
+                            Close();
+                        }));
+                    }
+                    catch (Exception error)
+                    {
+                        BeginInvoke(new Action(() =>
+                        {
+                            _status.Text = "安装失败";
+                            ExitCode = 1;
+                            MessageBox.Show(
+                                "安装失败：" + error.Message,
+                                AppName,
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                            _install.Enabled = true;
+                            _cancel.Enabled = true;
+                            _dir.Enabled = true;
+                            _shortcuts.Enabled = true;
+                        }));
+                    }
+                });
+            }
+        }
+    }
+}

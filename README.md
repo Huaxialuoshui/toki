@@ -248,6 +248,52 @@ flutter build apk --debug
 
 ## 打包安装包（双端）
 
+### 一键打包：`package.bat`（推荐）
+
+双击仓库根目录的 `package.bat`，或者在终端里：
+
+```bat
+package.bat                 :: APK + Windows 免安装包 + Windows 安装包
+package.bat apk             :: 只打 Android
+package.bat windows         :: 只打 Windows
+package.bat check           :: 打之前先跑 flutter analyze + flutter test
+package.bat check nopause   :: 组合使用；nopause = 结束不等待按键（适合脚本/CI）
+```
+
+它做的事：找 Flutter（PATH 或 `FLUTTER_ROOT` 或 `D:\Flutter\flutter`）→ 读 `pubspec.yaml` 里的版本号
+→ `flutter pub get` → 打 APK → 打 Windows release → 复制/压缩 → 生成安装包 → 打印带体积的产物清单。
+任一步失败会**停下来并提示常见原因**（签名缺失、没装 VS C++ 工作负载、网络问题），不会产出半个包。
+
+产物（`dist/` **不进版本库**，已在 `.gitignore` 排除）：
+
+| 平台 | 文件 | 说明 |
+| --- | --- | --- |
+| Android | `Toki-<版本>-android.apk` | 用 `android/toki-release.jks` 正式签名；手机直接安装（需允许"未知来源"） |
+| Windows（免安装） | `Toki-<版本>-windows-x64/` 与 `Toki-<版本>-windows-x64.zip` | 解压后运行 `toki.exe`。**必须整个目录一起解压**，只拷 exe 会缺 DLL 与 `data\` |
+| Windows（安装包） | `Toki-<版本>-windows-x64-setup.exe` | 单文件安装程序：解压到安装目录 + 桌面/开始菜单快捷方式 + 「设置 → 应用」里的卸载项 |
+
+### Windows 安装包说明
+
+安装包**不需要 Inno Setup / NSIS 等第三方工具**：源码是 `tool/installer/setup.cs.in`，
+`package.bat` 用系统自带的 .NET Framework 编译器（`csc.exe`）把 release 目录压进去编译成一个 exe。
+
+* 默认装到 `%LOCALAPPDATA%\Programs\Toki`（**不需要管理员权限**）；装的时候可以改路径；
+* 会创建桌面与开始菜单快捷方式（可关），并写一条 HKCU 卸载信息（出现在「设置 → 应用 → 已安装的应用」）；
+* 升级安装会先清掉旧程序文件；**用户数据不在安装目录**（数据库在 `%APPDATA%\com.toki\toki`，
+  设置在那边的 shared_preferences 里），所以升级不会丢数据；
+* 卸载：开始菜单 /「设置 → 应用」里点卸载，或直接跑安装目录里的 `uninstall.exe`
+  （会把快捷方式、注册表项和整个安装目录一起清掉）；
+* 命令行参数（适合自动化）：
+
+```bat
+Toki-0.1.0-windows-x64-setup.exe /silent                        :: 静默装到默认目录
+Toki-0.1.0-windows-x64-setup.exe /silent /dir=D:\Apps\Toki      :: 静默装到指定目录
+Toki-0.1.0-windows-x64-setup.exe /silent /noshortcuts /noregistry :: 不建快捷方式、不写卸载项
+Toki-0.1.0-windows-x64-setup.exe /uninstall /silent             :: 静默卸载
+```
+
+### 手工打包（不想用脚本时）
+
 ```powershell
 # Android：正式签名 APK（28 MB 左右）
 flutter build apk --release
@@ -257,13 +303,6 @@ flutter build apk --release
 flutter build windows --release
 # 产物：build\windows\x64\runner\Release\（toki.exe + DLL + data\）
 ```
-
-本项目当前的安装包放在 `dist/`（**不进版本库**，已在 `.gitignore` 里排除）：
-
-| 平台 | 文件 | 说明 |
-| --- | --- | --- |
-| Android | `Toki-0.1.0-android.apk` | 用 `android/toki-release.jks` 正式签名；手机直接安装（需允许"未知来源"） |
-| Windows | `Toki-0.1.0-windows-x64.zip` | 解压后运行 `toki.exe`。**必须整个目录一起解压**，只拷 exe 会缺 DLL 与 `data\` |
 
 签名与注意事项：
 
