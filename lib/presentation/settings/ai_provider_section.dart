@@ -8,9 +8,9 @@ import '../../core/utils/id_generator.dart';
 import '../../data/repositories/repository_providers.dart';
 import '../../domain/entities/ai_provider_config.dart';
 import '../../domain/services/ai_provider.dart';
-import '../../infrastructure/ai/openai_compatible_provider.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
+import 'ai_model_picker_dialog.dart';
 
 /// 常见 OpenAI Compatible 服务商预设，一键填充 Base URL 与模型。
 class _Preset {
@@ -212,6 +212,7 @@ class _AiProviderEditorDialogState
   late bool _isDefault;
   bool _showKey = false;
   bool _busy = false;
+  bool _modelManual = false;
   String? _feedback;
   bool _feedbackIsError = false;
 
@@ -382,8 +383,21 @@ class _AiProviderEditorDialogState
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _model,
+                          // 默认只读：模型名从服务商拉取后选择，避免手打错。
+                          // 服务商不提供模型列表时可以在选择弹窗里切到手动输入。
+                          readOnly: !_modelManual,
+                          onTap: _modelManual || _busy ? null : _pickModel,
                           decoration: InputDecoration(
                             labelText: l10n.aiModel,
+                            helperText:
+                                _modelManual ? l10n.aiModelManualHint : null,
+                            suffixIcon: IconButton(
+                              key: const ValueKey<String>('ai-fetch-models'),
+                              onPressed: _busy ? null : _pickModel,
+                              icon:
+                                  const Icon(Icons.list_alt_outlined, size: 20),
+                              tooltip: l10n.aiSelectModel,
+                            ),
                           ),
                           validator: (String? value) =>
                               (value == null || value.trim().isEmpty)
@@ -481,6 +495,54 @@ class _AiProviderEditorDialogState
     );
   }
 
+  /// 从服务商拉模型列表并选择。
+  ///
+  /// 模型名不再要求手打：这里用**表单当前内容**构造一个临时 provider，
+  /// 调 `GET {baseUrl}/models`，把返回的 id 列出来点选。
+  Future<void> _pickModel() async {
+    final l10n = context.l10n;
+    // 这里**不能**跑整表校验：模型还是空的，否则会卡死"要先填模型才能拉模型"。
+    // 拉模型只需要 Base URL（Key 可空，本地服务不需要）。
+    final baseUrl = _baseUrl.text.trim();
+    if (baseUrl.isEmpty ||
+        (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://'))) {
+      setState(() {
+        _feedbackIsError = true;
+        _feedback = l10n.aiInvalidUrl;
+      });
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+      _feedback = null;
+    });
+
+    final result = await showDialog<ModelChoice>(
+      context: context,
+      builder: (BuildContext dialogContext) => ModelPickerDialog(
+        config: _buildConfig(),
+        current: _model.text.trim(),
+      ),
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (result == null) return;
+
+    setState(() {
+      if (result.manual) {
+        _modelManual = true;
+        _feedbackIsError = false;
+        _feedback = l10n.aiModelManualHint;
+      } else {
+        _modelManual = false;
+        _model.text = result.model!;
+        _feedbackIsError = false;
+        _feedback = l10n.aiModelSelected(result.model!);
+      }
+    });
+  }
+
   /// 用当前表单内容发一条最小请求，验证 Base URL / Key / 模型是否可用。
   Future<void> _testConnection() async {
     final l10n = context.l10n;
@@ -492,7 +554,7 @@ class _AiProviderEditorDialogState
       _feedback = null;
     });
 
-    final provider = OpenAiCompatibleProvider(config: _buildConfig());
+    final provider = ref.read(aiProviderBuilderProvider)(_buildConfig());
     try {
       final response = await provider.chat(
         const AiChatRequest(

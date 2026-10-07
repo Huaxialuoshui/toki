@@ -48,6 +48,20 @@ class OpenAiCompatibleProvider implements AiProvider {
     return '$url/chat/completions';
   }
 
+  /// 模型列表地址：`{baseUrl}/models`。
+  static String resolveModelsUrl(String baseUrl) {
+    var url = baseUrl.trim();
+    while (url.endsWith('/')) {
+      url = url.substring(0, url.length - 1);
+    }
+    if (url.endsWith('/models')) return url;
+    // 有人会把完整的 chat/completions 地址填进来，这里做一次兜底。
+    if (url.endsWith('/chat/completions')) {
+      url = url.substring(0, url.length - '/chat/completions'.length);
+    }
+    return '$url/models';
+  }
+
   Map<String, String> _headers() {
     final headers = <String, String>{'Content-Type': 'application/json'};
     final key = config.apiKey;
@@ -266,6 +280,50 @@ class OpenAiCompatibleProvider implements AiProvider {
     } on FormatException {
       return null;
     }
+  }
+
+  @override
+  Future<List<String>> listModels() async {
+    final Response<dynamic> response;
+    try {
+      response = await _dio.get<dynamic>(
+        resolveModelsUrl(config.baseUrl),
+        options: Options(headers: _headers()),
+      );
+    } on DioException catch (error) {
+      throw await _mapDioError(error);
+    }
+    return parseModels(response.data);
+  }
+
+  /// 解析 `/models` 响应。
+  ///
+  /// 主流实现是 OpenAI 的 `{"object":"list","data":[{"id":"..."}]}`；
+  /// 也兼容 `{"models":[{"name":"..."}]}` 与纯数组两种写法。
+  static List<String> parseModels(Object? data) {
+    List<Object?> entries;
+    if (data is Map) {
+      final raw = data['data'] ?? data['models'];
+      if (raw is! List) return const <String>[];
+      entries = raw;
+    } else if (data is List) {
+      entries = data;
+    } else {
+      return const <String>[];
+    }
+
+    final ids = <String>[];
+    for (final entry in entries) {
+      final id = switch (entry) {
+        String value => value,
+        Map map => '${map['id'] ?? map['name'] ?? ''}',
+        _ => '',
+      };
+      if (id.trim().isEmpty) continue;
+      if (!ids.contains(id)) ids.add(id);
+    }
+    ids.sort();
+    return ids;
   }
 
   Future<AppException> _mapDioError(

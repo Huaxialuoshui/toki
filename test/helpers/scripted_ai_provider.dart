@@ -11,6 +11,9 @@ class ScriptedAiProvider implements AiProvider {
   int _index = 0;
 
   @override
+  Future<List<String>> listModels() async => const <String>[];
+
+  @override
   Future<AiResponse> chat(AiChatRequest request) async {
     requests.add(request);
     return const AiResponse(content: '');

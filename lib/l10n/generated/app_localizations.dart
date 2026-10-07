@@ -773,6 +773,66 @@ abstract class AppLocalizations {
   /// **'Model'**
   String get aiModel;
 
+  /// No description provided for @aiSelectModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose model'**
+  String get aiSelectModel;
+
+  /// No description provided for @aiModelPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a model'**
+  String get aiModelPickerTitle;
+
+  /// No description provided for @aiModelSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter models'**
+  String get aiModelSearchHint;
+
+  /// No description provided for @aiModelsLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} models available'**
+  String aiModelsLoaded(int count);
+
+  /// No description provided for @aiNoModels.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider returned no models. Use manual input below.'**
+  String get aiNoModels;
+
+  /// No description provided for @aiFetchModelsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch models'**
+  String get aiFetchModelsFailed;
+
+  /// No description provided for @aiRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get aiRetry;
+
+  /// No description provided for @aiModelManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter manually'**
+  String get aiModelManual;
+
+  /// No description provided for @aiModelManualHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the model name if the provider has no model list.'**
+  String get aiModelManualHint;
+
+  /// No description provided for @aiModelSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected model: {model}'**
+  String aiModelSelected(String model);
+
   /// No description provided for @aiTemperature.
   ///
   /// In en, this message translates to:

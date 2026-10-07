@@ -122,6 +122,90 @@ void main() {
         'http://127.0.0.1:1234/v1/chat/completions',
       );
     });
+
+    test('模型列表地址补 /models，并兜底去掉误填的 /chat/completions', () {
+      expect(
+        OpenAiCompatibleProvider.resolveModelsUrl('https://api.deepseek.com'),
+        'https://api.deepseek.com/models',
+      );
+      expect(
+        OpenAiCompatibleProvider.resolveModelsUrl(
+          'https://api.xiaomimimo.com/v1/',
+        ),
+        'https://api.xiaomimimo.com/v1/models',
+      );
+      expect(
+        OpenAiCompatibleProvider.resolveModelsUrl(
+          'http://127.0.0.1:11434/v1/models',
+        ),
+        'http://127.0.0.1:11434/v1/models',
+      );
+      expect(
+        OpenAiCompatibleProvider.resolveModelsUrl(
+          'https://api.deepseek.com/v1/chat/completions',
+        ),
+        'https://api.deepseek.com/v1/models',
+      );
+    });
+  });
+
+  group('模型列表', () {
+    test('GET {baseUrl}/models，解析 OpenAI 的 data[].id 并排序去重', () async {
+      final adapter = _FakeAdapter(
+        (_) => _json(<String, Object?>{
+          'object': 'list',
+          'data': <Object?>[
+            <String, Object?>{'id': 'mimo-v2.6-pro', 'object': 'model'},
+            <String, Object?>{'id': 'mimo-v2.5', 'object': 'model'},
+            <String, Object?>{'id': 'mimo-v2.6-pro', 'object': 'model'},
+            <String, Object?>{'object': 'model'},
+          ],
+        }),
+      );
+
+      final models = await _provider(adapter).listModels();
+
+      expect(models, <String>['mimo-v2.5', 'mimo-v2.6-pro']);
+      expect(adapter.lastRequest?.method, 'GET');
+      expect(
+        adapter.lastRequest?.uri.toString(),
+        'http://127.0.0.1:11434/v1/models',
+      );
+    });
+
+    test('兼容 models[].name 与纯数组两种写法', () {
+      expect(
+        OpenAiCompatibleProvider.parseModels(<String, Object?>{
+          'models': <Object?>[
+            <String, Object?>{'name': 'glm-4-flash'},
+          ],
+        }),
+        <String>['glm-4-flash'],
+      );
+      expect(
+        OpenAiCompatibleProvider.parseModels(<Object?>['b', 'a']),
+        <String>['a', 'b'],
+      );
+      expect(
+        OpenAiCompatibleProvider.parseModels(<String, Object?>{'nope': 1}),
+        isEmpty,
+      );
+    });
+
+    test('带 Key 时请求头仍然是 Bearer，且 401 给出可读原因', () async {
+      final adapter = _FakeAdapter(
+        (_) => _json(<String, Object?>{}, status: 401),
+      );
+      try {
+        await _provider(adapter, config: _config(apiKey: 'sk-secret'))
+            .listModels();
+        fail('应当抛出 AppException');
+      } on AppException catch (error) {
+        expect(error.message, contains('HTTP 401'));
+        expect(error.message, isNot(contains('sk-secret')));
+      }
+      expect(adapter.lastRequest?.headers['Authorization'], 'Bearer sk-secret');
+    });
   });
 
   group('非流式 chat', () {

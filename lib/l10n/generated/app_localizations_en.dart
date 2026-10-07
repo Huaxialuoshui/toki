@@ -368,6 +368,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiModel => 'Model';
 
   @override
+  String get aiSelectModel => 'Choose model';
+
+  @override
+  String get aiModelPickerTitle => 'Choose a model';
+
+  @override
+  String get aiModelSearchHint => 'Filter models';
+
+  @override
+  String aiModelsLoaded(int count) {
+    return '$count models available';
+  }
+
+  @override
+  String get aiNoModels => 'The provider returned no models. Use manual input below.';
+
+  @override
+  String get aiFetchModelsFailed => 'Could not fetch models';
+
+  @override
+  String get aiRetry => 'Retry';
+
+  @override
+  String get aiModelManual => 'Enter manually';
+
+  @override
+  String get aiModelManualHint => 'Type the model name if the provider has no model list.';
+
+  @override
+  String aiModelSelected(String model) {
+    return 'Selected model: $model';
+  }
+
+  @override
   String get aiTemperature => 'Temperature';
 
   @override

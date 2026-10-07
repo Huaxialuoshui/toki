@@ -188,6 +188,30 @@
   "aiBaseUrl": "Base URL",
   "aiApiKey": "API Key",
   "aiModel": "Model",
+  "aiSelectModel": "Choose model",
+  "aiModelPickerTitle": "Choose a model",
+  "aiModelSearchHint": "Filter models",
+  "aiModelsLoaded": "{count} models available",
+  "@aiModelsLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiNoModels": "The provider returned no models. Use manual input below.",
+  "aiFetchModelsFailed": "Could not fetch models",
+  "aiRetry": "Retry",
+  "aiModelManual": "Enter manually",
+  "aiModelManualHint": "Type the model name if the provider has no model list.",
+  "aiModelSelected": "Selected model: {model}",
+  "@aiModelSelected": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
   "aiTemperature": "Temperature",
   "aiMaxTokens": "Max tokens",
   "aiStreamingEnabled": "Streaming output",

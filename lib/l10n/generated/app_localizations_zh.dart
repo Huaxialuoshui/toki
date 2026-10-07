@@ -368,6 +368,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiModel => '模型';
 
   @override
+  String get aiSelectModel => '选择模型';
+
+  @override
+  String get aiModelPickerTitle => '选择模型';
+
+  @override
+  String get aiModelSearchHint => '筛选模型';
+
+  @override
+  String aiModelsLoaded(int count) {
+    return '共 $count 个可用模型';
+  }
+
+  @override
+  String get aiNoModels => '服务商没有返回模型，可在下面切到手动输入。';
+
+  @override
+  String get aiFetchModelsFailed => '获取模型失败';
+
+  @override
+  String get aiRetry => '重试';
+
+  @override
+  String get aiModelManual => '手动输入';
+
+  @override
+  String get aiModelManualHint => '服务商不提供模型列表时，可以手动输入模型名。';
+
+  @override
+  String aiModelSelected(String model) {
+    return '已选择模型：$model';
+  }
+
+  @override
   String get aiTemperature => '温度';
 
   @override

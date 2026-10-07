@@ -8,6 +8,8 @@ class FakeAiProvider implements AiProvider {
     this.chunks = const <String>['你好', '，我是小雪'],
     this.error,
     this.delay,
+    this.models = const <String>['fake-small', 'fake-large'],
+    this.modelsError,
   });
 
   final List<String> chunks;
@@ -18,7 +20,21 @@ class FakeAiProvider implements AiProvider {
   /// 每个块之间的延迟（用于观察中间状态）。
   final Duration? delay;
 
+  /// `listModels` 返回的模型 id。
+  final List<String> models;
+
+  /// 非空时 `listModels` 抛出该错误。
+  final Object? modelsError;
+
   final List<AiChatRequest> requests = <AiChatRequest>[];
+  int listModelsCalls = 0;
+
+  @override
+  Future<List<String>> listModels() async {
+    listModelsCalls++;
+    if (modelsError != null) throw modelsError!;
+    return models;
+  }
 
   @override
   Future<AiResponse> chat(AiChatRequest request) async {

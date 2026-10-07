@@ -15,8 +15,10 @@ class AiMessage {
     this.toolCalls = const <AiToolCall>[],
   });
 
-  const AiMessage.system(String content) : this(role: AiRole.system, content: content);
-  const AiMessage.user(String content) : this(role: AiRole.user, content: content);
+  const AiMessage.system(String content)
+      : this(role: AiRole.system, content: content);
+  const AiMessage.user(String content)
+      : this(role: AiRole.user, content: content);
   const AiMessage.assistant(String content)
       : this(role: AiRole.assistant, content: content);
 
@@ -180,4 +182,9 @@ abstract interface class AiProvider {
 
   /// 逐块返回增量文本，供界面做"逐字输出"。
   Stream<AiResponseChunk> chatStream(AiChatRequest request);
+
+  /// 拉取该服务当前可用的模型 id 列表（OpenAI 兼容的 `GET {baseUrl}/models`）。
+  ///
+  /// 设置页用它做"从服务商获取模型 → 选一个"，省得用户手打模型名。
+  Future<List<String>> listModels();
 }

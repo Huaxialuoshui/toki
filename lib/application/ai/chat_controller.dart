@@ -12,7 +12,6 @@ import '../../domain/entities/ai_provider_config.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_session.dart';
 import '../../domain/services/ai_provider.dart';
-import '../../infrastructure/ai/openai_compatible_provider.dart';
 import '../../infrastructure/clock_provider.dart';
 import 'ai_providers.dart';
 import 'context_service.dart';
@@ -86,7 +85,8 @@ class ChatStreamState {
 }
 
 /// 会话与消息（供 UI 直接 watch）。
-final chatSessionProvider = FutureProvider.autoDispose<ChatSession>((ref) async {
+final chatSessionProvider =
+    FutureProvider.autoDispose<ChatSession>((ref) async {
   final repository = ref.watch(chatRepositoryProvider);
   final now = ref.watch(clockProvider).now();
 
@@ -150,7 +150,7 @@ final aiProviderFactoryProvider =
   return () {
     final config = ref.read(activeAiConfigProvider);
     if (config == null) return null;
-    return OpenAiCompatibleProvider(config: config);
+    return ref.read(aiProviderBuilderProvider)(config);
   };
 });
 
@@ -310,7 +310,8 @@ class ChatController extends Notifier<ChatStreamState> {
   }
 
   Future<String?> _latestUserQuestion(String sessionId) async {
-    final history = await ref.read(chatRepositoryProvider).getMessages(sessionId);
+    final history =
+        await ref.read(chatRepositoryProvider).getMessages(sessionId);
     for (final message in history.reversed) {
       if (message.role == ChatRole.user) return message.content;
     }
@@ -444,9 +445,8 @@ class ChatController extends Notifier<ChatStreamState> {
 
     // 控制上下文长度：只带最近 40 条，并从一条 user 消息开始——
     // 否则可能把 assistant(tool_calls) 或 tool 结果截断，导致协议不合法。
-    var recent = history.length <= 40
-        ? history
-        : history.sublist(history.length - 40);
+    var recent =
+        history.length <= 40 ? history : history.sublist(history.length - 40);
     final firstUserIndex = recent.indexWhere(
       (ChatMessage message) => message.role == ChatRole.user,
     );
@@ -584,8 +584,9 @@ class ChatController extends Notifier<ChatStreamState> {
         toolResult: outcome.content,
         toolCall: ToolCallInfo(
           toolName: call.name,
-          status:
-              outcome.isError ? ToolCallStatus.failed : ToolCallStatus.succeeded,
+          status: outcome.isError
+              ? ToolCallStatus.failed
+              : ToolCallStatus.succeeded,
           summary: outcome.display,
         ),
         createdAt: clock.now(),
