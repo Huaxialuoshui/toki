@@ -215,6 +215,34 @@ flutter build apk --debug
 # 产物：build\app\outputs\flutter-apk\app-debug.apk
 ```
 
+## 打包安装包（双端）
+
+```powershell
+# Android：正式签名 APK（28 MB 左右）
+flutter build apk --release
+# 产物：build\app\outputs\flutter-apk\app-release.apk
+
+# Windows：release 可执行目录（约 32 MB，压缩后 14 MB）
+flutter build windows --release
+# 产物：build\windows\x64\runner\Release\（toki.exe + DLL + data\）
+```
+
+本项目当前的安装包放在 `dist/`（**不进版本库**，已在 `.gitignore` 里排除）：
+
+| 平台 | 文件 | 说明 |
+| --- | --- | --- |
+| Android | `Toki-0.1.0-android.apk` | 用 `android/toki-release.jks` 正式签名；手机直接安装（需允许"未知来源"） |
+| Windows | `Toki-0.1.0-windows-x64.zip` | 解压后运行 `toki.exe`。**必须整个目录一起解压**，只拷 exe 会缺 DLL 与 `data\` |
+
+签名与注意事项：
+
+* 签名配置在 `android/key.properties`（**不进版本库**），密钥库是 `android/toki-release.jks`。
+  **这两个文件要自己备份**——丢了就无法用同一个签名更新应用，只能卸载重装。
+* 换了签名后覆盖安装会失败（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`），需要先卸载旧版；
+  `pm uninstall -k` 想保留数据也不行，安卓会拦住签名不一致的安装。
+* Windows 的 exe **没有代码签名**，首次运行可能被 SmartScreen 拦一下（"更多信息 → 仍要运行"）。
+* release 包不会写入示例数据，装完是空库，从零开始。
+
 ## AI 配置 / Provider 配置（规划）
 
 Phase 6 起提供「OpenAI Compatible」Provider 配置（Base URL / API Key / Model / Temperature / Max Tokens / 流式开关），
