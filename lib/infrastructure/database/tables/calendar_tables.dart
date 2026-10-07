@@ -36,8 +36,11 @@ class CalendarEvents extends Table {
   /// 事件自定义颜色（ARGB int）。
   IntColumn get color => integer().nullable()();
 
-  /// 重复规则（RRULE 字符串），Phase 3 接入。
+  /// 重复规则：`none` / `daily` / `weekly` / `monthly` / `yearly`（null 等价于不重复）。
   TextColumn get repeatRule => text().nullable()();
+
+  /// 重复的结束日期（含当天）；为空表示一直重复（按查询窗口展开）。
+  DateTimeColumn get repeatUntil => dateTime().nullable()();
 
   /// 提前提醒分钟数。
   IntColumn get reminderMinutes => integer().nullable()();

@@ -52,6 +52,11 @@ class ChatSessions extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
   TextColumn get personaId => text().nullable().references(AiPersonas, #id)();
+
+  /// 这个会话用哪个服务商；为空时用"默认服务商"。
+  /// 故意不加外键：SQLite 的 ALTER TABLE ADD COLUMN 不方便带 REFERENCES，
+  /// 服务商被删掉时的回落逻辑放在应用层（见 activeAiConfigProvider）。
+  TextColumn get providerId => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

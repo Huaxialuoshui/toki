@@ -47,6 +47,7 @@ extension CalendarEventRowMapper on CalendarEventRow {
         categoryId: categoryId,
         color: color == null ? null : colorFromArgb(color!),
         repeatRule: repeatRule,
+        repeatUntil: repeatUntil,
         reminderMinutes: reminderMinutes,
         status: status,
         createdAt: createdAt,
@@ -67,6 +68,7 @@ CalendarEventsCompanion calendarEventToCompanion(CalendarEvent event) =>
       color:
           Value<int?>(event.color == null ? null : argbFromColor(event.color!)),
       repeatRule: Value<String?>(event.repeatRule),
+      repeatUntil: Value<DateTime?>(event.repeatUntil),
       reminderMinutes: Value<int?>(event.reminderMinutes),
       status: Value<EventStatus>(event.status),
       createdAt: Value<DateTime>(event.createdAt),
@@ -105,6 +107,8 @@ extension CountdownRowMapper on CountdownRow {
         targetTime: targetTime,
         description: description,
         color: color == null ? null : colorFromArgb(color!),
+        backgroundColor:
+            backgroundColor == null ? null : colorFromArgb(backgroundColor!),
         icon: icon,
         isPinned: isPinned,
         displayStyle: displayStyle,
@@ -122,6 +126,11 @@ CountdownsCompanion countdownToCompanion(CountdownItem item) =>
       description: Value<String?>(item.description),
       color:
           Value<int?>(item.color == null ? null : argbFromColor(item.color!)),
+      backgroundColor: Value<int?>(
+        item.backgroundColor == null
+            ? null
+            : argbFromColor(item.backgroundColor!),
+      ),
       icon: Value<String?>(item.icon),
       isPinned: Value<bool>(item.isPinned),
       displayStyle: Value<CountdownDisplayStyle>(item.displayStyle),
@@ -221,6 +230,7 @@ extension ChatSessionRowMapper on ChatSessionRow {
         id: id,
         title: title,
         personaId: personaId ?? '',
+        providerId: providerId ?? '',
         createdAt: createdAt,
         updatedAt: updatedAt,
       );
@@ -232,6 +242,8 @@ ChatSessionsCompanion chatSessionToCompanion(ChatSession session) =>
       title: Value<String>(session.title),
       personaId:
           Value<String?>(session.personaId.isEmpty ? null : session.personaId),
+      providerId: Value<String?>(
+          session.providerId.isEmpty ? null : session.providerId),
       createdAt: Value<DateTime>(session.createdAt),
       updatedAt: Value<DateTime>(session.updatedAt),
     );

@@ -79,10 +79,7 @@ class AppSettingsStore {
   List<int> readScheduledNotificationIds() {
     final raw = _preferences.getStringList(_scheduledNotificationIdsKey);
     if (raw == null) return const <int>[];
-    return raw
-        .map(int.tryParse)
-        .whereType<int>()
-        .toList(growable: false);
+    return raw.map(int.tryParse).whereType<int>().toList(growable: false);
   }
 
   Future<void> writeScheduledNotificationIds(List<int> ids) =>

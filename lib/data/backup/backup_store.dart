@@ -19,6 +19,7 @@ abstract final class BackupTables {
     'chat_sessions',
     'chat_messages',
     'theme_configs',
+    'daily_digests',
   ];
 }
 
@@ -146,6 +147,11 @@ class BackupStore {
         return rows
             .map((ThemeConfigRow r) => r.toJson(serializer: _backupSerializer))
             .toList();
+      case 'daily_digests':
+        final rows = await _db.select(_db.dailyDigests).get();
+        return rows
+            .map((DailyDigestRow r) => r.toJson(serializer: _backupSerializer))
+            .toList();
       default:
         return const <Map<String, dynamic>>[];
     }
@@ -171,6 +177,8 @@ class BackupStore {
         await _db.delete(_db.chatMessages).go();
       case 'theme_configs':
         await _db.delete(_db.themeConfigs).go();
+      case 'daily_digests':
+        await _db.delete(_db.dailyDigests).go();
     }
   }
 
@@ -205,6 +213,9 @@ class BackupStore {
         case 'theme_configs':
           await _db.into(_db.themeConfigs).insertOnConflictUpdate(
               ThemeConfigRow.fromJson(row, serializer: _backupSerializer));
+        case 'daily_digests':
+          await _db.into(_db.dailyDigests).insertOnConflictUpdate(
+              DailyDigestRow.fromJson(row, serializer: _backupSerializer));
       }
     } catch (error) {
       throw BackupException(

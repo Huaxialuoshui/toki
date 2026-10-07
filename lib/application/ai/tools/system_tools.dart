@@ -8,8 +8,7 @@ List<AiTool> buildSystemTools({required Clock clock}) {
   return <AiTool>[
     SimpleAiTool(
       name: 'get_current_time',
-      description:
-          '获取当前日期与时间（含时区偏移与星期）。推算"明天下午"这类相对时间前必须先调用它。',
+      description: '获取当前日期与时间（含时区偏移与星期）。推算"明天下午"这类相对时间前必须先调用它。',
       category: AiToolCategory.read,
       parameters: <String, Object?>{
         'type': 'object',

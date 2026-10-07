@@ -22,6 +22,7 @@ class CalendarEvent {
     this.categoryId,
     this.color,
     this.repeatRule,
+    this.repeatUntil,
     this.reminderMinutes,
     this.status = EventStatus.scheduled,
   });
@@ -36,8 +37,11 @@ class CalendarEvent {
   final String? categoryId;
   final Color? color;
 
-  /// 重复规则（RRULE 字符串），Phase 3 接入。
+  /// 重复规则：`none` / `daily` / `weekly` / `monthly` / `yearly`。
   final String? repeatRule;
+
+  /// 重复的结束日期（含当天）；为空表示一直重复。
+  final DateTime? repeatUntil;
 
   /// 提前提醒分钟数（如 5 / 10 / 30 / 60 / 1440）。
   final int? reminderMinutes;
@@ -68,6 +72,7 @@ class CalendarEvent {
     String? categoryId,
     Color? color,
     String? repeatRule,
+    DateTime? repeatUntil,
     int? reminderMinutes,
     EventStatus? status,
     DateTime? createdAt,
@@ -84,6 +89,7 @@ class CalendarEvent {
       categoryId: categoryId ?? this.categoryId,
       color: color ?? this.color,
       repeatRule: repeatRule ?? this.repeatRule,
+      repeatUntil: repeatUntil ?? this.repeatUntil,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
@@ -105,6 +111,7 @@ class CalendarEvent {
         other.categoryId == categoryId &&
         other.color == color &&
         other.repeatRule == repeatRule &&
+        other.repeatUntil == repeatUntil &&
         other.reminderMinutes == reminderMinutes &&
         other.status == status &&
         other.createdAt == createdAt &&
@@ -123,6 +130,7 @@ class CalendarEvent {
         categoryId,
         color,
         repeatRule,
+        repeatUntil,
         reminderMinutes,
         status,
         createdAt,

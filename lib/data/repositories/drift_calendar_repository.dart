@@ -42,6 +42,24 @@ class DriftCalendarRepository implements CalendarRepository {
   }
 
   @override
+  Stream<List<CalendarEvent>> watchRelevant({
+    required DateTime from,
+    required DateTime to,
+  }) {
+    final query = _db.select(_db.calendarEvents)
+      ..where(
+        ($CalendarEventsTable t) =>
+            t.startTime.isSmallerThanValue(to) &
+            ((t.repeatRule.isNotNull() & t.repeatRule.isNotValue('none')) |
+                t.endTime.isBiggerOrEqualValue(from)),
+      )
+      ..orderBy(<OrderClauseGenerator<$CalendarEventsTable>>[
+        ($CalendarEventsTable t) => OrderingTerm.asc(t.startTime),
+      ]);
+    return query.watch().map(_mapAll);
+  }
+
+  @override
   Stream<List<CalendarEvent>> watchUpcoming({
     required DateTime after,
     int limit = 5,
@@ -116,6 +134,15 @@ class DriftCalendarRepository implements CalendarRepository {
 
   @override
   Future<void> deleteAll() => _db.delete(_db.calendarEvents).go();
+
+  @override
+  Future<void> clearCategoryFromEvents(String categoryId) async {
+    await (_db.update(_db.calendarEvents)
+          ..where(
+            ($CalendarEventsTable t) => t.categoryId.equals(categoryId),
+          ))
+        .write(const CalendarEventsCompanion(categoryId: Value<String?>(null)));
+  }
 
   List<CalendarEvent> _mapAll(List<CalendarEventRow> rows) => rows
       .map((CalendarEventRow row) => row.toDomain())

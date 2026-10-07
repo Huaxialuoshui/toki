@@ -45,7 +45,8 @@ void main() {
     );
   }
 
-  Future<void> addCountdown(String title, DateTime target, {bool pinned = false}) {
+  Future<void> addCountdown(String title, DateTime target,
+      {bool pinned = false}) {
     return countdowns.upsert(
       CountdownItem(
         id: 'cd-$title',
@@ -107,8 +108,8 @@ void main() {
     // 20 条里最多列 12 条（按列出的行数算，避免与 id 里的标题重复计数）
     final listed = context
         .split('\n')
-        .where((String line) =>
-            line.startsWith('  - ') && !line.contains('已省略'))
+        .where(
+            (String line) => line.startsWith('  - ') && !line.contains('已省略'))
         .length;
     expect(listed, 12);
   });
@@ -117,8 +118,7 @@ void main() {
     await addCountdown('毕业答辩', DateTime(2026, 10, 19, 15));
     await addCountdown('生日', DateTime(2026, 12, 2, 0));
 
-    final mentioned =
-        (await service.buildContext('距离毕业答辩还有多久？'))!;
+    final mentioned = (await service.buildContext('距离毕业答辩还有多久？'))!;
     expect(mentioned, contains('毕业答辩'));
     expect(mentioned, isNot(contains('生日')));
 

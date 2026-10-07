@@ -74,7 +74,8 @@ List<AiTool> buildCalendarTools({
       handler: (Map<String, Object?> args) async {
         final now = clock.now();
         final from = args.optionalDateTime('from') ?? now;
-        final to = args.optionalDateTime('to') ?? from.add(const Duration(days: 7));
+        final to =
+            args.optionalDateTime('to') ?? from.add(const Duration(days: 7));
         if (!to.isAfter(from)) {
           return const AiToolResult.failure(
             'to 必须晚于 from（请使用 ISO-8601 时间）',
@@ -131,7 +132,8 @@ List<AiTool> buildCalendarTools({
       handler: (Map<String, Object?> args) async {
         final now = clock.now();
         final from = args.optionalDateTime('from') ?? now;
-        final to = args.optionalDateTime('to') ?? from.add(const Duration(days: 7));
+        final to =
+            args.optionalDateTime('to') ?? from.add(const Duration(days: 7));
         final list = await eventsInRange(from, to);
         return AiToolResult.success(<String, Object?>{
           'from': isoWithOffset(from),

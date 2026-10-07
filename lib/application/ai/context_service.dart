@@ -152,7 +152,8 @@ class ContextService {
     if (text.contains('昨天')) return day(-1);
 
     if (text.contains('下周') || text.contains('next week')) {
-      final monday = today.subtract(Duration(days: today.weekday - DateTime.monday));
+      final monday =
+          today.subtract(Duration(days: today.weekday - DateTime.monday));
       return DateTimeRange(
         start: monday.add(const Duration(days: 7)),
         end: monday.add(const Duration(days: 14)),
@@ -161,7 +162,8 @@ class ContextService {
     if (text.contains('这周') ||
         text.contains('本周') ||
         text.contains('this week')) {
-      final monday = today.subtract(Duration(days: today.weekday - DateTime.monday));
+      final monday =
+          today.subtract(Duration(days: today.weekday - DateTime.monday));
       return DateTimeRange(
         start: monday,
         end: monday.add(const Duration(days: 7)),
@@ -237,7 +239,8 @@ class ContextService {
   static String _date(DateTime time) =>
       '${time.year}-${_two(time.month)}-${_two(time.day)}';
 
-  static String _time(DateTime time) => '${_two(time.hour)}:${_two(time.minute)}';
+  static String _time(DateTime time) =>
+      '${_two(time.hour)}:${_two(time.minute)}';
 
   static String _weekday(DateTime time) {
     const names = <String>['周一', '周二', '周三', '周四', '周五', '周六', '周日'];

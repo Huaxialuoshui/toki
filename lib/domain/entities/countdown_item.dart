@@ -26,6 +26,7 @@ class CountdownItem {
     required this.updatedAt,
     this.description,
     this.color,
+    this.backgroundColor,
     this.icon,
     this.isPinned = false,
     this.displayStyle = CountdownDisplayStyle.fullText,
@@ -37,6 +38,9 @@ class CountdownItem {
   final DateTime targetTime;
   final String? description;
   final Color? color;
+
+  /// 卡片背景色；为空时用主题的 surface 色。
+  final Color? backgroundColor;
 
   /// 图标标识（使用 Material 图标名，Phase 4 支持自定义）。
   final String? icon;
@@ -55,6 +59,7 @@ class CountdownItem {
     DateTime? targetTime,
     String? description,
     Color? color,
+    Color? backgroundColor,
     String? icon,
     bool? isPinned,
     CountdownDisplayStyle? displayStyle,
@@ -68,6 +73,7 @@ class CountdownItem {
       targetTime: targetTime ?? this.targetTime,
       description: description ?? this.description,
       color: color ?? this.color,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       icon: icon ?? this.icon,
       isPinned: isPinned ?? this.isPinned,
       displayStyle: displayStyle ?? this.displayStyle,
@@ -86,6 +92,7 @@ class CountdownItem {
         other.targetTime == targetTime &&
         other.description == description &&
         other.color == color &&
+        other.backgroundColor == backgroundColor &&
         other.icon == icon &&
         other.isPinned == isPinned &&
         other.displayStyle == displayStyle &&
@@ -101,6 +108,7 @@ class CountdownItem {
         targetTime,
         description,
         color,
+        backgroundColor,
         icon,
         isPinned,
         displayStyle,

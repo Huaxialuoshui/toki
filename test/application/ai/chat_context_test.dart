@@ -66,9 +66,7 @@ void main() {
     await addEvent('今天的会议', DateTime(2026, 10, 6, 14));
     await addEvent('下周答辩', DateTime(2026, 10, 14, 15));
 
-    await container
-        .read(chatControllerProvider.notifier)
-        .send('我下周有什么安排？');
+    await container.read(chatControllerProvider.notifier).send('我下周有什么安排？');
 
     final systems = ai.requests.single.messages
         .where((AiMessage message) => message.role == AiRole.system)
@@ -87,13 +85,11 @@ void main() {
     ]);
     await setUpContainer(ai);
 
-    await container
-        .read(chatControllerProvider.notifier)
-        .send('距离毕业设计答辩还有多久？');
+    await container.read(chatControllerProvider.notifier).send('距离毕业设计答辩还有多久？');
 
     final context = ai.requests.single.messages
-        .firstWhere((AiMessage message) => message.role == AiRole.system &&
-            message.content.contains('当前时间'))
+        .firstWhere((AiMessage message) =>
+            message.role == AiRole.system && message.content.contains('当前时间'))
         .content;
     expect(context, contains('毕业设计答辩'));
     expect(context, contains('还有 13 天'));
@@ -136,7 +132,8 @@ void main() {
         role: ChatRole.assistant,
         content: '',
         requestedToolCalls: const <ChatToolCall>[
-          ChatToolCall(id: 'call-x', name: 'get_today_events', argumentsJson: '{}'),
+          ChatToolCall(
+              id: 'call-x', name: 'get_today_events', argumentsJson: '{}'),
         ],
         createdAt: clock.now().add(const Duration(hours: 1)),
       ),

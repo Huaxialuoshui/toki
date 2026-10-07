@@ -76,11 +76,13 @@ void main() {
     const permissions = ToolPermissions(allowDelete: true);
     final allowed = names(permissions);
 
-    expect(allowed, containsAll(<String>[
-      'delete_event',
-      'delete_countdown',
-      'delete_reminder',
-    ]));
+    expect(
+        allowed,
+        containsAll(<String>[
+          'delete_event',
+          'delete_countdown',
+          'delete_reminder',
+        ]));
   });
 
   test('人设的 enabledTools 不为空时，只暴露列出的工具', () {

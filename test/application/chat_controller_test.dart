@@ -101,7 +101,9 @@ void main() {
     expect(request.messages.first.role, AiRole.system);
     expect(request.messages.first.content, isNotEmpty);
     expect(
-      request.messages.where((AiMessage m) => m.role == AiRole.user).map((m) => m.content),
+      request.messages
+          .where((AiMessage m) => m.role == AiRole.user)
+          .map((m) => m.content),
       <String>['第一条', '第二条'],
     );
   });

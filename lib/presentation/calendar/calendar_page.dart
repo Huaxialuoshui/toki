@@ -5,6 +5,7 @@ import '../../application/calendar/calendar_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/calendar_event.dart';
+import '../../domain/services/recurrence.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/async_hint.dart';
@@ -108,9 +109,12 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final now = ref.watch(clockProvider).now();
 
     final eventsAsync = ref.watch(eventsForRangeProvider(_range));
-    final events = eventsAsync.valueOrNull ?? const <CalendarEvent>[];
+    final events = eventsAsync.valueOrNull ?? const <EventOccurrence>[];
     final dayEvents = events
-        .where((CalendarEvent event) => event.occursOn(_selectedDay))
+        .where(
+          (EventOccurrence occurrence) =>
+              DateUtils.isSameDay(occurrence.start, _selectedDay),
+        )
         .toList(growable: false);
 
     return PageScaffold(
@@ -183,12 +187,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                 icon: Icons.event_busy_outlined,
               )
             else
-              for (final event in dayEvents)
+              for (final occurrence in dayEvents)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: EventTile(
-                    event: event,
-                    onTap: () => _openDetail(event),
+                    event: occurrence.event,
+                    startTime: occurrence.start,
+                    endTime: occurrence.end,
+                    onTap: () => _openDetail(occurrence.event),
                   ),
                 ),
           ] else if (_mode == CalendarViewMode.week) ...<Widget>[
@@ -266,7 +272,7 @@ class _MonthGrid extends StatelessWidget {
   final DateTime month;
   final DateTime selectedDay;
   final DateTime today;
-  final List<CalendarEvent> events;
+  final List<EventOccurrence> events;
   final ValueChanged<DateTime> onSelectDay;
 
   @override
@@ -324,9 +330,9 @@ class _MonthGrid extends StatelessWidget {
                   final isSelected = date == selectedDay;
                   final isToday = DateUtils.isSameDay(date, today);
                   final colors = <Color>[
-                    for (final event in events)
-                      if (event.occursOn(date))
-                        event.color ?? theme.colorScheme.primary,
+                    for (final occurrence in events)
+                      if (DateUtils.isSameDay(occurrence.start, date))
+                        occurrence.event.color ?? theme.colorScheme.primary,
                   ];
 
                   return _DayCell(

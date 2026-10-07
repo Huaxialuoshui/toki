@@ -69,7 +69,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePhaseBannerTitle => 'Phase 2 · 本地数据库';
 
   @override
-  String get homePhaseBannerBody => '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
+  String get homePhaseBannerBody =>
+      '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
 
   @override
   String get homePhaseBannerDismiss => '知道了';
@@ -220,6 +221,76 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get calendarFieldReminder => '提醒';
+
+  @override
+  String get calendarFieldRepeat => '重复';
+
+  @override
+  String get calendarRepeatNone => '不重复';
+
+  @override
+  String get calendarRepeatDaily => '每天';
+
+  @override
+  String get calendarRepeatWeekly => '每周';
+
+  @override
+  String get calendarRepeatMonthly => '每月';
+
+  @override
+  String get calendarRepeatYearly => '每年';
+
+  @override
+  String get calendarRepeatForever => '不设结束日期';
+
+  @override
+  String calendarRepeatUntil(String date) {
+    return '截止 $date';
+  }
+
+  @override
+  String get calendarReminderCustom => '自定义提前量';
+
+  @override
+  String get calendarCategorySection => '日历分类';
+
+  @override
+  String get calendarCategoryAdd => '新建分类';
+
+  @override
+  String get calendarCategoryEdit => '编辑分类';
+
+  @override
+  String get calendarCategoryName => '名称';
+
+  @override
+  String get calendarCategoryColor => '颜色';
+
+  @override
+  String get calendarCategoryEmpty => '还没有分类';
+
+  @override
+  String get calendarCategorySaved => '分类已保存';
+
+  @override
+  String get calendarCategoryDeleted => '分类已删除';
+
+  @override
+  String get calendarCategoryDeleteTitle => '删除这个分类？';
+
+  @override
+  String calendarCategoryDeleteBody(String name) {
+    return '「$name」下的事件会变成无分类，事件本身不会被删除。';
+  }
+
+  @override
+  String get calendarUnitMinutes => '分钟';
+
+  @override
+  String get calendarUnitHours => '小时';
+
+  @override
+  String get calendarUnitDays => '天';
 
   @override
   String get calendarReminderAtTime => '准时提醒';
@@ -383,6 +454,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiEditMessageTitle => '编辑消息';
 
   @override
+  String get aiSwitchProvider => 'AI 服务商';
+
+  @override
+  String get aiNoProviderShort => '未配置';
+
+  @override
   String get aiClearConfirm => '清空这段对话？';
 
   @override
@@ -521,7 +598,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiPersonaAvatarHint => '可以填 emoji、1 个字，或图片路径 / URL';
 
   @override
-  String get aiPersonaDefaultPrompt => '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
+  String get aiPersonaDefaultPrompt =>
+      '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
 
   @override
   String aiPersonaSwitched(String name) {
@@ -839,7 +917,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsNotificationSection => '通知提醒';
 
   @override
-  String get settingsNotificationSectionSubtitle => 'Android 用系统本地通知，Windows 用系统 Toast';
+  String get settingsNotificationSectionSubtitle =>
+      'Android 用系统本地通知，Windows 用系统 Toast';
 
   @override
   String get settingsNotificationPermission => '通知权限';
@@ -893,7 +972,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsBackupSectionSubtitle => '带版本控制的 JSON 导入导出（Phase 12）';
 
   @override
-  String get backupIntro => '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
+  String get backupIntro =>
+      '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
 
   @override
   String get backupIncludeApiKeys => '导出时包含 API Key';
@@ -997,7 +1077,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsProjectPath => '项目路径';
 
   @override
-  String get settingsPhaseNote => 'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
+  String get settingsPhaseNote =>
+      'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
 
   @override
   String get mockEventDefense => '毕业设计答辩';

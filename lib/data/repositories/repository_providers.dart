@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/repositories/ai_repository.dart';
 import '../../domain/repositories/calendar_repository.dart';
 import '../../domain/repositories/countdown_repository.dart';
+import '../../domain/repositories/daily_digest_repository.dart';
 import '../../domain/repositories/reminder_repository.dart';
 import '../../domain/repositories/theme_repository.dart';
 import '../../infrastructure/clock_provider.dart';
@@ -11,6 +12,7 @@ import '../../infrastructure/database/connection.dart';
 import 'drift_ai_repository.dart';
 import 'drift_calendar_repository.dart';
 import 'drift_countdown_repository.dart';
+import 'drift_daily_digest_repository.dart';
 import 'drift_reminder_repository.dart';
 import 'drift_theme_repository.dart';
 
@@ -44,6 +46,10 @@ final countdownRepositoryProvider = Provider<CountdownRepository>(
 
 final reminderRepositoryProvider = Provider<ReminderRepository>(
   (ref) => DriftReminderRepository(ref.watch(appDatabaseProvider)),
+);
+
+final dailyDigestRepositoryProvider = Provider<DailyDigestRepository>(
+  (ref) => DriftDailyDigestRepository(ref.watch(appDatabaseProvider)),
 );
 
 final themeRepositoryProvider = Provider<ThemeRepository>(

@@ -11,6 +11,7 @@ import '../../application/ai/chat_appearance_controller.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
+import '../../domain/entities/ai_provider_config.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_session.dart';
 import '../../domain/entities/chat_appearance.dart';
@@ -345,11 +346,21 @@ class _AiPageState extends ConsumerState<AiPage> {
     final appearance = ref.watch(chatAppearanceProvider);
     final personas =
         ref.watch(personasProvider).valueOrNull ?? const <AiPersona>[];
+    final providers = ref.watch(aiProvidersProvider).valueOrNull ??
+        const <AiProviderConfig>[];
 
     return PageScaffold(
       title: l10n.navAi,
       subtitle: '${persona.name} · ${persona.description ?? ''}',
       actions: <Widget>[
+        if (providers.isNotEmpty)
+          _ProviderSwitcher(
+            providers: providers,
+            activeId: config?.id ?? '',
+            onSelect: (String id) =>
+                ref.read(chatControllerProvider.notifier).switchProvider(id),
+          ),
+        const SizedBox(width: 8),
         _PersonaSwitcher(
           personas: personas,
           active: persona,
@@ -603,6 +614,87 @@ class _PersonaSwitcher extends StatelessWidget {
             Text(active.name, style: theme.textTheme.labelLarge),
             const SizedBox(width: 4),
             const Icon(Icons.arrow_drop_down, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 服务商切换：这个会话用哪个模型（只影响后续请求）。
+class _ProviderSwitcher extends StatelessWidget {
+  const _ProviderSwitcher({
+    required this.providers,
+    required this.activeId,
+    required this.onSelect,
+  });
+
+  final List<AiProviderConfig> providers;
+  final String activeId;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final matches = providers.where((AiProviderConfig p) => p.id == activeId);
+    final active = matches.isEmpty ? null : matches.first;
+
+    return PopupMenuButton<String>(
+      key: const ValueKey<String>('ai-provider-switcher'),
+      tooltip: l10n.aiSwitchProvider,
+      onSelected: onSelect,
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        for (final provider in providers)
+          PopupMenuItem<String>(
+            value: provider.id,
+            child: Row(
+              children: <Widget>[
+                const Icon(Icons.memory, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(provider.name),
+                      Text(
+                        provider.model,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (provider.id == activeId)
+                  Icon(Icons.check, size: 16, color: theme.colorScheme.primary),
+              ],
+            ),
+          ),
+      ],
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              Icons.memory,
+              size: 16,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 6),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: Text(
+                active?.model ?? l10n.aiNoProviderShort,
+                style: theme.textTheme.labelMedium,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, size: 16),
           ],
         ),
       ),

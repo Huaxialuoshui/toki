@@ -9,8 +9,8 @@ import '../../application/settings/settings_controller.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
-import '../../domain/entities/calendar_event.dart';
 import '../../domain/entities/countdown_item.dart';
+import '../../domain/services/recurrence.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
@@ -39,8 +39,8 @@ class HomePage extends ConsumerWidget {
     final countdownsAsync = ref.watch(pinnedCountdownsProvider);
     final showPhaseBanner = ref.watch(firstLaunchProvider);
 
-    final todayEvents = todayAsync.valueOrNull ?? const <CalendarEvent>[];
-    final upcoming = upcomingAsync.valueOrNull ?? const <CalendarEvent>[];
+    final todayEvents = todayAsync.valueOrNull ?? const <EventOccurrence>[];
+    final upcoming = upcomingAsync.valueOrNull ?? const <EventOccurrence>[];
     final pinned = countdownsAsync.valueOrNull ?? const <CountdownItem>[];
     final persona = ref.watch(activePersonaProvider) ??
         buildFallbackPersona(now: now, l10n: l10n);
@@ -70,11 +70,13 @@ class HomePage extends ConsumerWidget {
           else if (todayEvents.isEmpty)
             EmptyHint(text: l10n.homeNoEvents)
           else
-            for (final event in todayEvents)
+            for (final occurrence in todayEvents)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: EventTile(
-                  event: event,
+                  event: occurrence.event,
+                  startTime: occurrence.start,
+                  endTime: occurrence.end,
                   onTap: () => context.go('/calendar'),
                 ),
               ),
@@ -103,11 +105,13 @@ class HomePage extends ConsumerWidget {
           else if (upcoming.isEmpty)
             EmptyHint(text: l10n.homeNoEvents)
           else
-            for (final event in upcoming)
+            for (final occurrence in upcoming)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: EventTile(
-                  event: event,
+                  event: occurrence.event,
+                  startTime: occurrence.start,
+                  endTime: occurrence.end,
                   showDate: true,
                   onTap: () => context.go('/calendar'),
                 ),

@@ -15,6 +15,16 @@ abstract interface class CalendarRepository {
     required DateTime to,
   });
 
+  /// `[from, to)` 内**可能出现**的全部日程，包含重复日程的"原始行"。
+  ///
+  /// 与 [watchRange] 的区别：重复日程只在它第一次的 startTime 上有一行，
+  /// 所以要放宽到"开始时间早于 to 且（有重复规则 或 落在区间内）"，
+  /// 再由上层用 `expandOccurrences` 展开成具体发生时间。
+  Stream<List<CalendarEvent>> watchRelevant({
+    required DateTime from,
+    required DateTime to,
+  });
+
   /// [after] 之后的最近事件。
   Stream<List<CalendarEvent>> watchUpcoming({
     required DateTime after,
@@ -31,6 +41,9 @@ abstract interface class CalendarRepository {
 
   Future<void> deleteById(String id);
   Future<void> deleteAll();
+
+  /// 把引用了该分类的事件改成"无分类"（删除分类前调用，避免外键约束）。
+  Future<void> clearCategoryFromEvents(String categoryId);
 }
 
 /// 日历分类的数据访问契约。

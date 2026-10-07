@@ -13,6 +13,9 @@ class Countdowns extends Table {
   DateTimeColumn get targetTime => dateTime()();
   TextColumn get description => text().nullable()();
   IntColumn get color => integer().nullable()();
+
+  /// 卡片背景色（ARGB int）；为空时用主题的 surface。
+  IntColumn get backgroundColor => integer().nullable()();
   TextColumn get icon => text().nullable()();
   BoolColumn get isPinned => boolean().withDefault(const Constant(false))();
   TextColumn get displayStyle => textEnum<CountdownDisplayStyle>()();

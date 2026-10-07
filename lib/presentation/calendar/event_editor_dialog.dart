@@ -9,7 +9,9 @@ import '../../core/utils/date_formats.dart';
 import '../../core/utils/id_generator.dart';
 import '../../domain/entities/calendar_category.dart';
 import '../../domain/entities/calendar_event.dart';
+import '../../domain/services/recurrence.dart';
 import '../../infrastructure/clock_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 
 /// 打开日程编辑器。
@@ -55,6 +57,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
   String _categoryId = '';
   int? _colorValue;
   int? _reminderMinutes;
+  RepeatRule _repeatRule = RepeatRule.none;
+  DateTime? _repeatUntil;
   String? _errorText;
   bool _busy = false;
 
@@ -71,6 +75,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
     _categoryId = event?.categoryId ?? '';
     _colorValue = event?.color == null ? null : _argb(event!.color!);
     _reminderMinutes = event?.reminderMinutes;
+    _repeatRule = RepeatRule.parse(event?.repeatRule);
+    _repeatUntil = event?.repeatUntil;
 
     if (event != null) {
       _start = event.startTime;
@@ -268,6 +274,65 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
                           ],
                         ),
                         const SizedBox(height: 14),
+                        _FieldLabel(text: l10n.calendarFieldRepeat),
+                        DropdownButtonFormField<RepeatRule>(
+                          value: _repeatRule,
+                          decoration: const InputDecoration(
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          items: <DropdownMenuItem<RepeatRule>>[
+                            for (final rule in RepeatRule.values)
+                              DropdownMenuItem<RepeatRule>(
+                                value: rule,
+                                child: Text(_repeatLabel(l10n, rule)),
+                              ),
+                          ],
+                          onChanged: _busy
+                              ? null
+                              : (RepeatRule? value) => setState(() {
+                                    _repeatRule = value ?? RepeatRule.none;
+                                    if (!_repeatRule.repeats) {
+                                      _repeatUntil = null;
+                                    }
+                                  }),
+                        ),
+                        if (_repeatRule.repeats) ...<Widget>[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _busy ? null : _pickRepeatUntil,
+                                  icon: const Icon(
+                                    Icons.event_repeat_outlined,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    _repeatUntil == null
+                                        ? l10n.calendarRepeatForever
+                                        : l10n.calendarRepeatUntil(
+                                            DateFormats.shortDate(
+                                              _repeatUntil!,
+                                              context.localeCode,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              if (_repeatUntil != null)
+                                IconButton(
+                                  onPressed: _busy
+                                      ? null
+                                      : () =>
+                                          setState(() => _repeatUntil = null),
+                                  tooltip: l10n.calendarRepeatForever,
+                                  icon: const Icon(Icons.close, size: 18),
+                                ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 14),
                         _FieldLabel(text: l10n.calendarFieldReminder),
                         DropdownButtonFormField<int>(
                           value: _reminderMinutes,
@@ -284,11 +349,28 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
                                 value: minutes,
                                 child: Text(l10n.reminderLabel(minutes)),
                               ),
+                            // 自定义时长：不在预设里时也要能把当前值显示出来。
+                            if (_reminderMinutes != null &&
+                                !ReminderPresets.minutes
+                                    .contains(_reminderMinutes))
+                              DropdownMenuItem<int>(
+                                value: _reminderMinutes,
+                                child:
+                                    Text(l10n.reminderLabel(_reminderMinutes)),
+                              ),
                           ],
                           onChanged: _busy
                               ? null
                               : (int? value) =>
                                   setState(() => _reminderMinutes = value),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: _busy ? null : _pickCustomReminder,
+                            icon: const Icon(Icons.timer_outlined, size: 18),
+                            label: Text(l10n.calendarReminderCustom),
+                          ),
                         ),
                         if (_errorText != null) ...<Widget>[
                           const SizedBox(height: 12),
@@ -408,6 +490,113 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
     });
   }
 
+  String _repeatLabel(AppLocalizations l10n, RepeatRule rule) {
+    switch (rule) {
+      case RepeatRule.none:
+        return l10n.calendarRepeatNone;
+      case RepeatRule.daily:
+        return l10n.calendarRepeatDaily;
+      case RepeatRule.weekly:
+        return l10n.calendarRepeatWeekly;
+      case RepeatRule.monthly:
+        return l10n.calendarRepeatMonthly;
+      case RepeatRule.yearly:
+        return l10n.calendarRepeatYearly;
+    }
+  }
+
+  /// 重复截止日期（可选）。
+  Future<void> _pickRepeatUntil() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _repeatUntil ?? _start,
+      firstDate: DateUtils.dateOnly(_start),
+      lastDate: DateTime(_start.year + 10),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _repeatUntil = picked);
+  }
+
+  /// 自定义提醒提前量：数字 + 单位（分钟 / 小时 / 天）。
+  Future<void> _pickCustomReminder() async {
+    final l10n = context.l10n;
+    final controller = TextEditingController(
+      text:
+          '${(_reminderMinutes ?? 15) ~/ _reminderUnitFor(_reminderMinutes ?? 15)}',
+    );
+    var unit = _reminderUnitFor(_reminderMinutes ?? 15);
+
+    final minutes = await showDialog<int>(
+      context: context,
+      builder: (BuildContext dialogContext) => StatefulBuilder(
+        builder: (BuildContext dialogContext, StateSetter setDialogState) =>
+            AlertDialog(
+          title: Text(l10n.calendarReminderCustom),
+          content: Row(
+            children: <Widget>[
+              SizedBox(
+                width: 90,
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                  decoration: const InputDecoration(isDense: true),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<int>(
+                  value: unit,
+                  decoration: const InputDecoration(isDense: true),
+                  items: <DropdownMenuItem<int>>[
+                    DropdownMenuItem<int>(
+                      value: 1,
+                      child: Text(l10n.calendarUnitMinutes),
+                    ),
+                    DropdownMenuItem<int>(
+                      value: 60,
+                      child: Text(l10n.calendarUnitHours),
+                    ),
+                    DropdownMenuItem<int>(
+                      value: 1440,
+                      child: Text(l10n.calendarUnitDays),
+                    ),
+                  ],
+                  onChanged: (int? value) =>
+                      setDialogState(() => unit = value ?? 1),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.calendarCancel),
+            ),
+            FilledButton(
+              key: const ValueKey<String>('reminder-custom-save'),
+              onPressed: () {
+                final value = int.tryParse(controller.text.trim());
+                Navigator.of(dialogContext)
+                    .pop(value == null || value <= 0 ? null : value * unit);
+              },
+              child: Text(l10n.calendarSave),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (minutes == null || !mounted) return;
+    setState(() => _reminderMinutes = minutes);
+  }
+
+  /// 自定义弹窗打开时，把已有分钟数换算成"最大的整数单位"。
+  int _reminderUnitFor(int minutes) {
+    if (minutes >= 1440 && minutes % 1440 == 0) return 1440;
+    if (minutes >= 60 && minutes % 60 == 0) return 60;
+    return 1;
+  }
+
   Future<void> _save() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
@@ -433,7 +622,8 @@ class _EventEditorDialogState extends ConsumerState<EventEditorDialog> {
       location: _emptyToNull(_location.text),
       categoryId: _categoryId.isEmpty ? null : _categoryId,
       color: _colorValue == null ? null : Color(_colorValue!),
-      repeatRule: existing?.repeatRule,
+      repeatRule: _repeatRule.repeats ? _repeatRule.storageValue : null,
+      repeatUntil: _repeatRule.repeats ? _repeatUntil : null,
       reminderMinutes: _reminderMinutes,
       status: existing?.status ?? EventStatus.scheduled,
       createdAt: existing?.createdAt ?? now,

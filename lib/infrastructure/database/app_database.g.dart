@@ -455,6 +455,12 @@ class $CalendarEventsTable extends CalendarEvents
   late final GeneratedColumn<String> repeatRule = GeneratedColumn<String>(
       'repeat_rule', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _repeatUntilMeta =
+      const VerificationMeta('repeatUntil');
+  @override
+  late final GeneratedColumn<DateTime> repeatUntil = GeneratedColumn<DateTime>(
+      'repeat_until', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _reminderMinutesMeta =
       const VerificationMeta('reminderMinutes');
   @override
@@ -490,6 +496,7 @@ class $CalendarEventsTable extends CalendarEvents
         categoryId,
         color,
         repeatRule,
+        repeatUntil,
         reminderMinutes,
         status,
         createdAt,
@@ -558,6 +565,12 @@ class $CalendarEventsTable extends CalendarEvents
           repeatRule.isAcceptableOrUnknown(
               data['repeat_rule']!, _repeatRuleMeta));
     }
+    if (data.containsKey('repeat_until')) {
+      context.handle(
+          _repeatUntilMeta,
+          repeatUntil.isAcceptableOrUnknown(
+              data['repeat_until']!, _repeatUntilMeta));
+    }
     if (data.containsKey('reminder_minutes')) {
       context.handle(
           _reminderMinutesMeta,
@@ -605,6 +618,8 @@ class $CalendarEventsTable extends CalendarEvents
           .read(DriftSqlType.int, data['${effectivePrefix}color']),
       repeatRule: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}repeat_rule']),
+      repeatUntil: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}repeat_until']),
       reminderMinutes: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}reminder_minutes']),
       status: $CalendarEventsTable.$converterstatus.fromSql(attachedDatabase
@@ -640,8 +655,11 @@ class CalendarEventRow extends DataClass
   /// 事件自定义颜色（ARGB int）。
   final int? color;
 
-  /// 重复规则（RRULE 字符串），Phase 3 接入。
+  /// 重复规则：`none` / `daily` / `weekly` / `monthly` / `yearly`（null 等价于不重复）。
   final String? repeatRule;
+
+  /// 重复的结束日期（含当天）；为空表示一直重复（按查询窗口展开）。
+  final DateTime? repeatUntil;
 
   /// 提前提醒分钟数。
   final int? reminderMinutes;
@@ -659,6 +677,7 @@ class CalendarEventRow extends DataClass
       this.categoryId,
       this.color,
       this.repeatRule,
+      this.repeatUntil,
       this.reminderMinutes,
       required this.status,
       required this.createdAt,
@@ -685,6 +704,9 @@ class CalendarEventRow extends DataClass
     }
     if (!nullToAbsent || repeatRule != null) {
       map['repeat_rule'] = Variable<String>(repeatRule);
+    }
+    if (!nullToAbsent || repeatUntil != null) {
+      map['repeat_until'] = Variable<DateTime>(repeatUntil);
     }
     if (!nullToAbsent || reminderMinutes != null) {
       map['reminder_minutes'] = Variable<int>(reminderMinutes);
@@ -719,6 +741,9 @@ class CalendarEventRow extends DataClass
       repeatRule: repeatRule == null && nullToAbsent
           ? const Value.absent()
           : Value(repeatRule),
+      repeatUntil: repeatUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatUntil),
       reminderMinutes: reminderMinutes == null && nullToAbsent
           ? const Value.absent()
           : Value(reminderMinutes),
@@ -742,6 +767,7 @@ class CalendarEventRow extends DataClass
       categoryId: serializer.fromJson<String?>(json['categoryId']),
       color: serializer.fromJson<int?>(json['color']),
       repeatRule: serializer.fromJson<String?>(json['repeatRule']),
+      repeatUntil: serializer.fromJson<DateTime?>(json['repeatUntil']),
       reminderMinutes: serializer.fromJson<int?>(json['reminderMinutes']),
       status: $CalendarEventsTable.$converterstatus
           .fromJson(serializer.fromJson<String>(json['status'])),
@@ -763,6 +789,7 @@ class CalendarEventRow extends DataClass
       'categoryId': serializer.toJson<String?>(categoryId),
       'color': serializer.toJson<int?>(color),
       'repeatRule': serializer.toJson<String?>(repeatRule),
+      'repeatUntil': serializer.toJson<DateTime?>(repeatUntil),
       'reminderMinutes': serializer.toJson<int?>(reminderMinutes),
       'status': serializer
           .toJson<String>($CalendarEventsTable.$converterstatus.toJson(status)),
@@ -782,6 +809,7 @@ class CalendarEventRow extends DataClass
           Value<String?> categoryId = const Value.absent(),
           Value<int?> color = const Value.absent(),
           Value<String?> repeatRule = const Value.absent(),
+          Value<DateTime?> repeatUntil = const Value.absent(),
           Value<int?> reminderMinutes = const Value.absent(),
           EventStatus? status,
           DateTime? createdAt,
@@ -797,6 +825,7 @@ class CalendarEventRow extends DataClass
         categoryId: categoryId.present ? categoryId.value : this.categoryId,
         color: color.present ? color.value : this.color,
         repeatRule: repeatRule.present ? repeatRule.value : this.repeatRule,
+        repeatUntil: repeatUntil.present ? repeatUntil.value : this.repeatUntil,
         reminderMinutes: reminderMinutes.present
             ? reminderMinutes.value
             : this.reminderMinutes,
@@ -819,6 +848,8 @@ class CalendarEventRow extends DataClass
       color: data.color.present ? data.color.value : this.color,
       repeatRule:
           data.repeatRule.present ? data.repeatRule.value : this.repeatRule,
+      repeatUntil:
+          data.repeatUntil.present ? data.repeatUntil.value : this.repeatUntil,
       reminderMinutes: data.reminderMinutes.present
           ? data.reminderMinutes.value
           : this.reminderMinutes,
@@ -841,6 +872,7 @@ class CalendarEventRow extends DataClass
           ..write('categoryId: $categoryId, ')
           ..write('color: $color, ')
           ..write('repeatRule: $repeatRule, ')
+          ..write('repeatUntil: $repeatUntil, ')
           ..write('reminderMinutes: $reminderMinutes, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
@@ -861,6 +893,7 @@ class CalendarEventRow extends DataClass
       categoryId,
       color,
       repeatRule,
+      repeatUntil,
       reminderMinutes,
       status,
       createdAt,
@@ -879,6 +912,7 @@ class CalendarEventRow extends DataClass
           other.categoryId == this.categoryId &&
           other.color == this.color &&
           other.repeatRule == this.repeatRule &&
+          other.repeatUntil == this.repeatUntil &&
           other.reminderMinutes == this.reminderMinutes &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
@@ -896,6 +930,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
   final Value<String?> categoryId;
   final Value<int?> color;
   final Value<String?> repeatRule;
+  final Value<DateTime?> repeatUntil;
   final Value<int?> reminderMinutes;
   final Value<EventStatus> status;
   final Value<DateTime> createdAt;
@@ -912,6 +947,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
     this.categoryId = const Value.absent(),
     this.color = const Value.absent(),
     this.repeatRule = const Value.absent(),
+    this.repeatUntil = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -929,6 +965,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
     this.categoryId = const Value.absent(),
     this.color = const Value.absent(),
     this.repeatRule = const Value.absent(),
+    this.repeatUntil = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     required EventStatus status,
     required DateTime createdAt,
@@ -952,6 +989,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
     Expression<String>? categoryId,
     Expression<int>? color,
     Expression<String>? repeatRule,
+    Expression<DateTime>? repeatUntil,
     Expression<int>? reminderMinutes,
     Expression<String>? status,
     Expression<DateTime>? createdAt,
@@ -969,6 +1007,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
       if (categoryId != null) 'category_id': categoryId,
       if (color != null) 'color': color,
       if (repeatRule != null) 'repeat_rule': repeatRule,
+      if (repeatUntil != null) 'repeat_until': repeatUntil,
       if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
@@ -988,6 +1027,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
       Value<String?>? categoryId,
       Value<int?>? color,
       Value<String?>? repeatRule,
+      Value<DateTime?>? repeatUntil,
       Value<int?>? reminderMinutes,
       Value<EventStatus>? status,
       Value<DateTime>? createdAt,
@@ -1004,6 +1044,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
       categoryId: categoryId ?? this.categoryId,
       color: color ?? this.color,
       repeatRule: repeatRule ?? this.repeatRule,
+      repeatUntil: repeatUntil ?? this.repeatUntil,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
@@ -1045,6 +1086,9 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
     if (repeatRule.present) {
       map['repeat_rule'] = Variable<String>(repeatRule.value);
     }
+    if (repeatUntil.present) {
+      map['repeat_until'] = Variable<DateTime>(repeatUntil.value);
+    }
     if (reminderMinutes.present) {
       map['reminder_minutes'] = Variable<int>(reminderMinutes.value);
     }
@@ -1077,6 +1121,7 @@ class CalendarEventsCompanion extends UpdateCompanion<CalendarEventRow> {
           ..write('categoryId: $categoryId, ')
           ..write('color: $color, ')
           ..write('repeatRule: $repeatRule, ')
+          ..write('repeatUntil: $repeatUntil, ')
           ..write('reminderMinutes: $reminderMinutes, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
@@ -1119,6 +1164,12 @@ class $CountdownsTable extends Countdowns
   @override
   late final GeneratedColumn<int> color = GeneratedColumn<int>(
       'color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _backgroundColorMeta =
+      const VerificationMeta('backgroundColor');
+  @override
+  late final GeneratedColumn<int> backgroundColor = GeneratedColumn<int>(
+      'background_color', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _iconMeta = const VerificationMeta('icon');
   @override
@@ -1169,6 +1220,7 @@ class $CountdownsTable extends Countdowns
         targetTime,
         description,
         color,
+        backgroundColor,
         icon,
         isPinned,
         displayStyle,
@@ -1215,6 +1267,12 @@ class $CountdownsTable extends Countdowns
       context.handle(
           _colorMeta, color.isAcceptableOrUnknown(data['color']!, _colorMeta));
     }
+    if (data.containsKey('background_color')) {
+      context.handle(
+          _backgroundColorMeta,
+          backgroundColor.isAcceptableOrUnknown(
+              data['background_color']!, _backgroundColorMeta));
+    }
     if (data.containsKey('icon')) {
       context.handle(
           _iconMeta, icon.isAcceptableOrUnknown(data['icon']!, _iconMeta));
@@ -1258,6 +1316,8 @@ class $CountdownsTable extends Countdowns
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       color: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}color']),
+      backgroundColor: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}background_color']),
       icon: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}icon']),
       isPinned: attachedDatabase.typeMapping
@@ -1290,6 +1350,9 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
   final DateTime targetTime;
   final String? description;
   final int? color;
+
+  /// 卡片背景色（ARGB int）；为空时用主题的 surface。
+  final int? backgroundColor;
   final String? icon;
   final bool isPinned;
   final CountdownDisplayStyle displayStyle;
@@ -1302,6 +1365,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
       required this.targetTime,
       this.description,
       this.color,
+      this.backgroundColor,
       this.icon,
       required this.isPinned,
       required this.displayStyle,
@@ -1319,6 +1383,9 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
     }
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<int>(color);
+    }
+    if (!nullToAbsent || backgroundColor != null) {
+      map['background_color'] = Variable<int>(backgroundColor);
     }
     if (!nullToAbsent || icon != null) {
       map['icon'] = Variable<String>(icon);
@@ -1344,6 +1411,9 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
           : Value(description),
       color:
           color == null && nullToAbsent ? const Value.absent() : Value(color),
+      backgroundColor: backgroundColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backgroundColor),
       icon: icon == null && nullToAbsent ? const Value.absent() : Value(icon),
       isPinned: Value(isPinned),
       displayStyle: Value(displayStyle),
@@ -1362,6 +1432,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
       targetTime: serializer.fromJson<DateTime>(json['targetTime']),
       description: serializer.fromJson<String?>(json['description']),
       color: serializer.fromJson<int?>(json['color']),
+      backgroundColor: serializer.fromJson<int?>(json['backgroundColor']),
       icon: serializer.fromJson<String?>(json['icon']),
       isPinned: serializer.fromJson<bool>(json['isPinned']),
       displayStyle: $CountdownsTable.$converterdisplayStyle
@@ -1380,6 +1451,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
       'targetTime': serializer.toJson<DateTime>(targetTime),
       'description': serializer.toJson<String?>(description),
       'color': serializer.toJson<int?>(color),
+      'backgroundColor': serializer.toJson<int?>(backgroundColor),
       'icon': serializer.toJson<String?>(icon),
       'isPinned': serializer.toJson<bool>(isPinned),
       'displayStyle': serializer.toJson<String>(
@@ -1396,6 +1468,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
           DateTime? targetTime,
           Value<String?> description = const Value.absent(),
           Value<int?> color = const Value.absent(),
+          Value<int?> backgroundColor = const Value.absent(),
           Value<String?> icon = const Value.absent(),
           bool? isPinned,
           CountdownDisplayStyle? displayStyle,
@@ -1408,6 +1481,9 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
         targetTime: targetTime ?? this.targetTime,
         description: description.present ? description.value : this.description,
         color: color.present ? color.value : this.color,
+        backgroundColor: backgroundColor.present
+            ? backgroundColor.value
+            : this.backgroundColor,
         icon: icon.present ? icon.value : this.icon,
         isPinned: isPinned ?? this.isPinned,
         displayStyle: displayStyle ?? this.displayStyle,
@@ -1424,6 +1500,9 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
       description:
           data.description.present ? data.description.value : this.description,
       color: data.color.present ? data.color.value : this.color,
+      backgroundColor: data.backgroundColor.present
+          ? data.backgroundColor.value
+          : this.backgroundColor,
       icon: data.icon.present ? data.icon.value : this.icon,
       isPinned: data.isPinned.present ? data.isPinned.value : this.isPinned,
       displayStyle: data.displayStyle.present
@@ -1443,6 +1522,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
           ..write('targetTime: $targetTime, ')
           ..write('description: $description, ')
           ..write('color: $color, ')
+          ..write('backgroundColor: $backgroundColor, ')
           ..write('icon: $icon, ')
           ..write('isPinned: $isPinned, ')
           ..write('displayStyle: $displayStyle, ')
@@ -1454,8 +1534,19 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, targetTime, description, color,
-      icon, isPinned, displayStyle, sortOrder, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      id,
+      title,
+      targetTime,
+      description,
+      color,
+      backgroundColor,
+      icon,
+      isPinned,
+      displayStyle,
+      sortOrder,
+      createdAt,
+      updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1465,6 +1556,7 @@ class CountdownRow extends DataClass implements Insertable<CountdownRow> {
           other.targetTime == this.targetTime &&
           other.description == this.description &&
           other.color == this.color &&
+          other.backgroundColor == this.backgroundColor &&
           other.icon == this.icon &&
           other.isPinned == this.isPinned &&
           other.displayStyle == this.displayStyle &&
@@ -1479,6 +1571,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
   final Value<DateTime> targetTime;
   final Value<String?> description;
   final Value<int?> color;
+  final Value<int?> backgroundColor;
   final Value<String?> icon;
   final Value<bool> isPinned;
   final Value<CountdownDisplayStyle> displayStyle;
@@ -1492,6 +1585,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
     this.targetTime = const Value.absent(),
     this.description = const Value.absent(),
     this.color = const Value.absent(),
+    this.backgroundColor = const Value.absent(),
     this.icon = const Value.absent(),
     this.isPinned = const Value.absent(),
     this.displayStyle = const Value.absent(),
@@ -1506,6 +1600,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
     required DateTime targetTime,
     this.description = const Value.absent(),
     this.color = const Value.absent(),
+    this.backgroundColor = const Value.absent(),
     this.icon = const Value.absent(),
     this.isPinned = const Value.absent(),
     required CountdownDisplayStyle displayStyle,
@@ -1525,6 +1620,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
     Expression<DateTime>? targetTime,
     Expression<String>? description,
     Expression<int>? color,
+    Expression<int>? backgroundColor,
     Expression<String>? icon,
     Expression<bool>? isPinned,
     Expression<String>? displayStyle,
@@ -1539,6 +1635,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
       if (targetTime != null) 'target_time': targetTime,
       if (description != null) 'description': description,
       if (color != null) 'color': color,
+      if (backgroundColor != null) 'background_color': backgroundColor,
       if (icon != null) 'icon': icon,
       if (isPinned != null) 'is_pinned': isPinned,
       if (displayStyle != null) 'display_style': displayStyle,
@@ -1555,6 +1652,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
       Value<DateTime>? targetTime,
       Value<String?>? description,
       Value<int?>? color,
+      Value<int?>? backgroundColor,
       Value<String?>? icon,
       Value<bool>? isPinned,
       Value<CountdownDisplayStyle>? displayStyle,
@@ -1568,6 +1666,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
       targetTime: targetTime ?? this.targetTime,
       description: description ?? this.description,
       color: color ?? this.color,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       icon: icon ?? this.icon,
       isPinned: isPinned ?? this.isPinned,
       displayStyle: displayStyle ?? this.displayStyle,
@@ -1595,6 +1694,9 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
     }
     if (color.present) {
       map['color'] = Variable<int>(color.value);
+    }
+    if (backgroundColor.present) {
+      map['background_color'] = Variable<int>(backgroundColor.value);
     }
     if (icon.present) {
       map['icon'] = Variable<String>(icon.value);
@@ -1629,6 +1731,7 @@ class CountdownsCompanion extends UpdateCompanion<CountdownRow> {
           ..write('targetTime: $targetTime, ')
           ..write('description: $description, ')
           ..write('color: $color, ')
+          ..write('backgroundColor: $backgroundColor, ')
           ..write('icon: $icon, ')
           ..write('isPinned: $isPinned, ')
           ..write('displayStyle: $displayStyle, ')
@@ -3234,6 +3337,12 @@ class $ChatSessionsTable extends ChatSessions
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES ai_personas (id)'));
+  static const VerificationMeta _providerIdMeta =
+      const VerificationMeta('providerId');
+  @override
+  late final GeneratedColumn<String> providerId = GeneratedColumn<String>(
+      'provider_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -3248,7 +3357,7 @@ class $ChatSessionsTable extends ChatSessions
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, title, personaId, createdAt, updatedAt];
+      [id, title, personaId, providerId, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3273,6 +3382,12 @@ class $ChatSessionsTable extends ChatSessions
     if (data.containsKey('persona_id')) {
       context.handle(_personaIdMeta,
           personaId.isAcceptableOrUnknown(data['persona_id']!, _personaIdMeta));
+    }
+    if (data.containsKey('provider_id')) {
+      context.handle(
+          _providerIdMeta,
+          providerId.isAcceptableOrUnknown(
+              data['provider_id']!, _providerIdMeta));
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -3301,6 +3416,8 @@ class $ChatSessionsTable extends ChatSessions
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       personaId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}persona_id']),
+      providerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}provider_id']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -3318,12 +3435,18 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
   final String id;
   final String title;
   final String? personaId;
+
+  /// 这个会话用哪个服务商；为空时用"默认服务商"。
+  /// 故意不加外键：SQLite 的 ALTER TABLE ADD COLUMN 不方便带 REFERENCES，
+  /// 服务商被删掉时的回落逻辑放在应用层（见 activeAiConfigProvider）。
+  final String? providerId;
   final DateTime createdAt;
   final DateTime updatedAt;
   const ChatSessionRow(
       {required this.id,
       required this.title,
       this.personaId,
+      this.providerId,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -3333,6 +3456,9 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
     map['title'] = Variable<String>(title);
     if (!nullToAbsent || personaId != null) {
       map['persona_id'] = Variable<String>(personaId);
+    }
+    if (!nullToAbsent || providerId != null) {
+      map['provider_id'] = Variable<String>(providerId);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -3346,6 +3472,9 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
       personaId: personaId == null && nullToAbsent
           ? const Value.absent()
           : Value(personaId),
+      providerId: providerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(providerId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3358,6 +3487,7 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       personaId: serializer.fromJson<String?>(json['personaId']),
+      providerId: serializer.fromJson<String?>(json['providerId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3369,6 +3499,7 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'personaId': serializer.toJson<String?>(personaId),
+      'providerId': serializer.toJson<String?>(providerId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3378,12 +3509,14 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
           {String? id,
           String? title,
           Value<String?> personaId = const Value.absent(),
+          Value<String?> providerId = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       ChatSessionRow(
         id: id ?? this.id,
         title: title ?? this.title,
         personaId: personaId.present ? personaId.value : this.personaId,
+        providerId: providerId.present ? providerId.value : this.providerId,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -3392,6 +3525,8 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
       personaId: data.personaId.present ? data.personaId.value : this.personaId,
+      providerId:
+          data.providerId.present ? data.providerId.value : this.providerId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3403,6 +3538,7 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('personaId: $personaId, ')
+          ..write('providerId: $providerId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3410,7 +3546,8 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, personaId, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, title, personaId, providerId, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3418,6 +3555,7 @@ class ChatSessionRow extends DataClass implements Insertable<ChatSessionRow> {
           other.id == this.id &&
           other.title == this.title &&
           other.personaId == this.personaId &&
+          other.providerId == this.providerId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -3426,6 +3564,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
   final Value<String> id;
   final Value<String> title;
   final Value<String?> personaId;
+  final Value<String?> providerId;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -3433,6 +3572,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.personaId = const Value.absent(),
+    this.providerId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3441,6 +3581,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
     required String id,
     required String title,
     this.personaId = const Value.absent(),
+    this.providerId = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -3452,6 +3593,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
     Expression<String>? id,
     Expression<String>? title,
     Expression<String>? personaId,
+    Expression<String>? providerId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -3460,6 +3602,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (personaId != null) 'persona_id': personaId,
+      if (providerId != null) 'provider_id': providerId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -3470,6 +3613,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
       {Value<String>? id,
       Value<String>? title,
       Value<String?>? personaId,
+      Value<String?>? providerId,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -3477,6 +3621,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
       id: id ?? this.id,
       title: title ?? this.title,
       personaId: personaId ?? this.personaId,
+      providerId: providerId ?? this.providerId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -3494,6 +3639,9 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
     }
     if (personaId.present) {
       map['persona_id'] = Variable<String>(personaId.value);
+    }
+    if (providerId.present) {
+      map['provider_id'] = Variable<String>(providerId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -3513,6 +3661,7 @@ class ChatSessionsCompanion extends UpdateCompanion<ChatSessionRow> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('personaId: $personaId, ')
+          ..write('providerId: $providerId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -4795,6 +4944,312 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
   }
 }
 
+class $DailyDigestsTable extends DailyDigests
+    with TableInfo<$DailyDigestsTable, DailyDigestRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyDigestsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+      'kind', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dayKeyMeta = const VerificationMeta('dayKey');
+  @override
+  late final GeneratedColumn<String> dayKey = GeneratedColumn<String>(
+      'day_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _contentMeta =
+      const VerificationMeta('content');
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+      'content', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, kind, dayKey, content, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_digests';
+  @override
+  VerificationContext validateIntegrity(Insertable<DailyDigestRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+          _kindMeta, kind.isAcceptableOrUnknown(data['kind']!, _kindMeta));
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('day_key')) {
+      context.handle(_dayKeyMeta,
+          dayKey.isAcceptableOrUnknown(data['day_key']!, _dayKeyMeta));
+    } else if (isInserting) {
+      context.missing(_dayKeyMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyDigestRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyDigestRow(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      kind: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
+      dayKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}day_key'])!,
+      content: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $DailyDigestsTable createAlias(String alias) {
+    return $DailyDigestsTable(attachedDatabase, alias);
+  }
+}
+
+class DailyDigestRow extends DataClass implements Insertable<DailyDigestRow> {
+  final String id;
+  final String kind;
+  final String dayKey;
+  final String content;
+  final DateTime createdAt;
+  const DailyDigestRow(
+      {required this.id,
+      required this.kind,
+      required this.dayKey,
+      required this.content,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['kind'] = Variable<String>(kind);
+    map['day_key'] = Variable<String>(dayKey);
+    map['content'] = Variable<String>(content);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DailyDigestsCompanion toCompanion(bool nullToAbsent) {
+    return DailyDigestsCompanion(
+      id: Value(id),
+      kind: Value(kind),
+      dayKey: Value(dayKey),
+      content: Value(content),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory DailyDigestRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyDigestRow(
+      id: serializer.fromJson<String>(json['id']),
+      kind: serializer.fromJson<String>(json['kind']),
+      dayKey: serializer.fromJson<String>(json['dayKey']),
+      content: serializer.fromJson<String>(json['content']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'kind': serializer.toJson<String>(kind),
+      'dayKey': serializer.toJson<String>(dayKey),
+      'content': serializer.toJson<String>(content),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DailyDigestRow copyWith(
+          {String? id,
+          String? kind,
+          String? dayKey,
+          String? content,
+          DateTime? createdAt}) =>
+      DailyDigestRow(
+        id: id ?? this.id,
+        kind: kind ?? this.kind,
+        dayKey: dayKey ?? this.dayKey,
+        content: content ?? this.content,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  DailyDigestRow copyWithCompanion(DailyDigestsCompanion data) {
+    return DailyDigestRow(
+      id: data.id.present ? data.id.value : this.id,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      dayKey: data.dayKey.present ? data.dayKey.value : this.dayKey,
+      content: data.content.present ? data.content.value : this.content,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyDigestRow(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('dayKey: $dayKey, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, kind, dayKey, content, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyDigestRow &&
+          other.id == this.id &&
+          other.kind == this.kind &&
+          other.dayKey == this.dayKey &&
+          other.content == this.content &&
+          other.createdAt == this.createdAt);
+}
+
+class DailyDigestsCompanion extends UpdateCompanion<DailyDigestRow> {
+  final Value<String> id;
+  final Value<String> kind;
+  final Value<String> dayKey;
+  final Value<String> content;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const DailyDigestsCompanion({
+    this.id = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.dayKey = const Value.absent(),
+    this.content = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DailyDigestsCompanion.insert({
+    required String id,
+    required String kind,
+    required String dayKey,
+    required String content,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        kind = Value(kind),
+        dayKey = Value(dayKey),
+        content = Value(content),
+        createdAt = Value(createdAt);
+  static Insertable<DailyDigestRow> custom({
+    Expression<String>? id,
+    Expression<String>? kind,
+    Expression<String>? dayKey,
+    Expression<String>? content,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (kind != null) 'kind': kind,
+      if (dayKey != null) 'day_key': dayKey,
+      if (content != null) 'content': content,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DailyDigestsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? kind,
+      Value<String>? dayKey,
+      Value<String>? content,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return DailyDigestsCompanion(
+      id: id ?? this.id,
+      kind: kind ?? this.kind,
+      dayKey: dayKey ?? this.dayKey,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (dayKey.present) {
+      map['day_key'] = Variable<String>(dayKey.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyDigestsCompanion(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('dayKey: $dayKey, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4808,6 +5263,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ChatSessionsTable chatSessions = $ChatSessionsTable(this);
   late final $ChatMessagesTable chatMessages = $ChatMessagesTable(this);
   late final $ThemeConfigsTable themeConfigs = $ThemeConfigsTable(this);
+  late final $DailyDigestsTable dailyDigests = $DailyDigestsTable(this);
   late final Index idxEventsStartTime = Index('idx_events_start_time',
       'CREATE INDEX idx_events_start_time ON calendar_events (start_time)');
   late final Index idxCountdownsTargetTime = Index('idx_countdowns_target_time',
@@ -4830,6 +5286,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         chatSessions,
         chatMessages,
         themeConfigs,
+        dailyDigests,
         idxEventsStartTime,
         idxCountdownsTargetTime,
         idxRemindersTriggerTime,
@@ -5139,6 +5596,7 @@ typedef $$CalendarEventsTableCreateCompanionBuilder = CalendarEventsCompanion
   Value<String?> categoryId,
   Value<int?> color,
   Value<String?> repeatRule,
+  Value<DateTime?> repeatUntil,
   Value<int?> reminderMinutes,
   required EventStatus status,
   required DateTime createdAt,
@@ -5157,6 +5615,7 @@ typedef $$CalendarEventsTableUpdateCompanionBuilder = CalendarEventsCompanion
   Value<String?> categoryId,
   Value<int?> color,
   Value<String?> repeatRule,
+  Value<DateTime?> repeatUntil,
   Value<int?> reminderMinutes,
   Value<EventStatus> status,
   Value<DateTime> createdAt,
@@ -5236,6 +5695,9 @@ class $$CalendarEventsTableFilterComposer
 
   ColumnFilters<String> get repeatRule => $composableBuilder(
       column: $table.repeatRule, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get reminderMinutes => $composableBuilder(
       column: $table.reminderMinutes,
@@ -5330,6 +5792,9 @@ class $$CalendarEventsTableOrderingComposer
   ColumnOrderings<String> get repeatRule => $composableBuilder(
       column: $table.repeatRule, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get reminderMinutes => $composableBuilder(
       column: $table.reminderMinutes,
       builder: (column) => ColumnOrderings(column));
@@ -5399,6 +5864,9 @@ class $$CalendarEventsTableAnnotationComposer
 
   GeneratedColumn<String> get repeatRule => $composableBuilder(
       column: $table.repeatRule, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => column);
 
   GeneratedColumn<int> get reminderMinutes => $composableBuilder(
       column: $table.reminderMinutes, builder: (column) => column);
@@ -5489,6 +5957,7 @@ class $$CalendarEventsTableTableManager extends RootTableManager<
             Value<String?> categoryId = const Value.absent(),
             Value<int?> color = const Value.absent(),
             Value<String?> repeatRule = const Value.absent(),
+            Value<DateTime?> repeatUntil = const Value.absent(),
             Value<int?> reminderMinutes = const Value.absent(),
             Value<EventStatus> status = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -5506,6 +5975,7 @@ class $$CalendarEventsTableTableManager extends RootTableManager<
             categoryId: categoryId,
             color: color,
             repeatRule: repeatRule,
+            repeatUntil: repeatUntil,
             reminderMinutes: reminderMinutes,
             status: status,
             createdAt: createdAt,
@@ -5523,6 +5993,7 @@ class $$CalendarEventsTableTableManager extends RootTableManager<
             Value<String?> categoryId = const Value.absent(),
             Value<int?> color = const Value.absent(),
             Value<String?> repeatRule = const Value.absent(),
+            Value<DateTime?> repeatUntil = const Value.absent(),
             Value<int?> reminderMinutes = const Value.absent(),
             required EventStatus status,
             required DateTime createdAt,
@@ -5540,6 +6011,7 @@ class $$CalendarEventsTableTableManager extends RootTableManager<
             categoryId: categoryId,
             color: color,
             repeatRule: repeatRule,
+            repeatUntil: repeatUntil,
             reminderMinutes: reminderMinutes,
             status: status,
             createdAt: createdAt,
@@ -5622,6 +6094,7 @@ typedef $$CountdownsTableCreateCompanionBuilder = CountdownsCompanion Function({
   required DateTime targetTime,
   Value<String?> description,
   Value<int?> color,
+  Value<int?> backgroundColor,
   Value<String?> icon,
   Value<bool> isPinned,
   required CountdownDisplayStyle displayStyle,
@@ -5636,6 +6109,7 @@ typedef $$CountdownsTableUpdateCompanionBuilder = CountdownsCompanion Function({
   Value<DateTime> targetTime,
   Value<String?> description,
   Value<int?> color,
+  Value<int?> backgroundColor,
   Value<String?> icon,
   Value<bool> isPinned,
   Value<CountdownDisplayStyle> displayStyle,
@@ -5668,6 +6142,10 @@ class $$CountdownsTableFilterComposer
 
   ColumnFilters<int> get color => $composableBuilder(
       column: $table.color, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get backgroundColor => $composableBuilder(
+      column: $table.backgroundColor,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get icon => $composableBuilder(
       column: $table.icon, builder: (column) => ColumnFilters(column));
@@ -5715,6 +6193,10 @@ class $$CountdownsTableOrderingComposer
   ColumnOrderings<int> get color => $composableBuilder(
       column: $table.color, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get backgroundColor => $composableBuilder(
+      column: $table.backgroundColor,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get icon => $composableBuilder(
       column: $table.icon, builder: (column) => ColumnOrderings(column));
 
@@ -5758,6 +6240,9 @@ class $$CountdownsTableAnnotationComposer
 
   GeneratedColumn<int> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<int> get backgroundColor => $composableBuilder(
+      column: $table.backgroundColor, builder: (column) => column);
 
   GeneratedColumn<String> get icon =>
       $composableBuilder(column: $table.icon, builder: (column) => column);
@@ -5810,6 +6295,7 @@ class $$CountdownsTableTableManager extends RootTableManager<
             Value<DateTime> targetTime = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<int?> color = const Value.absent(),
+            Value<int?> backgroundColor = const Value.absent(),
             Value<String?> icon = const Value.absent(),
             Value<bool> isPinned = const Value.absent(),
             Value<CountdownDisplayStyle> displayStyle = const Value.absent(),
@@ -5824,6 +6310,7 @@ class $$CountdownsTableTableManager extends RootTableManager<
             targetTime: targetTime,
             description: description,
             color: color,
+            backgroundColor: backgroundColor,
             icon: icon,
             isPinned: isPinned,
             displayStyle: displayStyle,
@@ -5838,6 +6325,7 @@ class $$CountdownsTableTableManager extends RootTableManager<
             required DateTime targetTime,
             Value<String?> description = const Value.absent(),
             Value<int?> color = const Value.absent(),
+            Value<int?> backgroundColor = const Value.absent(),
             Value<String?> icon = const Value.absent(),
             Value<bool> isPinned = const Value.absent(),
             required CountdownDisplayStyle displayStyle,
@@ -5852,6 +6340,7 @@ class $$CountdownsTableTableManager extends RootTableManager<
             targetTime: targetTime,
             description: description,
             color: color,
+            backgroundColor: backgroundColor,
             icon: icon,
             isPinned: isPinned,
             displayStyle: displayStyle,
@@ -6820,6 +7309,7 @@ typedef $$ChatSessionsTableCreateCompanionBuilder = ChatSessionsCompanion
   required String id,
   required String title,
   Value<String?> personaId,
+  Value<String?> providerId,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -6829,6 +7319,7 @@ typedef $$ChatSessionsTableUpdateCompanionBuilder = ChatSessionsCompanion
   Value<String> id,
   Value<String> title,
   Value<String?> personaId,
+  Value<String?> providerId,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -6883,6 +7374,9 @@ class $$ChatSessionsTableFilterComposer
 
   ColumnFilters<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get providerId => $composableBuilder(
+      column: $table.providerId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -6947,6 +7441,9 @@ class $$ChatSessionsTableOrderingComposer
   ColumnOrderings<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get providerId => $composableBuilder(
+      column: $table.providerId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -6988,6 +7485,9 @@ class $$ChatSessionsTableAnnotationComposer
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get providerId => $composableBuilder(
+      column: $table.providerId, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -7063,6 +7563,7 @@ class $$ChatSessionsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String?> personaId = const Value.absent(),
+            Value<String?> providerId = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -7071,6 +7572,7 @@ class $$ChatSessionsTableTableManager extends RootTableManager<
             id: id,
             title: title,
             personaId: personaId,
+            providerId: providerId,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -7079,6 +7581,7 @@ class $$ChatSessionsTableTableManager extends RootTableManager<
             required String id,
             required String title,
             Value<String?> personaId = const Value.absent(),
+            Value<String?> providerId = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -7087,6 +7590,7 @@ class $$ChatSessionsTableTableManager extends RootTableManager<
             id: id,
             title: title,
             personaId: personaId,
+            providerId: providerId,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -7849,6 +8353,179 @@ typedef $$ThemeConfigsTableProcessedTableManager = ProcessedTableManager<
     ),
     ThemeConfigRow,
     PrefetchHooks Function()>;
+typedef $$DailyDigestsTableCreateCompanionBuilder = DailyDigestsCompanion
+    Function({
+  required String id,
+  required String kind,
+  required String dayKey,
+  required String content,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$DailyDigestsTableUpdateCompanionBuilder = DailyDigestsCompanion
+    Function({
+  Value<String> id,
+  Value<String> kind,
+  Value<String> dayKey,
+  Value<String> content,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+class $$DailyDigestsTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyDigestsTable> {
+  $$DailyDigestsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get kind => $composableBuilder(
+      column: $table.kind, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dayKey => $composableBuilder(
+      column: $table.dayKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$DailyDigestsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyDigestsTable> {
+  $$DailyDigestsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+      column: $table.kind, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dayKey => $composableBuilder(
+      column: $table.dayKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DailyDigestsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyDigestsTable> {
+  $$DailyDigestsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get dayKey =>
+      $composableBuilder(column: $table.dayKey, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$DailyDigestsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $DailyDigestsTable,
+    DailyDigestRow,
+    $$DailyDigestsTableFilterComposer,
+    $$DailyDigestsTableOrderingComposer,
+    $$DailyDigestsTableAnnotationComposer,
+    $$DailyDigestsTableCreateCompanionBuilder,
+    $$DailyDigestsTableUpdateCompanionBuilder,
+    (
+      DailyDigestRow,
+      BaseReferences<_$AppDatabase, $DailyDigestsTable, DailyDigestRow>
+    ),
+    DailyDigestRow,
+    PrefetchHooks Function()> {
+  $$DailyDigestsTableTableManager(_$AppDatabase db, $DailyDigestsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyDigestsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyDigestsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyDigestsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> kind = const Value.absent(),
+            Value<String> dayKey = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DailyDigestsCompanion(
+            id: id,
+            kind: kind,
+            dayKey: dayKey,
+            content: content,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String kind,
+            required String dayKey,
+            required String content,
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DailyDigestsCompanion.insert(
+            id: id,
+            kind: kind,
+            dayKey: dayKey,
+            content: content,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$DailyDigestsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $DailyDigestsTable,
+    DailyDigestRow,
+    $$DailyDigestsTableFilterComposer,
+    $$DailyDigestsTableOrderingComposer,
+    $$DailyDigestsTableAnnotationComposer,
+    $$DailyDigestsTableCreateCompanionBuilder,
+    $$DailyDigestsTableUpdateCompanionBuilder,
+    (
+      DailyDigestRow,
+      BaseReferences<_$AppDatabase, $DailyDigestsTable, DailyDigestRow>
+    ),
+    DailyDigestRow,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7871,4 +8548,6 @@ class $AppDatabaseManager {
       $$ChatMessagesTableTableManager(_db, _db.chatMessages);
   $$ThemeConfigsTableTableManager get themeConfigs =>
       $$ThemeConfigsTableTableManager(_db, _db.themeConfigs);
+  $$DailyDigestsTableTableManager get dailyDigests =>
+      $$DailyDigestsTableTableManager(_db, _db.dailyDigests);
 }

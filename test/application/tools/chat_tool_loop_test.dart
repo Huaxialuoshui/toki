@@ -72,7 +72,8 @@ void main() {
 
     // 2) 消息序列：user → assistant(工具请求) → tool(结果) → assistant(最终回复)
     final stored = await messages();
-    expect(stored.map((ChatMessage message) => message.role).toList(), <ChatRole>[
+    expect(
+        stored.map((ChatMessage message) => message.role).toList(), <ChatRole>[
       ChatRole.user,
       ChatRole.assistant,
       ChatRole.tool,
@@ -107,7 +108,8 @@ void main() {
       textTurn('抱歉，我没有权限删除日程。'),
     ]);
     await setUpContainer(ai);
-    final before = (await container.read(calendarRepositoryProvider).getAll()).length;
+    final before =
+        (await container.read(calendarRepositoryProvider).getAll()).length;
 
     await container.read(chatControllerProvider.notifier).send('删掉毕业答辩');
 
@@ -140,7 +142,8 @@ void main() {
     ]);
     await setUpContainer(ai);
     container.read(toolPermissionsProvider.notifier).setDelete(true);
-    final before = (await container.read(calendarRepositoryProvider).getAll()).length;
+    final before =
+        (await container.read(calendarRepositoryProvider).getAll()).length;
 
     final controller = container.read(chatControllerProvider.notifier);
     final future = controller.send('删掉毕业答辩');

@@ -156,10 +156,21 @@ final activePersonaProvider = Provider.autoDispose<AiPersona?>((ref) {
   return personas.first;
 });
 
-/// 当前生效的 AI 服务商配置：优先"默认"，否则用列表里的第一个。
+/// 当前生效的 AI 服务商配置：
+/// 1. 当前会话指定的服务商（聊天页可以切换）；
+/// 2. 标了"默认"的那个；
+/// 3. 列表里的第一个。
 final activeAiConfigProvider = Provider.autoDispose<AiProviderConfig?>((ref) {
   final configs = ref.watch(aiProvidersProvider).valueOrNull;
   if (configs == null || configs.isEmpty) return null;
+
+  final selectedId = ref.watch(chatSessionProvider).valueOrNull?.providerId;
+  if (selectedId != null && selectedId.isNotEmpty) {
+    for (final config in configs) {
+      if (config.id == selectedId) return config;
+    }
+    // 服务商被删掉了：回落到默认，不影响继续聊天。
+  }
   for (final config in configs) {
     if (config.isDefault) return config;
   }
@@ -690,6 +701,19 @@ class ChatController extends Notifier<ChatStreamState> {
         createdAt: session.createdAt,
         updatedAt: clock.now(),
       ),
+    );
+    ref.invalidate(chatSessionProvider);
+  }
+
+  /// 切换当前会话使用的服务商（只影响后续请求）。
+  ///
+  /// 传空字符串表示"跟随默认服务商"。
+  Future<void> switchProvider(String providerId) async {
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final session = await ref.read(chatSessionProvider.future);
+    await repository.upsertSession(
+      session.copyWith(providerId: providerId, updatedAt: clock.now()),
     );
     ref.invalidate(chatSessionProvider);
   }

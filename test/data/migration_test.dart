@@ -30,7 +30,7 @@ void main() {
     addTearDown(database.close);
 
     // 从 v1 快照建库，再迁移到当前版本并校验结构一致。
-    await verifier.migrateAndValidate(database, 3);
+    await verifier.migrateAndValidate(database, 4);
   });
 
   test('v1 → v2 迁移会补上 chat_messages.tool_call_id', () async {
@@ -39,7 +39,7 @@ void main() {
     addTearDown(database.close);
 
     await database.customStatement('PRAGMA foreign_keys = OFF');
-    await verifier.migrateAndValidate(database, 3);
+    await verifier.migrateAndValidate(database, 4);
 
     final columns = await database
         .customSelect('PRAGMA table_info(chat_messages)')
@@ -53,7 +53,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 3);
+    await verifier.migrateAndValidate(database, 4);
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -62,7 +62,31 @@ void main() {
     expect(columns, contains('shadow_strength'));
   });
 
-  test('从空库创建后，9 张表全部存在', () async {
+  test('v3 → v4 迁移会补上会话服务商 / 倒计时背景色 / 重复结束日期 / 每日计划表', () async {
+    final connection = await verifier.startAt(3);
+    final database = AppDatabase(connection);
+    addTearDown(database.close);
+
+    await verifier.migrateAndValidate(database, 4);
+
+    Future<List<String>> columnsOf(String table) => database
+        .customSelect('PRAGMA table_info($table)')
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+
+    expect(await columnsOf('chat_sessions'), contains('provider_id'));
+    expect(await columnsOf('countdowns'), contains('background_color'));
+    expect(await columnsOf('calendar_events'), contains('repeat_until'));
+
+    final tables = await database
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'daily_digests'",
+        )
+        .get();
+    expect(tables, hasLength(1));
+  });
+
+  test('从空库创建后，10 张表全部存在', () async {
     final database = AppDatabase.memory();
     addTearDown(database.close);
 
@@ -85,6 +109,7 @@ void main() {
         'chat_messages',
         'chat_sessions',
         'countdowns',
+        'daily_digests',
         'reminders',
         'theme_configs',
       ]),

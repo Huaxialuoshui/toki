@@ -45,7 +45,8 @@ void main() {
   tearDown(() => database.close());
 
   /// 执行工具并解析回灌给模型的 JSON。
-  Future<Map<String, Object?>> run(String name, Map<String, Object?> args) async {
+  Future<Map<String, Object?>> run(
+      String name, Map<String, Object?> args) async {
     final tool = registry.byName(name);
     expect(tool, isNotNull, reason: '工具 $name 应当已注册');
     final result = await tool!.execute(args);
@@ -103,8 +104,7 @@ void main() {
     expect(stored.single.startTime, DateTime(2026, 10, 20, 15));
     expect(stored.single.endTime, DateTime(2026, 10, 20, 16));
 
-    final createdReminders =
-        await reminders.getForEvent(stored.single.id);
+    final createdReminders = await reminders.getForEvent(stored.single.id);
     expect(createdReminders, hasLength(1));
     expect(
       createdReminders.single.triggerTime,
@@ -202,7 +202,8 @@ void main() {
     final list = await run('get_countdowns', <String, Object?>{});
     final payload = list['result']! as Map<String, Object?>;
     expect(payload['count'], 1);
-    final first = (payload['countdowns']! as List<Object?>).first as Map<String, Object?>;
+    final first =
+        (payload['countdowns']! as List<Object?>).first as Map<String, Object?>;
     expect(first['remaining_days'], 13);
 
     await run('update_countdown', <String, Object?>{
@@ -253,7 +254,8 @@ void main() {
     }
   });
 
-  test('CalendarEvent 事件不参与：create_event 的 end_time 早于 start_time 会报错', () async {
+  test('CalendarEvent 事件不参与：create_event 的 end_time 早于 start_time 会报错',
+      () async {
     final result = await run('create_event', <String, Object?>{
       'title': '错误时间',
       'start_time': '2026-10-20T15:00:00',

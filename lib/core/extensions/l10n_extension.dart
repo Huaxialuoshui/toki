@@ -15,12 +15,14 @@ extension ReminderLabelExtension on AppLocalizations {
   String reminderLabel(int? minutes) {
     if (minutes == null) return calendarNoReminder;
     if (minutes == 0) return calendarReminderAtTime;
-    if (minutes < Duration.minutesPerHour) {
-      return calendarReminderMinutes(minutes);
+    // 用"能整除才换算"而不是"大于就换算"：自定义 90 分钟要显示 90 分钟，
+    // 而不是被截断成 1 小时。
+    if (minutes % Duration.minutesPerDay == 0) {
+      return calendarReminderDays(minutes ~/ Duration.minutesPerDay);
     }
-    if (minutes < Duration.minutesPerDay) {
+    if (minutes % Duration.minutesPerHour == 0) {
       return calendarReminderHours(minutes ~/ Duration.minutesPerHour);
     }
-    return calendarReminderDays(minutes ~/ Duration.minutesPerDay);
+    return calendarReminderMinutes(minutes);
   }
 }

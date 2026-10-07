@@ -93,7 +93,8 @@ void main() {
   });
 
   tokiWidgetTest('设置页可以切换背景类型并实时预览', (tester) async {
-    await pumpTokiApp(tester, size: const Size(1400, 2400), seedDatabase: false);
+    await pumpTokiApp(tester,
+        size: const Size(1400, 2400), seedDatabase: false);
     await tester.tap(
       find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
     );

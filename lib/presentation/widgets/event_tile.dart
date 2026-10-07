@@ -10,11 +10,17 @@ class EventTile extends StatelessWidget {
   const EventTile({
     super.key,
     required this.event,
+    this.startTime,
+    this.endTime,
     this.onTap,
     this.showDate = false,
   });
 
   final CalendarEvent event;
+
+  /// 重复日程展开出来的这一次的时间；为空表示用事件自身的时间。
+  final DateTime? startTime;
+  final DateTime? endTime;
   final VoidCallback? onTap;
 
   /// 在标题前显示日期（用于"未来事件"列表）。
@@ -26,14 +32,16 @@ class EventTile extends StatelessWidget {
     final l10n = context.l10n;
     final locale = context.localeCode;
     final color = event.color ?? theme.colorScheme.primary;
+    final start = startTime ?? event.startTime;
+    final end = endTime ?? event.endTime;
 
     final timeText = event.allDay
         ? l10n.calendarAllDay
-        : '${DateFormats.time(event.startTime, locale)} – '
-            '${DateFormats.time(event.endTime, locale)}';
+        : '${DateFormats.time(start, locale)} – '
+            '${DateFormats.time(end, locale)}';
 
     final details = <String>[
-      if (showDate) DateFormats.shortDate(event.startTime, locale),
+      if (showDate) DateFormats.shortDate(start, locale),
       timeText,
       if (event.location != null) event.location!,
     ].join(' · ');

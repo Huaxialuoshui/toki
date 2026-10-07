@@ -10,6 +10,7 @@ import 'converters.dart';
 import 'tables/ai_tables.dart';
 import 'tables/calendar_tables.dart';
 import 'tables/countdown_tables.dart';
+import 'tables/digest_tables.dart';
 import 'tables/reminder_tables.dart';
 import 'tables/theme_tables.dart';
 
@@ -32,6 +33,7 @@ part 'app_database.g.dart';
     ChatSessions,
     ChatMessages,
     ThemeConfigs,
+    DailyDigests,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -41,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   /// 当前结构版本。备份文件里会带上它，用来判断"这份备份能不能直接恢复"。
-  static const int currentSchemaVersion = 3;
+  static const int currentSchemaVersion = 4;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -59,6 +61,14 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) {
             // v3：用户主题增加阴影强度（主题编辑器可调）。
             await m.addColumn(themeConfigs, themeConfigs.shadowStrength);
+          }
+          if (from < 4) {
+            // v4：会话记住用哪个服务商；倒计时支持背景色；日程支持重复结束日期；
+            //     新增 AI 每日计划 / 总结表。
+            await m.addColumn(chatSessions, chatSessions.providerId);
+            await m.addColumn(countdowns, countdowns.backgroundColor);
+            await m.addColumn(calendarEvents, calendarEvents.repeatUntil);
+            await m.createTable(dailyDigests);
           }
         },
         beforeOpen: (OpeningDetails details) async {

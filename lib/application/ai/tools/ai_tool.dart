@@ -70,8 +70,7 @@ class SimpleAiTool extends AiTool {
   final bool confirm;
 
   @override
-  bool get requiresConfirmation =>
-      confirm || category == AiToolCategory.delete;
+  bool get requiresConfirmation => confirm || category == AiToolCategory.delete;
 
   @override
   Future<AiToolResult> execute(Map<String, Object?> args) => handler(args);

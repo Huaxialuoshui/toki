@@ -101,6 +101,42 @@
   "calendarFieldColor": "Color",
   "calendarColorDefault": "Default",
   "calendarFieldReminder": "Reminder",
+  "calendarFieldRepeat": "Repeat",
+  "calendarRepeatNone": "Does not repeat",
+  "calendarRepeatDaily": "Every day",
+  "calendarRepeatWeekly": "Every week",
+  "calendarRepeatMonthly": "Every month",
+  "calendarRepeatYearly": "Every year",
+  "calendarRepeatForever": "No end date",
+  "calendarRepeatUntil": "Until {date}",
+  "@calendarRepeatUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarReminderCustom": "Custom lead time",
+  "calendarCategorySection": "Calendar categories",
+  "calendarCategoryAdd": "Add category",
+  "calendarCategoryEdit": "Edit category",
+  "calendarCategoryName": "Name",
+  "calendarCategoryColor": "Colour",
+  "calendarCategoryEmpty": "No categories yet",
+  "calendarCategorySaved": "Category saved",
+  "calendarCategoryDeleted": "Category deleted",
+  "calendarCategoryDeleteTitle": "Delete this category?",
+  "calendarCategoryDeleteBody": "Events in \"{name}\" will become uncategorised. The events themselves are kept.",
+  "@calendarCategoryDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarUnitMinutes": "minutes",
+  "calendarUnitHours": "hours",
+  "calendarUnitDays": "days",
   "calendarReminderAtTime": "At start time",
   "calendarReminderHours": "{hours} hours before",
   "@calendarReminderHours": {
@@ -193,6 +229,8 @@
   "aiMessageRegenerate": "Regenerate",
   "aiMessageDelete": "Delete message",
   "aiEditMessageTitle": "Edit message",
+  "aiSwitchProvider": "AI provider",
+  "aiNoProviderShort": "No provider",
   "aiClearConfirm": "Clear this conversation?",
   "aiStreamingHint": "Replying…",
   "aiProviderName": "Name",

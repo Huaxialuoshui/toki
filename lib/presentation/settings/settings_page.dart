@@ -18,6 +18,7 @@ import '../../shared/widgets/glass_card.dart';
 import 'ai_provider_section.dart';
 import 'ai_persona_section.dart';
 import 'backup_section.dart';
+import 'calendar_category_section.dart';
 import 'chat_appearance_section.dart';
 import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
@@ -254,6 +255,12 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.notifications_active_outlined,
           ),
           const _NotificationCard(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.calendarCategorySection,
+            icon: Icons.category_outlined,
+          ),
+          const CalendarCategorySection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsBackupSection,

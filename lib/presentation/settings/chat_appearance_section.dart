@@ -201,8 +201,8 @@ class ChatAppearanceSection extends ConsumerWidget {
               icon: const Icon(Icons.restart_alt, size: 18),
               label: Text(l10n.chatAppearanceReset),
               style: TextButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurface
-                    .withValues(alpha: 0.7),
+                foregroundColor:
+                    theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ),

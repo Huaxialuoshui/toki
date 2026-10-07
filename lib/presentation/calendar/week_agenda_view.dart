@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/calendar_event.dart';
+import '../../domain/services/recurrence.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/event_tile.dart';
 
@@ -22,7 +23,7 @@ class WeekAgendaView extends StatelessWidget {
 
   /// 周一。
   final DateTime weekStart;
-  final List<CalendarEvent> events;
+  final List<EventOccurrence> events;
   final DateTime today;
   final ValueChanged<CalendarEvent> onSelectEvent;
   final ValueChanged<DateTime> onAddForDay;
@@ -40,8 +41,10 @@ class WeekAgendaView extends StatelessWidget {
               today: today,
               events: events
                   .where(
-                    (CalendarEvent event) =>
-                        event.occursOn(weekStart.add(Duration(days: index))),
+                    (EventOccurrence occurrence) => DateUtils.isSameDay(
+                      occurrence.start,
+                      weekStart.add(Duration(days: index)),
+                    ),
                   )
                   .toList(growable: false),
               onSelectEvent: onSelectEvent,
@@ -64,7 +67,7 @@ class _DaySection extends StatelessWidget {
 
   final DateTime day;
   final DateTime today;
-  final List<CalendarEvent> events;
+  final List<EventOccurrence> events;
   final ValueChanged<CalendarEvent> onSelectEvent;
   final ValueChanged<DateTime> onAddForDay;
 
@@ -123,12 +126,14 @@ class _DaySection extends StatelessWidget {
               ),
             )
           else
-            for (final event in events)
+            for (final occurrence in events)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: EventTile(
-                  event: event,
-                  onTap: () => onSelectEvent(event),
+                  event: occurrence.event,
+                  startTime: occurrence.start,
+                  endTime: occurrence.end,
+                  onTap: () => onSelectEvent(occurrence.event),
                 ),
               ),
         ],

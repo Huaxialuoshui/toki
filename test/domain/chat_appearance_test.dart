@@ -64,10 +64,8 @@ void main() {
     });
 
     test('空串 / 非法 JSON / 非对象都回落到默认值', () {
-      expect(ChatAppearanceConfig.decode(null),
-          ChatAppearanceConfig.defaults);
-      expect(ChatAppearanceConfig.decode('  '),
-          ChatAppearanceConfig.defaults);
+      expect(ChatAppearanceConfig.decode(null), ChatAppearanceConfig.defaults);
+      expect(ChatAppearanceConfig.decode('  '), ChatAppearanceConfig.defaults);
       expect(ChatAppearanceConfig.decode('not json'),
           ChatAppearanceConfig.defaults);
       expect(ChatAppearanceConfig.decode('[1,2,3]'),
