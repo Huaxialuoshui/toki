@@ -13,14 +13,18 @@ import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_session.dart';
 import '../../domain/services/ai_provider.dart';
 import '../../infrastructure/clock_provider.dart';
+import '../../infrastructure/storage/app_settings_store.dart';
 import 'ai_providers.dart';
 import 'context_service.dart';
 import 'tool_permissions.dart';
 import 'tools/ai_tool.dart';
 import 'tools/tool_registry.dart';
 
-/// 默认会话 id（多会话在后续阶段实现）。
+/// 首次使用时自动创建的会话 id（之后用户可以新建 / 切换 / 删除会话）。
 const String kDefaultChatSessionId = 'session-default';
+
+/// 默认会话标题；只有标题还是它时才会被首条消息自动改成摘要。
+const String kDefaultChatSessionTitle = 'Toki';
 
 /// 需要用户确认的危险操作。
 @immutable
@@ -84,18 +88,36 @@ class ChatStreamState {
   }
 }
 
-/// 会话与消息（供 UI 直接 watch）。
+/// 当前会话 id（应用级轻量设置，存在 shared_preferences）。
+final activeChatSessionIdProvider = StateProvider<String?>(
+  (ref) => ref.read(appSettingsStoreProvider).readActiveChatSessionId(),
+);
+
+/// 全部会话（最近更新的在前），供会话列表 UI 使用。
+final chatSessionsProvider = StreamProvider.autoDispose<List<ChatSession>>(
+  (ref) => ref.watch(chatRepositoryProvider).watchSessions(),
+);
+
+/// 当前会话与消息（供 UI 直接 watch）。
+///
+/// 解析顺序：持久化的当前会话 → 最近更新的会话 → 一个都没有时新建默认会话。
 final chatSessionProvider =
     FutureProvider.autoDispose<ChatSession>((ref) async {
   final repository = ref.watch(chatRepositoryProvider);
   final now = ref.watch(clockProvider).now();
+  final selectedId = ref.watch(activeChatSessionIdProvider);
 
-  final existing = await repository.findSession(kDefaultChatSessionId);
-  if (existing != null) return existing;
+  if (selectedId != null && selectedId.isNotEmpty) {
+    final selected = await repository.findSession(selectedId);
+    if (selected != null) return selected;
+  }
+
+  final existing = await repository.getSessions();
+  if (existing.isNotEmpty) return existing.first;
 
   final session = ChatSession(
     id: kDefaultChatSessionId,
-    title: 'Toki',
+    title: kDefaultChatSessionTitle,
     personaId: _firstPersonaId(ref),
     createdAt: now,
     updatedAt: now,
@@ -232,10 +254,31 @@ class ChatController extends Notifier<ChatStreamState> {
         createdAt: clock.now(),
       ),
     );
+    await _touchSession(session.id);
+    await _maybeAutoTitle(session, content);
 
     final pending = _runAgent(provider, session);
     _pending = pending;
     await pending;
+  }
+
+  /// 标题还是默认值时，用首条用户消息做摘要。
+  Future<void> _maybeAutoTitle(ChatSession session, String content) async {
+    if (session.title.trim().isNotEmpty &&
+        session.title != kDefaultChatSessionTitle) {
+      return;
+    }
+    final oneLine = content.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (oneLine.isEmpty) return;
+    final title =
+        oneLine.length <= 20 ? oneLine : '${oneLine.substring(0, 20)}…';
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    await repository.upsertSession(
+      session.copyWith(title: title, updatedAt: clock.now()),
+    );
+    // 标题变了：让 watch chatSessionProvider 的地方跟着刷新。
+    ref.invalidate(chatSessionProvider);
   }
 
   /// 核心循环：模型 → 工具 → 模型 …… 直到模型给出最终回复。
@@ -515,6 +558,123 @@ class ChatController extends Notifier<ChatStreamState> {
       await repository.deleteMessage(message.id);
     }
     state = const ChatStreamState();
+  }
+
+  /// 新建会话并切过去。
+  Future<void> createSession([String title = kDefaultChatSessionTitle]) async {
+    await cancel();
+    final repository = ref.read(chatRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final now = clock.now();
+    final session = ChatSession(
+      id: generateId('session', now: now),
+      title: title,
+      personaId: _firstPersonaId(ref),
+      createdAt: now,
+      updatedAt: now,
+    );
+    await repository.upsertSession(session);
+    _selectSession(session.id);
+    state = const ChatStreamState();
+  }
+
+  /// 切换当前会话。
+  Future<void> switchSession(String id) async {
+    if (ref.read(activeChatSessionIdProvider) == id) return;
+    await cancel();
+    _selectSession(id);
+    state = const ChatStreamState();
+  }
+
+  /// 删除会话（连带消息）。删的是当前会话时自动切到最近的一个。
+  Future<void> deleteSession(String id) async {
+    await cancel();
+    final repository = ref.read(chatRepositoryProvider);
+    // 首次启动时当前会话是"自动创建"出来的，持久化里还是空的，
+    // 所以也要拿当前已解析出的会话 id 比一次。
+    final activeId = ref.read(activeChatSessionIdProvider) ??
+        ref.read(chatSessionProvider).valueOrNull?.id;
+    await repository.deleteSession(id);
+    if (activeId != id) return;
+
+    final remaining = await repository.getSessions();
+    if (remaining.isEmpty) {
+      // 一个都不剩：直接建一个新的，别让界面停在已经删掉的会话上。
+      await createSession();
+      return;
+    }
+    _selectSession(remaining.first.id);
+  }
+
+  void _selectSession(String? id) {
+    ref.read(activeChatSessionIdProvider.notifier).state = id;
+    unawaited(
+      ref.read(appSettingsStoreProvider).writeActiveChatSessionId(id ?? ''),
+    );
+    ref.invalidate(chatSessionProvider);
+  }
+
+  /// 删除单条消息。
+  Future<void> deleteMessage(String messageId) async {
+    await cancel();
+    await ref.read(chatRepositoryProvider).deleteMessage(messageId);
+  }
+
+  /// 重新生成某条助手消息：删掉它以及它后面的消息，用前面最后一条用户消息重跑。
+  Future<void> regenerateFrom(String assistantMessageId) async {
+    if (state.isStreaming) return;
+    final repository = ref.read(chatRepositoryProvider);
+    final session = await ref.read(chatSessionProvider.future);
+    final messages = await repository.getMessages(session.id);
+    final index =
+        messages.indexWhere((ChatMessage m) => m.id == assistantMessageId);
+    if (index < 0) return;
+
+    String? question;
+    for (var i = index - 1; i >= 0; i--) {
+      if (messages[i].role == ChatRole.user) {
+        question = messages[i].content;
+        break;
+      }
+    }
+    if (question == null) return;
+
+    for (final message in messages.sublist(index)) {
+      await repository.deleteMessage(message.id);
+    }
+    await _rerun(question);
+  }
+
+  /// 编辑用户消息并重新生成后续回复（改完内容后，它后面的消息都会被删掉重跑）。
+  Future<void> editAndResend(String userMessageId, String text) async {
+    final content = text.trim();
+    if (content.isEmpty || state.isStreaming) return;
+    await cancel();
+    final repository = ref.read(chatRepositoryProvider);
+    final session = await ref.read(chatSessionProvider.future);
+    final messages = await repository.getMessages(session.id);
+    final index = messages.indexWhere((ChatMessage m) => m.id == userMessageId);
+    if (index < 0) return;
+
+    await repository.upsertMessage(messages[index].copyWith(content: content));
+    for (final message in messages.sublist(index + 1)) {
+      await repository.deleteMessage(message.id);
+    }
+    await _rerun(content);
+  }
+
+  /// 用已有的消息历史重跑一轮（用户消息不再插入）。
+  Future<void> _rerun(String question) async {
+    final provider = ref.read(aiProviderFactoryProvider)();
+    if (provider == null) {
+      state = const ChatStreamState(error: 'no-provider');
+      return;
+    }
+    final session = await ref.read(chatSessionProvider.future);
+    state = const ChatStreamState(isStreaming: true);
+    final pending = _runAgent(provider, session);
+    _pending = pending;
+    await pending;
   }
 
   /// 切换当前会话使用的人设（只影响后续请求的 system prompt）。

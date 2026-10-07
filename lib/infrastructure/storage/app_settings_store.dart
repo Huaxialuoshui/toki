@@ -26,6 +26,7 @@ class AppSettingsStore {
   static const String _aiAllowUpdateKey = 'settings.ai.allowUpdate';
   static const String _aiAllowDeleteKey = 'settings.ai.allowDelete';
   static const String _chatAppearanceKey = 'settings.chatAppearance';
+  static const String _activeChatSessionKey = 'settings.chatSessionId';
 
   /// 语言代码；返回 null 表示"跟随系统"。
   String? readLocaleCode() => _preferences.getString(_localeKey);
@@ -114,6 +115,13 @@ class AppSettingsStore {
 
   Future<void> writeChatAppearance(String json) =>
       _preferences.setString(_chatAppearanceKey, json);
+
+  /// 上次打开的会话 id（多会话；找不到就回落到最近的会话）。
+  String? readActiveChatSessionId() =>
+      _preferences.getString(_activeChatSessionKey);
+
+  Future<void> writeActiveChatSessionId(String id) =>
+      _preferences.setString(_activeChatSessionKey, id);
 }
 
 /// 必须在 `main()` 中 override（见 `lib/main.dart`）。

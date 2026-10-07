@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,11 +12,13 @@ import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/chat_message.dart';
+import '../../domain/entities/chat_session.dart';
 import '../../domain/entities/chat_appearance.dart';
 import '../../domain/entities/glass_style.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../shared/widgets/markdown_text.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/chat_background.dart';
 import '../widgets/image_source.dart';
@@ -47,6 +50,255 @@ class _AiPageState extends ConsumerState<AiPage> {
       if (!_scroll.hasClients) return;
       _scroll.jumpTo(_scroll.position.maxScrollExtent);
     });
+  }
+
+  /// 会话列表：新建 / 切换 / 删除。
+  Future<void> _showSessions() async {
+    final l10n = context.l10n;
+    final controller = ref.read(chatControllerProvider.notifier);
+    final activeId = ref.read(chatSessionProvider).valueOrNull?.id;
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      // 用 Consumer watch 会话流：新建 / 删除后列表立刻跟着变。
+      builder: (BuildContext sheetContext) => Consumer(
+        builder: (BuildContext context, WidgetRef sheetRef, Widget? _) {
+          final sessions = sheetRef.watch(chatSessionsProvider).valueOrNull ??
+              const <ChatSession>[];
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 12, 8),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          l10n.aiSessions,
+                          style: Theme.of(sheetContext)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      TextButton.icon(
+                        key: const ValueKey<String>('ai-new-session'),
+                        onPressed: () =>
+                            Navigator.of(sheetContext).pop('__new__'),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: Text(l10n.aiNewSession),
+                      ),
+                    ],
+                  ),
+                ),
+                if (sessions.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(child: Text(l10n.aiSessionEmpty)),
+                  )
+                else
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: sessions.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final session = sessions[index];
+                        final active = session.id == activeId;
+                        return ListTile(
+                          key: ValueKey<String>('ai-session-${session.id}'),
+                          selected: active,
+                          leading: Icon(
+                            active
+                                ? Icons.chat_bubble
+                                : Icons.chat_bubble_outline,
+                            size: 20,
+                          ),
+                          title: Text(
+                            session.title.isEmpty
+                                ? l10n.aiNewSession
+                                : session.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            DateFormats.time(
+                                session.updatedAt, context.localeCode),
+                          ),
+                          trailing: IconButton(
+                            key: ValueKey<String>(
+                                'ai-session-delete-${session.id}'),
+                            tooltip: l10n.aiDeleteSession,
+                            onPressed: () => Navigator.of(sheetContext)
+                                .pop('delete:${session.id}'),
+                            icon: Icon(
+                              Icons.delete_outline,
+                              size: 18,
+                              color: Theme.of(sheetContext).colorScheme.error,
+                            ),
+                          ),
+                          onTap: () => Navigator.of(sheetContext)
+                              .pop('switch:${session.id}'),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    if (selected == null || !mounted) return;
+
+    if (selected == '__new__') {
+      await controller.createSession(l10n.aiNewSession);
+      _scrollToBottom();
+      return;
+    }
+    if (selected.startsWith('switch:')) {
+      await controller.switchSession(selected.substring('switch:'.length));
+      _scrollToBottom();
+      return;
+    }
+    if (selected.startsWith('delete:')) {
+      final id = selected.substring('delete:'.length);
+      final confirmed = await _confirm(
+        l10n.aiDeleteSessionConfirm,
+        confirmLabel: l10n.calendarDelete,
+      );
+      if (confirmed != true) return;
+      await controller.deleteSession(id);
+    }
+  }
+
+  /// 单条消息的操作：复制 / 编辑并重发 / 重新生成 / 删除。
+  Future<void> _showMessageActions(ChatMessage message) async {
+    final l10n = context.l10n;
+    final controller = ref.read(chatControllerProvider.notifier);
+    final isUser = message.role == ChatRole.user;
+    final isAssistant = message.role == ChatRole.assistant;
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              key: const ValueKey<String>('ai-msg-copy'),
+              leading: const Icon(Icons.copy_all_outlined, size: 20),
+              title: Text(l10n.aiMessageCopy),
+              onTap: () => Navigator.of(sheetContext).pop('copy'),
+            ),
+            if (isUser)
+              ListTile(
+                key: const ValueKey<String>('ai-msg-edit'),
+                leading: const Icon(Icons.edit_outlined, size: 20),
+                title: Text(l10n.aiMessageEdit),
+                onTap: () => Navigator.of(sheetContext).pop('edit'),
+              ),
+            if (isAssistant)
+              ListTile(
+                key: const ValueKey<String>('ai-msg-regenerate'),
+                leading: const Icon(Icons.refresh, size: 20),
+                title: Text(l10n.aiMessageRegenerate),
+                onTap: () => Navigator.of(sheetContext).pop('regenerate'),
+              ),
+            ListTile(
+              key: const ValueKey<String>('ai-msg-delete'),
+              leading: Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: Theme.of(sheetContext).colorScheme.error,
+              ),
+              title: Text(
+                l10n.aiMessageDelete,
+                style: TextStyle(
+                  color: Theme.of(sheetContext).colorScheme.error,
+                ),
+              ),
+              onTap: () => Navigator.of(sheetContext).pop('delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (action == null || !mounted) return;
+
+    switch (action) {
+      case 'copy':
+        await Clipboard.setData(ClipboardData(text: message.content));
+        if (!mounted) return;
+        ScaffoldMessenger.maybeOf(context)
+            ?.showSnackBar(SnackBar(content: Text(l10n.aiMessageCopied)));
+      case 'edit':
+        final text = await _editMessage(message.content);
+        if (text == null) return;
+        await controller.editAndResend(message.id, text);
+        _scrollToBottom();
+      case 'regenerate':
+        await controller.regenerateFrom(message.id);
+        _scrollToBottom();
+      case 'delete':
+        await controller.deleteMessage(message.id);
+    }
+  }
+
+  Future<String?> _editMessage(String current) async {
+    final l10n = context.l10n;
+    final controller = TextEditingController(text: current);
+    final text = await showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.aiEditMessageTitle),
+        content: SizedBox(
+          width: 480,
+          child: TextField(
+            controller: controller,
+            minLines: 2,
+            maxLines: 8,
+            autofocus: true,
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.calendarCancel),
+          ),
+          FilledButton(
+            key: const ValueKey<String>('ai-edit-save'),
+            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+            child: Text(l10n.calendarSave),
+          ),
+        ],
+      ),
+    );
+    return (text == null || text.trim().isEmpty) ? null : text;
+  }
+
+  Future<bool?> _confirm(String body, {required String confirmLabel}) {
+    final l10n = context.l10n;
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.calendarDeleteConfirmTitle),
+        content: Text(body),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.calendarCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(confirmLabel),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _send() async {
@@ -106,6 +358,12 @@ class _AiPageState extends ConsumerState<AiPage> {
         ),
         const SizedBox(width: 8),
         IconButton(
+          key: const ValueKey<String>('ai-sessions'),
+          onPressed: () => _showSessions(),
+          icon: const Icon(Icons.forum_outlined),
+          tooltip: l10n.aiSessions,
+        ),
+        IconButton(
           onPressed: messages.isEmpty && !stream.isStreaming
               ? null
               : () => _confirmClear(context, ref),
@@ -161,6 +419,7 @@ class _AiPageState extends ConsumerState<AiPage> {
                                 message: message,
                                 persona: persona,
                                 appearance: appearance,
+                                onAction: () => _showMessageActions(message),
                               ),
                             );
                           },
@@ -226,12 +485,11 @@ class _AiPageState extends ConsumerState<AiPage> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final l10n = context.l10n;
 
-    final personas = ref.read(personasProvider).valueOrNull ?? const <AiPersona>[];
+    final personas =
+        ref.read(personasProvider).valueOrNull ?? const <AiPersona>[];
     final isPersisted = personas.any((AiPersona item) => item.id == persona.id);
     if (isPersisted) {
-      await ref
-          .read(chatControllerProvider.notifier)
-          .switchPersona(persona.id);
+      await ref.read(chatControllerProvider.notifier).switchPersona(persona.id);
     }
     messenger?.showSnackBar(
       SnackBar(content: Text(l10n.aiPersonaSwitched(persona.name))),
@@ -366,7 +624,8 @@ class _NoProviderNotice extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: <Widget>[
-            Icon(Icons.info_outline, size: 18, color: theme.colorScheme.primary),
+            Icon(Icons.info_outline,
+                size: 18, color: theme.colorScheme.primary),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -468,16 +727,20 @@ class _MessageView extends StatelessWidget {
     required this.message,
     required this.persona,
     required this.appearance,
+    required this.onAction,
   });
 
   final ChatMessage message;
   final AiPersona persona;
   final ChatAppearanceConfig appearance;
 
+  /// 长按 / 右键：打开这条消息的操作菜单。
+  final VoidCallback onAction;
+
   @override
   Widget build(BuildContext context) {
     if (message.role == ChatRole.tool) {
-      return _ToolCallView(message: message);
+      return _ToolCallView(message: message, onAction: onAction);
     }
 
     final theme = Theme.of(context);
@@ -504,46 +767,47 @@ class _MessageView extends StatelessWidget {
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if (!isUser) ...<Widget>[
-                _AssistantAvatar(persona: persona),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: GlassCard(
-                  style: style,
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SelectableText(
-                        message.content,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormats.time(message.createdAt, locale),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.55),
+      child: GestureDetector(
+        onLongPress: onAction,
+        onSecondaryTap: onAction,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                if (!isUser) ...<Widget>[
+                  _AssistantAvatar(persona: persona),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: GlassCard(
+                    style: style,
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        MarkdownText(message.content),
+                        const SizedBox(height: 4),
+                        Text(
+                          DateFormats.time(message.createdAt, locale),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.55),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              if (showUserAvatar) ...<Widget>[
-                const SizedBox(width: 8),
-                userAvatar,
+                if (showUserAvatar) ...<Widget>[
+                  const SizedBox(width: 8),
+                  userAvatar,
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -583,10 +847,7 @@ class _StreamingBubble extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       if (hasText)
-                        SelectableText(
-                          text,
-                          style: theme.textTheme.bodyMedium,
-                        )
+                        MarkdownText(text)
                       else
                         Text(
                           l10n.aiStreamingHint,
@@ -689,9 +950,10 @@ class _AnimatedMessage extends StatelessWidget {
 }
 
 class _ToolCallView extends StatelessWidget {
-  const _ToolCallView({required this.message});
+  const _ToolCallView({required this.message, required this.onAction});
 
   final ChatMessage message;
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -702,35 +964,39 @@ class _ToolCallView extends StatelessWidget {
 
     return Align(
       alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: GlassCard(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SizedBox(
-                width: 14,
-                height: 14,
-                child: running
-                    ? const CircularProgressIndicator(strokeWidth: 2)
-                    : Icon(
-                        Icons.check_circle_outline,
-                        size: 14,
-                        color: theme.colorScheme.primary,
-                      ),
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  '${l10n.aiToolCallLabel} · '
-                  '${toolLabel(l10n, tool?.toolName ?? '')} — ${message.content}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+      child: GestureDetector(
+        onLongPress: onAction,
+        onSecondaryTap: onAction,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: running
+                      ? const CircularProgressIndicator(strokeWidth: 2)
+                      : Icon(
+                          Icons.check_circle_outline,
+                          size: 14,
+                          color: theme.colorScheme.primary,
+                        ),
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    '${l10n.aiToolCallLabel} · '
+                    '${toolLabel(l10n, tool?.toolName ?? '')} — ${message.content}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

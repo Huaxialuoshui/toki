@@ -17,6 +17,20 @@ class ChatSession {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  ChatSession copyWith({
+    String? title,
+    String? personaId,
+    DateTime? updatedAt,
+  }) {
+    return ChatSession(
+      id: id,
+      title: title ?? this.title,
+      personaId: personaId ?? this.personaId,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

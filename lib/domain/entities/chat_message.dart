@@ -121,6 +121,28 @@ class ChatMessage {
 
   final DateTime createdAt;
 
+  ChatMessage copyWith({
+    String? content,
+    ToolCallInfo? toolCall,
+    String? toolCallId,
+    List<ChatToolCall>? requestedToolCalls,
+    String? toolResult,
+    bool? isStreaming,
+  }) {
+    return ChatMessage(
+      id: id,
+      sessionId: sessionId,
+      role: role,
+      content: content ?? this.content,
+      createdAt: createdAt,
+      toolCall: toolCall ?? this.toolCall,
+      toolCallId: toolCallId ?? this.toolCallId,
+      requestedToolCalls: requestedToolCalls ?? this.requestedToolCalls,
+      toolResult: toolResult ?? this.toolResult,
+      isStreaming: isStreaming ?? this.isStreaming,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

@@ -737,6 +737,72 @@ abstract class AppLocalizations {
   /// **'Clear conversation'**
   String get aiClearConversation;
 
+  /// No description provided for @aiSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get aiSessions;
+
+  /// No description provided for @aiNewSession.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get aiNewSession;
+
+  /// No description provided for @aiSessionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No chats yet'**
+  String get aiSessionEmpty;
+
+  /// No description provided for @aiDeleteSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat'**
+  String get aiDeleteSession;
+
+  /// No description provided for @aiDeleteSessionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this chat and all of its messages?'**
+  String get aiDeleteSessionConfirm;
+
+  /// No description provided for @aiMessageCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get aiMessageCopy;
+
+  /// No description provided for @aiMessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get aiMessageCopied;
+
+  /// No description provided for @aiMessageEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit and resend'**
+  String get aiMessageEdit;
+
+  /// No description provided for @aiMessageRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get aiMessageRegenerate;
+
+  /// No description provided for @aiMessageDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message'**
+  String get aiMessageDelete;
+
+  /// No description provided for @aiEditMessageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit message'**
+  String get aiEditMessageTitle;
+
   /// No description provided for @aiClearConfirm.
   ///
   /// In en, this message translates to:

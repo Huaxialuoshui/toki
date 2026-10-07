@@ -350,6 +350,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiClearConversation => 'Clear conversation';
 
   @override
+  String get aiSessions => 'Chats';
+
+  @override
+  String get aiNewSession => 'New chat';
+
+  @override
+  String get aiSessionEmpty => 'No chats yet';
+
+  @override
+  String get aiDeleteSession => 'Delete chat';
+
+  @override
+  String get aiDeleteSessionConfirm => 'Delete this chat and all of its messages?';
+
+  @override
+  String get aiMessageCopy => 'Copy';
+
+  @override
+  String get aiMessageCopied => 'Copied';
+
+  @override
+  String get aiMessageEdit => 'Edit and resend';
+
+  @override
+  String get aiMessageRegenerate => 'Regenerate';
+
+  @override
+  String get aiMessageDelete => 'Delete message';
+
+  @override
+  String get aiEditMessageTitle => 'Edit message';
+
+  @override
   String get aiClearConfirm => 'Clear this conversation?';
 
   @override

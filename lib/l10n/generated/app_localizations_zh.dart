@@ -350,6 +350,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiClearConversation => '清空对话';
 
   @override
+  String get aiSessions => '会话';
+
+  @override
+  String get aiNewSession => '新建会话';
+
+  @override
+  String get aiSessionEmpty => '还没有会话';
+
+  @override
+  String get aiDeleteSession => '删除会话';
+
+  @override
+  String get aiDeleteSessionConfirm => '删除这个会话以及它的全部消息？';
+
+  @override
+  String get aiMessageCopy => '复制';
+
+  @override
+  String get aiMessageCopied => '已复制';
+
+  @override
+  String get aiMessageEdit => '编辑并重发';
+
+  @override
+  String get aiMessageRegenerate => '重新生成';
+
+  @override
+  String get aiMessageDelete => '删除这条消息';
+
+  @override
+  String get aiEditMessageTitle => '编辑消息';
+
+  @override
   String get aiClearConfirm => '清空这段对话？';
 
   @override
