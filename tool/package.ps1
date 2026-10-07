@@ -52,12 +52,20 @@ function Fail {
 # 跑一条命令：输出逐行实时打屏 + 写进日志，返回退出码。
 function Invoke-Tool {
     param([string]$Exe, [string[]]$ToolArgs)
-    & $Exe @ToolArgs 2>&1 | ForEach-Object {
-        $line = if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.ToString() } else { "$_" }
-        Write-Host $line
-        Add-Content -LiteralPath $LogPath -Value $line -Encoding UTF8
+    # 工具往 stderr 写东西是常态（比如 flutter 的 "[!] ..."），别让
+    # $ErrorActionPreference='Stop' 把它包装成一坨 NativeCommandError 抛出来。
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & $Exe @ToolArgs 2>&1 | ForEach-Object {
+            $line = if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.ToString() } else { "$_" }
+            Write-Host $line
+            Add-Content -LiteralPath $LogPath -Value $line -Encoding UTF8
+        }
+        return $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previous
     }
-    return $LASTEXITCODE
 }
 
 function Format-Size {
@@ -98,6 +106,64 @@ if (-not $flutter) {
 }
 Write-Log "[1/6] Flutter：$flutter"
 & $flutter --version 2>&1 | Select-Object -First 1 | ForEach-Object { Write-Log "      $_" }
+
+# --- 1b. 把 Android SDK / JDK 显式喂给 Flutter ----------------------------
+# 双击运行时的环境变量可能跟终端里不一样，Flutter 有机会找不到 SDK
+# （报 "[!] No Android SDK found"）。所以这里自己找一遍，找到就设成
+# 环境变量，保证 flutter / gradle 一定用得上。
+$flutterConfig = @{}
+try {
+    & $flutter config --list 2>&1 | ForEach-Object {
+        if ("$_" -match '^\s*([a-z0-9\-]+):\s*(.+?)\s*$') {
+            $flutterConfig[$Matches[1]] = $Matches[2]
+        }
+    }
+} catch {
+    # 读不到 config 也没关系，下面还有别的兜底。
+}
+
+$adbPath = (Get-Command 'adb' -ErrorAction SilentlyContinue).Source
+$adbSdk = $null
+if ($adbPath) {
+    # ...\platform-tools\adb.exe -> ...（SDK 根目录）
+    $adbSdk = Split-Path -Parent (Split-Path -Parent $adbPath)
+}
+
+$androidSdk = $null
+foreach ($candidate in @(
+        $env:ANDROID_HOME,
+        $env:ANDROID_SDK_ROOT,
+        $flutterConfig['android-sdk'],
+        $adbSdk,
+        (Join-Path $env:LOCALAPPDATA 'Android\Sdk'),
+        'D:\androidSDK',
+        'C:\androidSDK',
+        'D:\Android\Sdk',
+        'C:\Android\Sdk')) {
+    if ($androidSdk) { break }
+    if ($candidate -and (Test-Path (Join-Path $candidate 'platform-tools'))) {
+        $androidSdk = (Resolve-Path -LiteralPath $candidate).Path
+    }
+}
+if ($androidSdk) {
+    $env:ANDROID_HOME = $androidSdk
+    $env:ANDROID_SDK_ROOT = $androidSdk
+    $extraTools = @(
+        (Join-Path $androidSdk 'platform-tools'),
+        (Join-Path $androidSdk 'cmdline-tools\latest\bin'),
+        (Join-Path $androidSdk 'emulator')) | Where-Object { Test-Path $_ }
+    if ($extraTools) { $env:Path = ($extraTools -join ';') + ';' + $env:Path }
+    Write-Log "      Android SDK：$androidSdk"
+} else {
+    Write-Log '      [!] 没找到 Android SDK。装不上 APK 就先跑一次：' 'Yellow'
+    Write-Log '          flutter config --android-sdk <你的 SDK 路径>' 'Yellow'
+}
+
+$jdk = $flutterConfig['jdk-dir']
+if ($jdk -and (Test-Path $jdk)) {
+    $env:JAVA_HOME = $jdk
+    Write-Log "      JDK：$jdk"
+}
 
 # --- 2. 版本号 ------------------------------------------------------------
 $versionMatch = (Select-String -Path (Join-Path $Root 'pubspec.yaml') -Pattern '^version:\s*(\S+)').Matches

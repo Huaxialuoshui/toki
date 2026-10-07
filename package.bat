@@ -42,17 +42,20 @@ call "%PS%" -NoProfile -ExecutionPolicy Bypass -File "%ROOT%tool\package.ps1" %*
 set "CODE=%ERRORLEVEL%"
 
 echo.
-if not "%CODE%"=="0" (
-  echo ===========================================================
-  echo   PACKAGING FAILED  (exit code %CODE%)
-  echo   Full log: %LOG%
-  echo ===========================================================
-) else (
-  echo ===========================================================
-  echo   PACKAGING DONE - see dist\
-  echo   Full log: %LOG%
-  echo ===========================================================
-)
+if not "%CODE%"=="0" goto failed
+echo ===========================================================
+echo   PACKAGING DONE - see dist\
+echo   Full log: %LOG%
+echo ===========================================================
+goto finish
+
+:failed
+echo ===========================================================
+echo   PACKAGING FAILED - exit code %CODE%
+echo   Full log: %LOG%
+echo ===========================================================
+
+:finish
 echo.
 if not defined NOPAUSE pause
 exit /b %CODE%
