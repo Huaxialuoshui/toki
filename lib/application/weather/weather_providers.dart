@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -97,14 +99,29 @@ class WeatherLocationsController extends Notifier<List<WeatherLocation>> {
     if (!channel.isSupported) {
       throw const WeatherLocationException('当前平台不支持定位');
     }
-    var granted = await channel.hasLocationPermission();
-    if (!granted) {
-      granted = await channel.requestLocationPermission();
+    // 原生侧的定位请求可能因为"没信号""定位开关没开"而一直不回调，
+    // 所以这里再加一道客户端超时，避免按钮一直转圈。
+    final GeoPoint? point;
+    try {
+      var granted = await channel.hasLocationPermission();
+      if (!granted) {
+        granted = await channel.requestLocationPermission();
+      }
+      if (!granted) {
+        throw const WeatherLocationException('没有拿到定位权限');
+      }
+      point = await channel.getLocation().timeout(kLocationTimeout);
+    } on WeatherLocationException {
+      rethrow;
+    } on TimeoutException {
+      throw const WeatherLocationException('定位超时，请确认系统定位已打开');
+    } on GeoLocationException catch (error) {
+      throw WeatherLocationException(error.message);
+    } on PlatformException catch (error) {
+      throw WeatherLocationException(error.message ?? '定位失败');
+    } on MissingPluginException {
+      throw const WeatherLocationException('当前平台不支持定位');
     }
-    if (!granted) {
-      throw const WeatherLocationException('没有拿到定位权限');
-    }
-    final point = await channel.getLocation();
     if (point == null) {
       throw const WeatherLocationException('拿不到当前位置（系统定位可能没开）');
     }
@@ -119,6 +136,9 @@ class WeatherLocationsController extends Notifier<List<WeatherLocation>> {
     return location;
   }
 }
+
+/// 等待一次定位回调的上限（原生侧也有同样的超时兜底）。
+const Duration kLocationTimeout = Duration(seconds: 25);
 
 final weatherLocationsProvider =
     NotifierProvider<WeatherLocationsController, List<WeatherLocation>>(

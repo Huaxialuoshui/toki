@@ -143,6 +143,35 @@ void main() {
     );
   });
 
+  test('原生定位抛错时转成可读的应用层错误', () async {
+    await setUpContainer();
+    // 覆盖成"原生报错"，模拟系统定位被关掉的情况。
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall call) async {
+      if (call.method == 'getLocation') {
+        throw PlatformException(
+          code: 'disabled',
+          message: '系统定位服务没有打开',
+        );
+      }
+      return true;
+    });
+
+    final controller = container.read(weatherLocationsProvider.notifier);
+
+    await expectLater(
+      controller.useCurrentLocation(),
+      throwsA(
+        isA<WeatherLocationException>().having(
+          (WeatherLocationException e) => e.message,
+          'message',
+          contains('系统定位服务没有打开'),
+        ),
+      ),
+    );
+    expect(container.read(weatherLocationsProvider), isEmpty);
+  });
+
   test('老版本单个城市设置会被迁移成历史位置', () async {
     await setUpContainer(
       preferences: <String, Object>{'settings.weatherCity': '上海'},

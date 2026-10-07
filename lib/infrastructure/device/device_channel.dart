@@ -17,6 +17,19 @@ class GeoPoint {
   final double? accuracy;
 }
 
+/// 定位失败（原生给了具体原因，例如"系统定位服务没有打开"）。
+///
+/// 其它通道方法在失败时安静地返回 null / false；定位是个例外——用户是**主动**
+/// 点了"用当前位置"，所以要把原因说出来，而不是显示"拿不到位置"。
+class GeoLocationException implements Exception {
+  const GeoLocationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// 原生能力通道（`toki/device`）。
 ///
 /// * 定位：天气按 GPS 取位置；
@@ -64,7 +77,14 @@ class DeviceChannel {
   /// 取一次位置；没有权限或系统定位关闭时返回 null。
   Future<GeoPoint?> getLocation() async {
     if (!isSupported) return null;
-    final result = await _invoke<Map<Object?, Object?>>('getLocation');
+    final Map<Object?, Object?>? result;
+    try {
+      result = await _channel.invokeMethod<Map<Object?, Object?>>('getLocation');
+    } on MissingPluginException {
+      return null;
+    } on PlatformException catch (error) {
+      throw GeoLocationException(error.message ?? '定位失败');
+    }
     if (result == null) return null;
     final latitude = (result['latitude'] as num?)?.toDouble();
     final longitude = (result['longitude'] as num?)?.toDouble();

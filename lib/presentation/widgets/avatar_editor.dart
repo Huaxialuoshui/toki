@@ -152,18 +152,28 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
               Center(child: AvatarPreview(config: _draft, radius: 32)),
               const SizedBox(height: 14),
               SegmentedButton<AvatarKind>(
+                key: const ValueKey<String>('avatar-kind'),
                 segments: <ButtonSegment<AvatarKind>>[
                   ButtonSegment<AvatarKind>(
                     value: AvatarKind.emoji,
-                    label: Text(l10n.avatarKindEmoji),
+                    label: Text(
+                      l10n.avatarKindEmoji,
+                      key: const ValueKey<String>('avatar-kind-emoji'),
+                    ),
                   ),
                   ButtonSegment<AvatarKind>(
                     value: AvatarKind.text,
-                    label: Text(l10n.avatarKindText),
+                    label: Text(
+                      l10n.avatarKindText,
+                      key: const ValueKey<String>('avatar-kind-text'),
+                    ),
                   ),
                   ButtonSegment<AvatarKind>(
                     value: AvatarKind.image,
-                    label: Text(l10n.avatarKindImage),
+                    label: Text(
+                      l10n.avatarKindImage,
+                      key: const ValueKey<String>('avatar-kind-image'),
+                    ),
                   ),
                 ],
                 selected: <AvatarKind>{_draft.kind},
@@ -295,6 +305,7 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
         ),
         if (!widget.initial.isEmpty)
           TextButton(
+            key: const ValueKey<String>('avatar-clear'),
             onPressed: () =>
                 Navigator.of(context).pop(const AvatarConfig(value: '')),
             child: Text(l10n.avatarClear),

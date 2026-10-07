@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
@@ -23,6 +26,14 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private var deviceChannel: MethodChannel? = null
     private var pendingLocationResult: MethodChannel.Result? = null
+    private var pendingLocationManager: LocationManager? = null
+    private var pendingLocationListener: LocationListener? = null
+    private val locationHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val locationTimeout = Runnable {
+        val pending = pendingLocationResult
+        clearPendingLocation()
+        pending?.error("timeout", "定位超时：可能没有信号，或者系统定位没有打开", null)
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -134,20 +145,47 @@ class MainActivity : FlutterActivity() {
             return
         }
 
+        // 上一次如果还在等，先取消，避免回调错位。
+        clearPendingLocation()
         pendingLocationResult = result
+        pendingLocationManager = manager
+        val listener = LocationListener { location ->
+            val payload = locationPayload(location)
+            val pending = pendingLocationResult
+            clearPendingLocation()
+            pending?.success(payload)
+        }
+        pendingLocationListener = listener
         try {
             manager.requestSingleUpdate(
                 provider,
-                { location ->
-                    pendingLocationResult?.success(locationPayload(location))
-                    pendingLocationResult = null
-                },
-                null,
+                listener,
+                Looper.getMainLooper(),
             )
+            // 系统可能一直不给回调（例如在室内没有 GPS 信号），所以必须有超时兜底，
+            // 否则 Flutter 侧会一直等下去。
+            locationHandler.postDelayed(locationTimeout, LOCATION_TIMEOUT_MS)
         } catch (error: SecurityException) {
-            pendingLocationResult = null
+            clearPendingLocation()
             result.error("permission", "定位权限被拒绝：${error.message}", null)
         }
+    }
+
+    /** 取消正在等待的定位回调（含超时计时器）。 */
+    private fun clearPendingLocation() {
+        locationHandler.removeCallbacks(locationTimeout)
+        val manager = pendingLocationManager
+        val listener = pendingLocationListener
+        if (manager != null && listener != null) {
+            try {
+                manager.removeUpdates(listener)
+            } catch (_: Exception) {
+                // 清理而已，失败无所谓。
+            }
+        }
+        pendingLocationManager = null
+        pendingLocationListener = null
+        pendingLocationResult = null
     }
 
     private fun lastKnown(manager: LocationManager): Location? {
@@ -180,5 +218,6 @@ class MainActivity : FlutterActivity() {
     companion object {
         const val CHANNEL = "toki/device"
         private const val LOCATION_REQUEST_CODE = 4301
+        private const val LOCATION_TIMEOUT_MS = 15_000L
     }
 }
