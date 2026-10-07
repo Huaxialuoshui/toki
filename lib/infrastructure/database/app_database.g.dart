@@ -4262,6 +4262,30 @@ class $ThemeConfigsTable extends ThemeConfigs
       type: DriftSqlType.double,
       requiredDuringInsert: false,
       defaultValue: const Constant(0.35));
+  static const VerificationMeta _navigationBarColorMeta =
+      const VerificationMeta('navigationBarColor');
+  @override
+  late final GeneratedColumn<int> navigationBarColor = GeneratedColumn<int>(
+      'navigation_bar_color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _sidebarColorMeta =
+      const VerificationMeta('sidebarColor');
+  @override
+  late final GeneratedColumn<int> sidebarColor = GeneratedColumn<int>(
+      'sidebar_color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _eventColorMeta =
+      const VerificationMeta('eventColor');
+  @override
+  late final GeneratedColumn<int> eventColor = GeneratedColumn<int>(
+      'event_color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _countdownColorMeta =
+      const VerificationMeta('countdownColor');
+  @override
+  late final GeneratedColumn<int> countdownColor = GeneratedColumn<int>(
+      'countdown_color', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -4290,6 +4314,10 @@ class $ThemeConfigsTable extends ThemeConfigs
         fontScale,
         animationEnabled,
         shadowStrength,
+        navigationBarColor,
+        sidebarColor,
+        eventColor,
+        countdownColor,
         createdAt,
         updatedAt
       ];
@@ -4394,6 +4422,30 @@ class $ThemeConfigsTable extends ThemeConfigs
           shadowStrength.isAcceptableOrUnknown(
               data['shadow_strength']!, _shadowStrengthMeta));
     }
+    if (data.containsKey('navigation_bar_color')) {
+      context.handle(
+          _navigationBarColorMeta,
+          navigationBarColor.isAcceptableOrUnknown(
+              data['navigation_bar_color']!, _navigationBarColorMeta));
+    }
+    if (data.containsKey('sidebar_color')) {
+      context.handle(
+          _sidebarColorMeta,
+          sidebarColor.isAcceptableOrUnknown(
+              data['sidebar_color']!, _sidebarColorMeta));
+    }
+    if (data.containsKey('event_color')) {
+      context.handle(
+          _eventColorMeta,
+          eventColor.isAcceptableOrUnknown(
+              data['event_color']!, _eventColorMeta));
+    }
+    if (data.containsKey('countdown_color')) {
+      context.handle(
+          _countdownColorMeta,
+          countdownColor.isAcceptableOrUnknown(
+              data['countdown_color']!, _countdownColorMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -4443,6 +4495,14 @@ class $ThemeConfigsTable extends ThemeConfigs
           DriftSqlType.bool, data['${effectivePrefix}animation_enabled'])!,
       shadowStrength: attachedDatabase.typeMapping.read(
           DriftSqlType.double, data['${effectivePrefix}shadow_strength'])!,
+      navigationBarColor: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}navigation_bar_color']),
+      sidebarColor: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}sidebar_color']),
+      eventColor: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}event_color']),
+      countdownColor: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}countdown_color']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -4475,6 +4535,12 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
 
   /// 阴影强度（0-1）。
   final double shadowStrength;
+
+  /// 区域配色（可空）：导航栏 / 侧边栏 / 日历事件默认色 / 倒计时默认色。
+  final int? navigationBarColor;
+  final int? sidebarColor;
+  final int? eventColor;
+  final int? countdownColor;
   final DateTime createdAt;
   final DateTime updatedAt;
   const ThemeConfigRow(
@@ -4492,6 +4558,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       required this.fontScale,
       required this.animationEnabled,
       required this.shadowStrength,
+      this.navigationBarColor,
+      this.sidebarColor,
+      this.eventColor,
+      this.countdownColor,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -4511,6 +4581,18 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
     map['font_scale'] = Variable<double>(fontScale);
     map['animation_enabled'] = Variable<bool>(animationEnabled);
     map['shadow_strength'] = Variable<double>(shadowStrength);
+    if (!nullToAbsent || navigationBarColor != null) {
+      map['navigation_bar_color'] = Variable<int>(navigationBarColor);
+    }
+    if (!nullToAbsent || sidebarColor != null) {
+      map['sidebar_color'] = Variable<int>(sidebarColor);
+    }
+    if (!nullToAbsent || eventColor != null) {
+      map['event_color'] = Variable<int>(eventColor);
+    }
+    if (!nullToAbsent || countdownColor != null) {
+      map['countdown_color'] = Variable<int>(countdownColor);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -4532,6 +4614,18 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       fontScale: Value(fontScale),
       animationEnabled: Value(animationEnabled),
       shadowStrength: Value(shadowStrength),
+      navigationBarColor: navigationBarColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(navigationBarColor),
+      sidebarColor: sidebarColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sidebarColor),
+      eventColor: eventColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(eventColor),
+      countdownColor: countdownColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(countdownColor),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -4555,6 +4649,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       fontScale: serializer.fromJson<double>(json['fontScale']),
       animationEnabled: serializer.fromJson<bool>(json['animationEnabled']),
       shadowStrength: serializer.fromJson<double>(json['shadowStrength']),
+      navigationBarColor: serializer.fromJson<int?>(json['navigationBarColor']),
+      sidebarColor: serializer.fromJson<int?>(json['sidebarColor']),
+      eventColor: serializer.fromJson<int?>(json['eventColor']),
+      countdownColor: serializer.fromJson<int?>(json['countdownColor']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -4577,6 +4675,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       'fontScale': serializer.toJson<double>(fontScale),
       'animationEnabled': serializer.toJson<bool>(animationEnabled),
       'shadowStrength': serializer.toJson<double>(shadowStrength),
+      'navigationBarColor': serializer.toJson<int?>(navigationBarColor),
+      'sidebarColor': serializer.toJson<int?>(sidebarColor),
+      'eventColor': serializer.toJson<int?>(eventColor),
+      'countdownColor': serializer.toJson<int?>(countdownColor),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -4597,6 +4699,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           double? fontScale,
           bool? animationEnabled,
           double? shadowStrength,
+          Value<int?> navigationBarColor = const Value.absent(),
+          Value<int?> sidebarColor = const Value.absent(),
+          Value<int?> eventColor = const Value.absent(),
+          Value<int?> countdownColor = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       ThemeConfigRow(
@@ -4614,6 +4720,14 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
         fontScale: fontScale ?? this.fontScale,
         animationEnabled: animationEnabled ?? this.animationEnabled,
         shadowStrength: shadowStrength ?? this.shadowStrength,
+        navigationBarColor: navigationBarColor.present
+            ? navigationBarColor.value
+            : this.navigationBarColor,
+        sidebarColor:
+            sidebarColor.present ? sidebarColor.value : this.sidebarColor,
+        eventColor: eventColor.present ? eventColor.value : this.eventColor,
+        countdownColor:
+            countdownColor.present ? countdownColor.value : this.countdownColor,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -4650,6 +4764,17 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       shadowStrength: data.shadowStrength.present
           ? data.shadowStrength.value
           : this.shadowStrength,
+      navigationBarColor: data.navigationBarColor.present
+          ? data.navigationBarColor.value
+          : this.navigationBarColor,
+      sidebarColor: data.sidebarColor.present
+          ? data.sidebarColor.value
+          : this.sidebarColor,
+      eventColor:
+          data.eventColor.present ? data.eventColor.value : this.eventColor,
+      countdownColor: data.countdownColor.present
+          ? data.countdownColor.value
+          : this.countdownColor,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4672,6 +4797,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           ..write('fontScale: $fontScale, ')
           ..write('animationEnabled: $animationEnabled, ')
           ..write('shadowStrength: $shadowStrength, ')
+          ..write('navigationBarColor: $navigationBarColor, ')
+          ..write('sidebarColor: $sidebarColor, ')
+          ..write('eventColor: $eventColor, ')
+          ..write('countdownColor: $countdownColor, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4694,6 +4823,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
       fontScale,
       animationEnabled,
       shadowStrength,
+      navigationBarColor,
+      sidebarColor,
+      eventColor,
+      countdownColor,
       createdAt,
       updatedAt);
   @override
@@ -4714,6 +4847,10 @@ class ThemeConfigRow extends DataClass implements Insertable<ThemeConfigRow> {
           other.fontScale == this.fontScale &&
           other.animationEnabled == this.animationEnabled &&
           other.shadowStrength == this.shadowStrength &&
+          other.navigationBarColor == this.navigationBarColor &&
+          other.sidebarColor == this.sidebarColor &&
+          other.eventColor == this.eventColor &&
+          other.countdownColor == this.countdownColor &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4733,6 +4870,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
   final Value<double> fontScale;
   final Value<bool> animationEnabled;
   final Value<double> shadowStrength;
+  final Value<int?> navigationBarColor;
+  final Value<int?> sidebarColor;
+  final Value<int?> eventColor;
+  final Value<int?> countdownColor;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -4751,6 +4892,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     this.fontScale = const Value.absent(),
     this.animationEnabled = const Value.absent(),
     this.shadowStrength = const Value.absent(),
+    this.navigationBarColor = const Value.absent(),
+    this.sidebarColor = const Value.absent(),
+    this.eventColor = const Value.absent(),
+    this.countdownColor = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4770,6 +4915,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     this.fontScale = const Value.absent(),
     this.animationEnabled = const Value.absent(),
     this.shadowStrength = const Value.absent(),
+    this.navigationBarColor = const Value.absent(),
+    this.sidebarColor = const Value.absent(),
+    this.eventColor = const Value.absent(),
+    this.countdownColor = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -4798,6 +4947,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     Expression<double>? fontScale,
     Expression<bool>? animationEnabled,
     Expression<double>? shadowStrength,
+    Expression<int>? navigationBarColor,
+    Expression<int>? sidebarColor,
+    Expression<int>? eventColor,
+    Expression<int>? countdownColor,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -4817,6 +4970,11 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       if (fontScale != null) 'font_scale': fontScale,
       if (animationEnabled != null) 'animation_enabled': animationEnabled,
       if (shadowStrength != null) 'shadow_strength': shadowStrength,
+      if (navigationBarColor != null)
+        'navigation_bar_color': navigationBarColor,
+      if (sidebarColor != null) 'sidebar_color': sidebarColor,
+      if (eventColor != null) 'event_color': eventColor,
+      if (countdownColor != null) 'countdown_color': countdownColor,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -4838,6 +4996,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       Value<double>? fontScale,
       Value<bool>? animationEnabled,
       Value<double>? shadowStrength,
+      Value<int?>? navigationBarColor,
+      Value<int?>? sidebarColor,
+      Value<int?>? eventColor,
+      Value<int?>? countdownColor,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -4856,6 +5018,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
       fontScale: fontScale ?? this.fontScale,
       animationEnabled: animationEnabled ?? this.animationEnabled,
       shadowStrength: shadowStrength ?? this.shadowStrength,
+      navigationBarColor: navigationBarColor ?? this.navigationBarColor,
+      sidebarColor: sidebarColor ?? this.sidebarColor,
+      eventColor: eventColor ?? this.eventColor,
+      countdownColor: countdownColor ?? this.countdownColor,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -4907,6 +5073,18 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
     if (shadowStrength.present) {
       map['shadow_strength'] = Variable<double>(shadowStrength.value);
     }
+    if (navigationBarColor.present) {
+      map['navigation_bar_color'] = Variable<int>(navigationBarColor.value);
+    }
+    if (sidebarColor.present) {
+      map['sidebar_color'] = Variable<int>(sidebarColor.value);
+    }
+    if (eventColor.present) {
+      map['event_color'] = Variable<int>(eventColor.value);
+    }
+    if (countdownColor.present) {
+      map['countdown_color'] = Variable<int>(countdownColor.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -4936,6 +5114,10 @@ class ThemeConfigsCompanion extends UpdateCompanion<ThemeConfigRow> {
           ..write('fontScale: $fontScale, ')
           ..write('animationEnabled: $animationEnabled, ')
           ..write('shadowStrength: $shadowStrength, ')
+          ..write('navigationBarColor: $navigationBarColor, ')
+          ..write('sidebarColor: $sidebarColor, ')
+          ..write('eventColor: $eventColor, ')
+          ..write('countdownColor: $countdownColor, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -8020,6 +8202,10 @@ typedef $$ThemeConfigsTableCreateCompanionBuilder = ThemeConfigsCompanion
   Value<double> fontScale,
   Value<bool> animationEnabled,
   Value<double> shadowStrength,
+  Value<int?> navigationBarColor,
+  Value<int?> sidebarColor,
+  Value<int?> eventColor,
+  Value<int?> countdownColor,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -8040,6 +8226,10 @@ typedef $$ThemeConfigsTableUpdateCompanionBuilder = ThemeConfigsCompanion
   Value<double> fontScale,
   Value<bool> animationEnabled,
   Value<double> shadowStrength,
+  Value<int?> navigationBarColor,
+  Value<int?> sidebarColor,
+  Value<int?> eventColor,
+  Value<int?> countdownColor,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -8098,6 +8288,20 @@ class $$ThemeConfigsTableFilterComposer
 
   ColumnFilters<double> get shadowStrength => $composableBuilder(
       column: $table.shadowStrength,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get navigationBarColor => $composableBuilder(
+      column: $table.navigationBarColor,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get sidebarColor => $composableBuilder(
+      column: $table.sidebarColor, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get eventColor => $composableBuilder(
+      column: $table.eventColor, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get countdownColor => $composableBuilder(
+      column: $table.countdownColor,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -8165,6 +8369,21 @@ class $$ThemeConfigsTableOrderingComposer
       column: $table.shadowStrength,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get navigationBarColor => $composableBuilder(
+      column: $table.navigationBarColor,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get sidebarColor => $composableBuilder(
+      column: $table.sidebarColor,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get eventColor => $composableBuilder(
+      column: $table.eventColor, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get countdownColor => $composableBuilder(
+      column: $table.countdownColor,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -8223,6 +8442,18 @@ class $$ThemeConfigsTableAnnotationComposer
   GeneratedColumn<double> get shadowStrength => $composableBuilder(
       column: $table.shadowStrength, builder: (column) => column);
 
+  GeneratedColumn<int> get navigationBarColor => $composableBuilder(
+      column: $table.navigationBarColor, builder: (column) => column);
+
+  GeneratedColumn<int> get sidebarColor => $composableBuilder(
+      column: $table.sidebarColor, builder: (column) => column);
+
+  GeneratedColumn<int> get eventColor => $composableBuilder(
+      column: $table.eventColor, builder: (column) => column);
+
+  GeneratedColumn<int> get countdownColor => $composableBuilder(
+      column: $table.countdownColor, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -8270,6 +8501,10 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             Value<double> fontScale = const Value.absent(),
             Value<bool> animationEnabled = const Value.absent(),
             Value<double> shadowStrength = const Value.absent(),
+            Value<int?> navigationBarColor = const Value.absent(),
+            Value<int?> sidebarColor = const Value.absent(),
+            Value<int?> eventColor = const Value.absent(),
+            Value<int?> countdownColor = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -8289,6 +8524,10 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             fontScale: fontScale,
             animationEnabled: animationEnabled,
             shadowStrength: shadowStrength,
+            navigationBarColor: navigationBarColor,
+            sidebarColor: sidebarColor,
+            eventColor: eventColor,
+            countdownColor: countdownColor,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -8308,6 +8547,10 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             Value<double> fontScale = const Value.absent(),
             Value<bool> animationEnabled = const Value.absent(),
             Value<double> shadowStrength = const Value.absent(),
+            Value<int?> navigationBarColor = const Value.absent(),
+            Value<int?> sidebarColor = const Value.absent(),
+            Value<int?> eventColor = const Value.absent(),
+            Value<int?> countdownColor = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -8327,6 +8570,10 @@ class $$ThemeConfigsTableTableManager extends RootTableManager<
             fontScale: fontScale,
             animationEnabled: animationEnabled,
             shadowStrength: shadowStrength,
+            navigationBarColor: navigationBarColor,
+            sidebarColor: sidebarColor,
+            eventColor: eventColor,
+            countdownColor: countdownColor,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,

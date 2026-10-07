@@ -316,6 +316,14 @@ extension ThemeConfigRowMapper on ThemeConfigRow {
         fontScale: fontScale,
         animationEnabled: animationEnabled,
         shadowStrength: shadowStrength,
+        navigationBarColor: navigationBarColor == null
+            ? null
+            : colorFromArgb(navigationBarColor!),
+        sidebarColor:
+            sidebarColor == null ? null : colorFromArgb(sidebarColor!),
+        eventColor: eventColor == null ? null : colorFromArgb(eventColor!),
+        countdownColor:
+            countdownColor == null ? null : colorFromArgb(countdownColor!),
       );
 }
 
@@ -339,6 +347,24 @@ ThemeConfigsCompanion themeConfigToCompanion(
       fontScale: Value<double>(config.fontScale),
       animationEnabled: Value<bool>(config.animationEnabled),
       shadowStrength: Value<double>(config.shadowStrength),
+      navigationBarColor: Value<int?>(
+        config.navigationBarColor == null
+            ? null
+            : argbFromColor(config.navigationBarColor!),
+      ),
+      sidebarColor: Value<int?>(
+        config.sidebarColor == null
+            ? null
+            : argbFromColor(config.sidebarColor!),
+      ),
+      eventColor: Value<int?>(
+        config.eventColor == null ? null : argbFromColor(config.eventColor!),
+      ),
+      countdownColor: Value<int?>(
+        config.countdownColor == null
+            ? null
+            : argbFromColor(config.countdownColor!),
+      ),
       createdAt: Value<DateTime>(createdAt),
       updatedAt: Value<DateTime>(updatedAt),
     );

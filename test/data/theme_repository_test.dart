@@ -29,6 +29,10 @@ void main() {
     fontScale: 1.1,
     animationEnabled: false,
     shadowStrength: 0.6,
+    navigationBarColor: Color(0xFF20242E),
+    sidebarColor: Color(0xFF161A22),
+    eventColor: Color(0xFF5A6BF0),
+    countdownColor: Color(0xFF12B5A5),
   );
 
   setUp(() {
@@ -48,6 +52,10 @@ void main() {
     expect(loaded.blurAmount, 18);
     expect(loaded.animationEnabled, isFalse);
     expect(loaded.shadowStrength, 0.6);
+    expect(loaded.navigationBarColor, const Color(0xFF20242E));
+    expect(loaded.sidebarColor, const Color(0xFF161A22));
+    expect(loaded.eventColor, const Color(0xFF5A6BF0));
+    expect(loaded.countdownColor, const Color(0xFF12B5A5));
   });
 
   test('再次保存时保留 createdAt，只更新 updatedAt', () async {

@@ -228,6 +228,68 @@ class _ThemeEditorPageState extends ConsumerState<ThemeEditorPage> {
             ),
             const SizedBox(height: 20),
             SectionHeader(
+              title: l10n.themeEditorAreas,
+              icon: Icons.dashboard_customize_outlined,
+            ),
+            GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    l10n.themeEditorAreasHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.66),
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  _ColourField(
+                    fieldKey: 'nav-bar',
+                    label: l10n.themeAreaNavBar,
+                    value: _draft.navigationBarColor ?? _draft.surfaceColor,
+                    onClear: () => _updateDraft(
+                      _draft.withAreaColor(ThemeArea.navigationBar, null),
+                    ),
+                    onPick: (Color color) => _updateDraft(
+                        _draft.withAreaColor(ThemeArea.navigationBar, color)),
+                  ),
+                  _ColourField(
+                    fieldKey: 'sidebar',
+                    label: l10n.themeAreaSidebar,
+                    value: _draft.sidebarColor ?? _draft.surfaceColor,
+                    onClear: () => _updateDraft(
+                      _draft.withAreaColor(ThemeArea.sidebar, null),
+                    ),
+                    onPick: (Color color) => _updateDraft(
+                        _draft.withAreaColor(ThemeArea.sidebar, color)),
+                  ),
+                  _ColourField(
+                    fieldKey: 'event',
+                    label: l10n.themeAreaEvent,
+                    value: _draft.eventColor ?? _draft.primaryColor,
+                    onClear: () => _updateDraft(
+                      _draft.withAreaColor(ThemeArea.event, null),
+                    ),
+                    onPick: (Color color) => _updateDraft(
+                        _draft.withAreaColor(ThemeArea.event, color)),
+                  ),
+                  _ColourField(
+                    fieldKey: 'countdown',
+                    label: l10n.themeAreaCountdown,
+                    value: _draft.countdownColor ?? _draft.primaryColor,
+                    onClear: () => _updateDraft(
+                      _draft.withAreaColor(ThemeArea.countdown, null),
+                    ),
+                    onPick: (Color color) => _updateDraft(
+                        _draft.withAreaColor(ThemeArea.countdown, color)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            SectionHeader(
               title: l10n.themeEditorPreview,
               icon: Icons.preview_outlined,
             ),
@@ -483,6 +545,13 @@ Map<String, Object?> _draftToJson(ThemeConfig config) => <String, Object?>{
       'fontScale': config.fontScale,
       'shadowStrength': config.shadowStrength,
       'animationEnabled': config.animationEnabled,
+      if (config.navigationBarColor != null)
+        'navigationBarColor': _argb(config.navigationBarColor!),
+      if (config.sidebarColor != null)
+        'sidebarColor': _argb(config.sidebarColor!),
+      if (config.eventColor != null) 'eventColor': _argb(config.eventColor!),
+      if (config.countdownColor != null)
+        'countdownColor': _argb(config.countdownColor!),
     };
 
 int _argb(Color color) =>
@@ -515,6 +584,18 @@ ThemeConfig? _configFromJson(String text) {
       fontScale: (decoded['fontScale'] as num?)?.toDouble() ?? 1,
       shadowStrength: (decoded['shadowStrength'] as num?)?.toDouble() ?? 0.35,
       animationEnabled: decoded['animationEnabled'] as bool? ?? true,
+      navigationBarColor: decoded['navigationBarColor'] == null
+          ? null
+          : _colorFrom(decoded['navigationBarColor']),
+      sidebarColor: decoded['sidebarColor'] == null
+          ? null
+          : _colorFrom(decoded['sidebarColor']),
+      eventColor: decoded['eventColor'] == null
+          ? null
+          : _colorFrom(decoded['eventColor']),
+      countdownColor: decoded['countdownColor'] == null
+          ? null
+          : _colorFrom(decoded['countdownColor']),
     );
   } on FormatException {
     return null;
@@ -529,6 +610,7 @@ class _ColourField extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onPick,
+    this.onClear,
   });
 
   /// 用于测试定位调色板的稳定标识（`primary` / `secondary` / ...）。
@@ -536,6 +618,9 @@ class _ColourField extends StatelessWidget {
   final String label;
   final Color value;
   final ValueChanged<Color> onPick;
+
+  /// 非空时在色板最前面加一个「默认」按钮（用于可选的区域配色）。
+  final VoidCallback? onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -558,6 +643,26 @@ class _ColourField extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: <Widget>[
+                if (onClear != null)
+                  InkWell(
+                    key: ValueKey<String>('swatch-$fieldKey-default'),
+                    onTap: onClear,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: theme.dividerColor),
+                      ),
+                      child: Text(
+                        context.l10n.calendarColorDefault,
+                        style: theme.textTheme.labelSmall,
+                      ),
+                    ),
+                  ),
                 for (final (int index, Color color)
                     in EventPalette.colors.indexed)
                   InkWell(

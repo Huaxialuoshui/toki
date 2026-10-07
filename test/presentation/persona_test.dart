@@ -54,7 +54,7 @@ void main() {
 
     await tester.enterText(find.byType(TextFormField).first, '阿蓝');
     await tester.enterText(find.byType(TextFormField).at(1), '学习搭子');
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Save').last);
     await tester.pumpAndSettle();
 
     expect(find.text('阿蓝'), findsOneWidget);
@@ -70,7 +70,7 @@ void main() {
     await tester.tap(find.text('小雪').last);
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, '小雪（改）');
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Save').last);
     await tester.pumpAndSettle();
     expect(find.text('小雪（改）'), findsOneWidget);
 
@@ -107,7 +107,7 @@ void main() {
       find.byType(TextFormField).at(6),
       '你是阿蓝，说话简短直接。',
     );
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Save').last);
     await tester.pumpAndSettle();
 
     await openAi(tester);

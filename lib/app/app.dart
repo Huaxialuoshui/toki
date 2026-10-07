@@ -10,6 +10,7 @@ import '../core/extensions/l10n_extension.dart';
 import '../domain/entities/glass_style.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../shared/widgets/glass_card.dart';
+import '../shared/widgets/theme_config_scope.dart';
 import 'router.dart';
 
 /// 应用根组件。
@@ -60,15 +61,18 @@ class TokiApp extends ConsumerWidget {
           ThemeMode.system => MediaQuery.platformBrightnessOf(context),
         };
         final config = resolution.configFor(brightness);
-        return GlassTheme(
-          style: GlassStyle.fromThemeConfig(config),
-          // 字号缩放在这里生效：ThemeData 的文本样式在部分平台没有显式 fontSize，
-          // 用 textScaler 才能对所有文字生效。
-          child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(config.fontScale),
+        return ThemeConfigScope(
+          config: config,
+          child: GlassTheme(
+            style: GlassStyle.fromThemeConfig(config),
+            // 字号缩放在这里生效：ThemeData 的文本样式在部分平台没有显式 fontSize，
+            // 用 textScaler 才能对所有文字生效。
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(config.fontScale),
+              ),
+              child: child ?? const SizedBox.shrink(),
             ),
-            child: child ?? const SizedBox.shrink(),
           ),
         );
       },

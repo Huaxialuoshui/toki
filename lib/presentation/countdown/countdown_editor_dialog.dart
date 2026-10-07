@@ -40,6 +40,7 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
   late CountdownDisplayStyle _style;
   late bool _isPinned;
   int? _colorValue;
+  int? _backgroundColorValue;
   String? _errorText;
   bool _busy = false;
 
@@ -54,6 +55,8 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
     _style = item?.displayStyle ?? CountdownDisplayStyle.fullText;
     _isPinned = item?.isPinned ?? false;
     _colorValue = item?.color == null ? null : _argb(item!.color!);
+    _backgroundColorValue =
+        item?.backgroundColor == null ? null : _argb(item!.backgroundColor!);
 
     final now = ref.read(clockProvider).now();
     _target = item?.targetTime ?? now.add(const Duration(days: 7));
@@ -233,6 +236,40 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
                           ],
                         ),
                         const SizedBox(height: 6),
+                        Text(
+                          l10n.countdownFieldBackground,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: <Widget>[
+                            ChoiceChip(
+                              label: Text(l10n.calendarColorDefault),
+                              selected: _backgroundColorValue == null,
+                              onSelected: _busy
+                                  ? null
+                                  : (_) => setState(
+                                        () => _backgroundColorValue = null,
+                                      ),
+                            ),
+                            for (final color in EventPalette.colors)
+                              _ColorDot(
+                                color: color,
+                                selected: _backgroundColorValue == _argb(color),
+                                onTap: _busy
+                                    ? null
+                                    : () => setState(
+                                          () => _backgroundColorValue =
+                                              _argb(color),
+                                        ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
                           title: Text(l10n.countdownFieldPinned),
@@ -328,6 +365,8 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
     final navigator = Navigator.of(context);
     final existing = widget.item;
     final color = _colorValue == null ? null : Color(_colorValue!);
+    final backgroundColor =
+        _backgroundColorValue == null ? null : Color(_backgroundColorValue!);
 
     setState(() {
       _busy = true;
@@ -342,6 +381,7 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
           targetTime: _target,
           description: _emptyToNull(_description.text),
           color: color,
+          backgroundColor: backgroundColor,
           displayStyle: _style,
           isPinned: _isPinned,
         );
@@ -352,6 +392,7 @@ class _CountdownEditorDialogState extends ConsumerState<CountdownEditorDialog> {
             targetTime: _target,
             description: _emptyToNull(_description.text),
             color: color,
+            backgroundColor: backgroundColor,
             displayStyle: _style,
             isPinned: _isPinned,
           ),

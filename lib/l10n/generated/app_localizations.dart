@@ -170,6 +170,198 @@ abstract class AppLocalizations {
   /// **'Weather integration is reserved for a later phase'**
   String get homeWeatherHint;
 
+  /// No description provided for @homeWeatherDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{city} · Low {min}° / High {max}°'**
+  String homeWeatherDetail(String city, String min, String max);
+
+  /// No description provided for @weatherCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get weatherCity;
+
+  /// No description provided for @weatherCityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Shanghai / 上海'**
+  String get weatherCityHint;
+
+  /// No description provided for @weatherCitySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'City saved'**
+  String get weatherCitySaved;
+
+  /// No description provided for @weatherSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get weatherSection;
+
+  /// No description provided for @weatherSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.'**
+  String get weatherSectionSubtitle;
+
+  /// No description provided for @weatherClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get weatherClear;
+
+  /// No description provided for @weatherPartlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weatherPartlyCloudy;
+
+  /// No description provided for @weatherCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weatherCloudy;
+
+  /// No description provided for @weatherFog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weatherFog;
+
+  /// No description provided for @weatherDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weatherDrizzle;
+
+  /// No description provided for @weatherRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get weatherRain;
+
+  /// No description provided for @weatherSnow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weatherSnow;
+
+  /// No description provided for @weatherThunder.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weatherThunder;
+
+  /// No description provided for @weatherUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get weatherUnknown;
+
+  /// No description provided for @weatherSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get weatherSave;
+
+  /// No description provided for @weatherClearCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get weatherClearCity;
+
+  /// No description provided for @digestSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily briefings'**
+  String get digestSection;
+
+  /// No description provided for @digestSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the assistant to write a morning plan and an evening recap. Off by default; generated at most once per day.'**
+  String get digestSectionSubtitle;
+
+  /// No description provided for @digestMorningToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning plan'**
+  String get digestMorningToggle;
+
+  /// No description provided for @digestEveningToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening recap'**
+  String get digestEveningToggle;
+
+  /// No description provided for @digestMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s plan'**
+  String get digestMorningTitle;
+
+  /// No description provided for @digestEveningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s recap'**
+  String get digestEveningTitle;
+
+  /// No description provided for @digestGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get digestGenerate;
+
+  /// No description provided for @digestRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get digestRegenerate;
+
+  /// No description provided for @digestGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'The assistant is writing…'**
+  String get digestGenerating;
+
+  /// No description provided for @digestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate'**
+  String get digestFailed;
+
+  /// No description provided for @syncSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sync'**
+  String get syncSection;
+
+  /// No description provided for @syncLocalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This device only'**
+  String get syncLocalTitle;
+
+  /// No description provided for @syncLocalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.'**
+  String get syncLocalSubtitle;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check local data'**
+  String get syncNow;
+
+  /// No description provided for @syncLocalDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data is ready ({message})'**
+  String syncLocalDone(String message);
+
   /// No description provided for @homeTodayEvents.
   ///
   /// In en, this message translates to:
@@ -301,6 +493,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pin to top'**
   String get countdownFieldPinned;
+
+  /// No description provided for @countdownFieldBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Card background'**
+  String get countdownFieldBackground;
 
   /// No description provided for @countdownDragHint.
   ///
@@ -1609,6 +1807,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Live preview'**
   String get themeEditorPreview;
+
+  /// No description provided for @themeEditorAreas.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-area colours'**
+  String get themeEditorAreas;
+
+  /// No description provided for @themeEditorAreasHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Leave any of them on \"Default\" to follow the theme colours above.'**
+  String get themeEditorAreasHint;
+
+  /// No description provided for @themeAreaNavBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Nav bar'**
+  String get themeAreaNavBar;
+
+  /// No description provided for @themeAreaSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Sidebar'**
+  String get themeAreaSidebar;
+
+  /// No description provided for @themeAreaEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar events'**
+  String get themeAreaEvent;
+
+  /// No description provided for @themeAreaCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdowns'**
+  String get themeAreaCountdown;
 
   /// No description provided for @themeSave.
   ///

@@ -44,6 +44,109 @@ class AppLocalizationsEn extends AppLocalizations {
       'Weather integration is reserved for a later phase';
 
   @override
+  String homeWeatherDetail(String city, String min, String max) {
+    return '$city · Low $min° / High $max°';
+  }
+
+  @override
+  String get weatherCity => 'City';
+
+  @override
+  String get weatherCityHint => 'e.g. Shanghai / 上海';
+
+  @override
+  String get weatherCitySaved => 'City saved';
+
+  @override
+  String get weatherSection => 'Weather';
+
+  @override
+  String get weatherSectionSubtitle =>
+      'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherPartlyCloudy => 'Partly cloudy';
+
+  @override
+  String get weatherCloudy => 'Overcast';
+
+  @override
+  String get weatherFog => 'Fog';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get weatherRain => 'Rain';
+
+  @override
+  String get weatherSnow => 'Snow';
+
+  @override
+  String get weatherThunder => 'Thunderstorm';
+
+  @override
+  String get weatherUnknown => 'Unknown';
+
+  @override
+  String get weatherSave => 'Save';
+
+  @override
+  String get weatherClearCity => 'Clear';
+
+  @override
+  String get digestSection => 'Daily briefings';
+
+  @override
+  String get digestSectionSubtitle =>
+      'Ask the assistant to write a morning plan and an evening recap. Off by default; generated at most once per day.';
+
+  @override
+  String get digestMorningToggle => 'Morning plan';
+
+  @override
+  String get digestEveningToggle => 'Evening recap';
+
+  @override
+  String get digestMorningTitle => 'Today\'s plan';
+
+  @override
+  String get digestEveningTitle => 'Today\'s recap';
+
+  @override
+  String get digestGenerate => 'Generate';
+
+  @override
+  String get digestRegenerate => 'Regenerate';
+
+  @override
+  String get digestGenerating => 'The assistant is writing…';
+
+  @override
+  String get digestFailed => 'Could not generate';
+
+  @override
+  String get syncSection => 'Data sync';
+
+  @override
+  String get syncLocalTitle => 'This device only';
+
+  @override
+  String get syncLocalSubtitle =>
+      'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.';
+
+  @override
+  String get syncNow => 'Check local data';
+
+  @override
+  String syncLocalDone(String message) {
+    return 'Local data is ready ($message)';
+  }
+
+  @override
   String get homeTodayEvents => 'Today\'s schedule';
 
   @override
@@ -117,6 +220,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countdownFieldPinned => 'Pin to top';
+
+  @override
+  String get countdownFieldBackground => 'Card background';
 
   @override
   String get countdownDragHint => 'Drag the handle to reorder';
@@ -811,6 +917,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeEditorPreview => 'Live preview';
+
+  @override
+  String get themeEditorAreas => 'Per-area colours';
+
+  @override
+  String get themeEditorAreasHint =>
+      'Optional. Leave any of them on \"Default\" to follow the theme colours above.';
+
+  @override
+  String get themeAreaNavBar => 'Nav bar';
+
+  @override
+  String get themeAreaSidebar => 'Sidebar';
+
+  @override
+  String get themeAreaEvent => 'Calendar events';
+
+  @override
+  String get themeAreaCountdown => 'Countdowns';
 
   @override
   String get themeSave => 'Save theme';

@@ -26,6 +26,7 @@ class CountdownActions {
     required DateTime targetTime,
     String? description,
     Color? color,
+    Color? backgroundColor,
     CountdownDisplayStyle displayStyle = CountdownDisplayStyle.fullText,
     bool isPinned = false,
   }) async {
@@ -44,6 +45,7 @@ class CountdownActions {
       targetTime: targetTime,
       description: description,
       color: color,
+      backgroundColor: backgroundColor,
       displayStyle: displayStyle,
       isPinned: isPinned,
       sortOrder: nextSortOrder,

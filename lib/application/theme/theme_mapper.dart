@@ -47,7 +47,7 @@ ThemeData buildThemeData(ThemeConfig config) {
             },
           ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: config.surfaceColor,
+      backgroundColor: config.navigationBarColor ?? config.surfaceColor,
       indicatorColor: config.primaryColor.withValues(alpha: 0.18),
       labelTextStyle: WidgetStatePropertyAll<TextStyle>(
         TextStyle(
@@ -58,7 +58,7 @@ ThemeData buildThemeData(ThemeConfig config) {
       ),
     ),
     navigationRailTheme: NavigationRailThemeData(
-      backgroundColor: config.surfaceColor,
+      backgroundColor: config.navigationBarColor ?? config.surfaceColor,
       indicatorColor: config.primaryColor.withValues(alpha: 0.18),
       selectedIconTheme: IconThemeData(color: config.primaryColor),
       unselectedIconTheme: IconThemeData(color: mutedText),

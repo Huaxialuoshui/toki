@@ -25,6 +25,12 @@ class ThemeConfigs extends Table {
 
   /// 阴影强度（0-1）。
   RealColumn get shadowStrength => real().withDefault(const Constant(0.35))();
+
+  /// 区域配色（可空）：导航栏 / 侧边栏 / 日历事件默认色 / 倒计时默认色。
+  IntColumn get navigationBarColor => integer().nullable()();
+  IntColumn get sidebarColor => integer().nullable()();
+  IntColumn get eventColor => integer().nullable()();
+  IntColumn get countdownColor => integer().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

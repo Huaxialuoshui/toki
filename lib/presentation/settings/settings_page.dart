@@ -20,6 +20,9 @@ import 'ai_persona_section.dart';
 import 'backup_section.dart';
 import 'calendar_category_section.dart';
 import 'chat_appearance_section.dart';
+import 'digest_section.dart';
+import 'sync_section.dart';
+import 'weather_section.dart';
 import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
@@ -261,6 +264,24 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.category_outlined,
           ),
           const CalendarCategorySection(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.weatherSection,
+            icon: Icons.wb_cloudy_outlined,
+          ),
+          const WeatherSection(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.digestSection,
+            icon: Icons.auto_awesome_outlined,
+          ),
+          const DigestSection(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.syncSection,
+            icon: Icons.cloud_sync_outlined,
+          ),
+          const SyncSection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsBackupSection,

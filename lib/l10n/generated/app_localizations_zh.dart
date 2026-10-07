@@ -43,6 +43,107 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeWeatherHint => '天气接入将在后续阶段提供';
 
   @override
+  String homeWeatherDetail(String city, String min, String max) {
+    return '$city · 最低 $min° / 最高 $max°';
+  }
+
+  @override
+  String get weatherCity => '城市';
+
+  @override
+  String get weatherCityHint => '例如 上海 / Shanghai';
+
+  @override
+  String get weatherCitySaved => '城市已保存';
+
+  @override
+  String get weatherSection => '天气';
+
+  @override
+  String get weatherSectionSubtitle => '用 Open-Meteo，不需要 API Key。城市留空时首页还是占位卡。';
+
+  @override
+  String get weatherClear => '晴';
+
+  @override
+  String get weatherPartlyCloudy => '多云';
+
+  @override
+  String get weatherCloudy => '阴';
+
+  @override
+  String get weatherFog => '雾';
+
+  @override
+  String get weatherDrizzle => '小雨';
+
+  @override
+  String get weatherRain => '雨';
+
+  @override
+  String get weatherSnow => '雪';
+
+  @override
+  String get weatherThunder => '雷阵雨';
+
+  @override
+  String get weatherUnknown => '未知';
+
+  @override
+  String get weatherSave => '保存';
+
+  @override
+  String get weatherClearCity => '清除';
+
+  @override
+  String get digestSection => 'AI 每日简报';
+
+  @override
+  String get digestSectionSubtitle => '让助手写一份早间计划和晚间总结。默认关闭，每天最多生成一次。';
+
+  @override
+  String get digestMorningToggle => '早间计划';
+
+  @override
+  String get digestEveningToggle => '晚间总结';
+
+  @override
+  String get digestMorningTitle => '今日计划';
+
+  @override
+  String get digestEveningTitle => '今日总结';
+
+  @override
+  String get digestGenerate => '生成';
+
+  @override
+  String get digestRegenerate => '重新生成';
+
+  @override
+  String get digestGenerating => '助手正在写…';
+
+  @override
+  String get digestFailed => '生成失败';
+
+  @override
+  String get syncSection => '数据同步';
+
+  @override
+  String get syncLocalTitle => '仅本机';
+
+  @override
+  String get syncLocalSubtitle =>
+      '第一版是本地优先：数据都在本机数据库里。WebDAV / 自建服务器 / 云同步会复用同一个 SyncService 接口，属于后续阶段。';
+
+  @override
+  String get syncNow => '检查本地数据';
+
+  @override
+  String syncLocalDone(String message) {
+    return '本地数据正常（$message）';
+  }
+
+  @override
   String get homeTodayEvents => '今日事项';
 
   @override
@@ -116,6 +217,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get countdownFieldPinned => '置顶';
+
+  @override
+  String get countdownFieldBackground => '卡片背景';
 
   @override
   String get countdownDragHint => '拖动右侧手柄可以排序';
@@ -799,6 +903,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get themeEditorPreview => '实时预览';
+
+  @override
+  String get themeEditorAreas => '区域配色（可选）';
+
+  @override
+  String get themeEditorAreasHint => '都可以留「默认」，跟随上面的主题色。';
+
+  @override
+  String get themeAreaNavBar => '导航栏';
+
+  @override
+  String get themeAreaSidebar => '侧边栏';
+
+  @override
+  String get themeAreaEvent => '日历事件';
+
+  @override
+  String get themeAreaCountdown => '倒计时';
 
   @override
   String get themeSave => '保存主题';

@@ -30,7 +30,7 @@ void main() {
     addTearDown(database.close);
 
     // 从 v1 快照建库，再迁移到当前版本并校验结构一致。
-    await verifier.migrateAndValidate(database, 4);
+    await verifier.migrateAndValidate(database, 5);
   });
 
   test('v1 → v2 迁移会补上 chat_messages.tool_call_id', () async {
@@ -39,7 +39,7 @@ void main() {
     addTearDown(database.close);
 
     await database.customStatement('PRAGMA foreign_keys = OFF');
-    await verifier.migrateAndValidate(database, 4);
+    await verifier.migrateAndValidate(database, 5);
 
     final columns = await database
         .customSelect('PRAGMA table_info(chat_messages)')
@@ -53,7 +53,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 4);
+    await verifier.migrateAndValidate(database, 5);
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -67,7 +67,7 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 4);
+    await verifier.migrateAndValidate(database, 5);
 
     Future<List<String>> columnsOf(String table) => database
         .customSelect('PRAGMA table_info($table)')
@@ -84,6 +84,28 @@ void main() {
         )
         .get();
     expect(tables, hasLength(1));
+  });
+
+  test('v4 → v5 迁移会补上主题的区域配色列', () async {
+    final connection = await verifier.startAt(4);
+    final database = AppDatabase(connection);
+    addTearDown(database.close);
+
+    await verifier.migrateAndValidate(database, 5);
+
+    final columns = await database
+        .customSelect('PRAGMA table_info(theme_configs)')
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+    expect(
+      columns,
+      containsAll(<String>[
+        'navigation_bar_color',
+        'sidebar_color',
+        'event_color',
+        'countdown_color',
+      ]),
+    );
   });
 
   test('从空库创建后，10 张表全部存在', () async {

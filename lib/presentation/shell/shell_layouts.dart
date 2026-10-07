@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/widgets/theme_config_scope.dart';
 import 'shell_destination.dart';
 
 /// 测试用：三档布局的根 Key。
@@ -124,7 +125,8 @@ class DesktopShell extends StatelessWidget {
               width: collapsed
                   ? AppConstants.sidebarCollapsedWidth
                   : AppConstants.sidebarWidth,
-              color: theme.colorScheme.surface,
+              color: ThemeConfigScope.of(context)?.sidebarColor ??
+                  theme.colorScheme.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[

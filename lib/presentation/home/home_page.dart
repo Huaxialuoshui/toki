@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../application/ai/chat_controller.dart';
+import '../../application/weather/weather_providers.dart';
 import '../../application/calendar/calendar_providers.dart';
 import '../../application/countdown/countdown_providers.dart';
 import '../../application/settings/settings_controller.dart';
@@ -11,11 +12,15 @@ import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/countdown_item.dart';
 import '../../domain/services/recurrence.dart';
+import '../../domain/entities/weather.dart';
+import '../../domain/entities/daily_digest.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
+import 'daily_digest_card.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/persona_avatar.dart';
@@ -60,6 +65,8 @@ class HomePage extends ConsumerWidget {
               ),
             ),
           const _WeatherCard(),
+          const DailyDigestCard(kind: DailyDigestKind.morning),
+          const DailyDigestCard(kind: DailyDigestKind.evening),
           const SizedBox(height: 24),
           SectionHeader(
             title: l10n.homeTodayEvents,
@@ -175,14 +182,27 @@ class _WeatherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return const _WeatherCardBody();
+  }
+}
+
+/// 天气卡片：设置里填了城市才显示真实天气，否则保留占位说明。
+class _WeatherCardBody extends ConsumerWidget {
+  const _WeatherCardBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final weather = ref.watch(weatherProvider).valueOrNull;
 
     return GlassCard(
       child: Row(
         children: <Widget>[
           Icon(
-            Icons.wb_cloudy_outlined,
+            weather == null
+                ? Icons.wb_cloudy_outlined
+                : _conditionIcon(weather.condition),
             size: 30,
             color: theme.colorScheme.primary,
           ),
@@ -192,14 +212,23 @@ class _WeatherCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  l10n.homeWeatherPlaceholder,
+                  weather == null
+                      ? l10n.homeWeatherPlaceholder
+                      : '${weather.temperature.round()}°C · '
+                          '${_conditionLabel(l10n, weather.condition)}',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  l10n.homeWeatherHint,
+                  weather == null
+                      ? l10n.homeWeatherHint
+                      : l10n.homeWeatherDetail(
+                          weather.city,
+                          weather.tempMin?.round().toString() ?? '—',
+                          weather.tempMax?.round().toString() ?? '—',
+                        ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
                   ),
@@ -210,6 +239,54 @@ class _WeatherCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static IconData _conditionIcon(WeatherCondition condition) {
+    switch (condition) {
+      case WeatherCondition.clear:
+        return Icons.wb_sunny_outlined;
+      case WeatherCondition.partlyCloudy:
+        return Icons.wb_cloudy_outlined;
+      case WeatherCondition.cloudy:
+        return Icons.cloud_outlined;
+      case WeatherCondition.fog:
+        return Icons.foggy;
+      case WeatherCondition.drizzle:
+      case WeatherCondition.rain:
+        return Icons.water_drop_outlined;
+      case WeatherCondition.snow:
+        return Icons.ac_unit;
+      case WeatherCondition.thunder:
+        return Icons.thunderstorm_outlined;
+      case WeatherCondition.unknown:
+        return Icons.wb_cloudy_outlined;
+    }
+  }
+
+  static String _conditionLabel(
+    AppLocalizations l10n,
+    WeatherCondition condition,
+  ) {
+    switch (condition) {
+      case WeatherCondition.clear:
+        return l10n.weatherClear;
+      case WeatherCondition.partlyCloudy:
+        return l10n.weatherPartlyCloudy;
+      case WeatherCondition.cloudy:
+        return l10n.weatherCloudy;
+      case WeatherCondition.fog:
+        return l10n.weatherFog;
+      case WeatherCondition.drizzle:
+        return l10n.weatherDrizzle;
+      case WeatherCondition.rain:
+        return l10n.weatherRain;
+      case WeatherCondition.snow:
+        return l10n.weatherSnow;
+      case WeatherCondition.thunder:
+        return l10n.weatherThunder;
+      case WeatherCondition.unknown:
+        return l10n.weatherUnknown;
+    }
   }
 }
 

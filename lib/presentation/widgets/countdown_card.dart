@@ -6,6 +6,7 @@ import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/countdown_item.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../shared/widgets/theme_config_scope.dart';
 
 /// 倒计时卡片。
 ///
@@ -36,7 +37,9 @@ class CountdownCard extends ConsumerWidget {
     final summary = ref.watch(
       provider.select((async) => async.valueOrNull?.summary),
     );
-    final accent = item.color ?? theme.colorScheme.primary;
+    final accent = item.color ??
+        ThemeConfigScope.of(context)?.countdownColor ??
+        theme.colorScheme.primary;
 
     if (summary == null) {
       return const GlassCard(
@@ -59,6 +62,8 @@ class CountdownCard extends ConsumerWidget {
 
     return GlassCard(
       onTap: onTap,
+      // 自定义背景色：只影响卡片底色，色条/数字仍用强调色。
+      color: item.backgroundColor,
       padding: compact
           ? const EdgeInsets.all(14)
           : const EdgeInsets.fromLTRB(16, 16, 16, 14),

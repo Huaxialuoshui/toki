@@ -14,6 +14,58 @@
   "homeGreeting": "Welcome back",
   "homeWeatherPlaceholder": "Weather",
   "homeWeatherHint": "Weather integration is reserved for a later phase",
+  "homeWeatherDetail": "{city} · Low {min}° / High {max}°",
+  "@homeWeatherDetail": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherCity": "City",
+  "weatherCityHint": "e.g. Shanghai / 上海",
+  "weatherCitySaved": "City saved",
+  "weatherSection": "Weather",
+  "weatherSectionSubtitle": "Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.",
+  "weatherClear": "Clear",
+  "weatherPartlyCloudy": "Partly cloudy",
+  "weatherCloudy": "Overcast",
+  "weatherFog": "Fog",
+  "weatherDrizzle": "Drizzle",
+  "weatherRain": "Rain",
+  "weatherSnow": "Snow",
+  "weatherThunder": "Thunderstorm",
+  "weatherUnknown": "Unknown",
+  "weatherSave": "Save",
+  "weatherClearCity": "Clear",
+  "digestSection": "Daily briefings",
+  "digestSectionSubtitle": "Ask the assistant to write a morning plan and an evening recap. Off by default; generated at most once per day.",
+  "digestMorningToggle": "Morning plan",
+  "digestEveningToggle": "Evening recap",
+  "digestMorningTitle": "Today's plan",
+  "digestEveningTitle": "Today's recap",
+  "digestGenerate": "Generate",
+  "digestRegenerate": "Regenerate",
+  "digestGenerating": "The assistant is writing…",
+  "digestFailed": "Could not generate",
+  "syncSection": "Data sync",
+  "syncLocalTitle": "This device only",
+  "syncLocalSubtitle": "Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.",
+  "syncNow": "Check local data",
+  "syncLocalDone": "Local data is ready ({message})",
+  "@syncLocalDone": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "homeTodayEvents": "Today's schedule",
   "homeNoEvents": "Nothing scheduled today",
   "homeCountdowns": "Countdowns",
@@ -65,6 +117,7 @@
   "countdownStyleBigNumber": "Big number",
   "countdownStyleFullText": "Full text",
   "countdownFieldPinned": "Pin to top",
+  "countdownFieldBackground": "Card background",
   "countdownDragHint": "Drag the handle to reorder",
   "countdownDragHintLongPress": "Long-press the handle to reorder",
   "countdownDragHandle": "Reorder",
@@ -384,6 +437,12 @@
   "themeBrightnessLight": "Light",
   "themeBrightnessDark": "Dark",
   "themeEditorPreview": "Live preview",
+  "themeEditorAreas": "Per-area colours",
+  "themeEditorAreasHint": "Optional. Leave any of them on \"Default\" to follow the theme colours above.",
+  "themeAreaNavBar": "Nav bar",
+  "themeAreaSidebar": "Sidebar",
+  "themeAreaEvent": "Calendar events",
+  "themeAreaCountdown": "Countdowns",
   "themeSave": "Save theme",
   "themeSaveAs": "Save as new",
   "themeSaveName": "Theme name",

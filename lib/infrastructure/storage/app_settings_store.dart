@@ -27,6 +27,10 @@ class AppSettingsStore {
   static const String _aiAllowDeleteKey = 'settings.ai.allowDelete';
   static const String _chatAppearanceKey = 'settings.chatAppearance';
   static const String _activeChatSessionKey = 'settings.chatSessionId';
+  static const String _weatherCityKey = 'settings.weatherCity';
+  static const String _weatherCacheKey = 'settings.weatherCache';
+  static const String _digestMorningKey = 'settings.digest.morning';
+  static const String _digestEveningKey = 'settings.digest.evening';
 
   /// 语言代码；返回 null 表示"跟随系统"。
   String? readLocaleCode() => _preferences.getString(_localeKey);
@@ -119,6 +123,41 @@ class AppSettingsStore {
 
   Future<void> writeActiveChatSessionId(String id) =>
       _preferences.setString(_activeChatSessionKey, id);
+
+  /// 天气城市（为空表示不显示天气，首页保留占位）。
+  String? readWeatherCity() => _preferences.getString(_weatherCityKey);
+
+  Future<void> writeWeatherCity(String? city) async {
+    if (city == null || city.trim().isEmpty) {
+      await _preferences.remove(_weatherCityKey);
+    } else {
+      await _preferences.setString(_weatherCityKey, city.trim());
+    }
+  }
+
+  /// 天气缓存（JSON 字符串），避免每次打开首页都打网络。
+  String? readWeatherCache() => _preferences.getString(_weatherCacheKey);
+
+  Future<void> writeWeatherCache(String? json) async {
+    if (json == null) {
+      await _preferences.remove(_weatherCacheKey);
+    } else {
+      await _preferences.setString(_weatherCacheKey, json);
+    }
+  }
+
+  /// AI 每日计划 / 每日总结开关（规格 §14），默认都关闭。
+  bool readMorningDigestEnabled() =>
+      _preferences.getBool(_digestMorningKey) ?? false;
+
+  Future<void> writeMorningDigestEnabled(bool value) =>
+      _preferences.setBool(_digestMorningKey, value);
+
+  bool readEveningDigestEnabled() =>
+      _preferences.getBool(_digestEveningKey) ?? false;
+
+  Future<void> writeEveningDigestEnabled(bool value) =>
+      _preferences.setBool(_digestEveningKey, value);
 }
 
 /// 必须在 `main()` 中 override（见 `lib/main.dart`）。

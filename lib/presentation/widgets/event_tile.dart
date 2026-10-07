@@ -4,6 +4,7 @@ import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/calendar_event.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../../shared/widgets/theme_config_scope.dart';
 
 /// 日程条目：左侧色条 + 标题 + 时间 / 地点。
 class EventTile extends StatelessWidget {
@@ -31,7 +32,10 @@ class EventTile extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = context.l10n;
     final locale = context.localeCode;
-    final color = event.color ?? theme.colorScheme.primary;
+    // 事件自己的颜色 > 主题里配的"日历事件默认色" > 主题主色。
+    final color = event.color ??
+        ThemeConfigScope.of(context)?.eventColor ??
+        theme.colorScheme.primary;
     final start = startTime ?? event.startTime;
     final end = endTime ?? event.endTime;
 
