@@ -362,6 +362,216 @@ abstract class AppLocalizations {
   /// **'Local data is ready ({message})'**
   String syncLocalDone(String message);
 
+  /// No description provided for @widgetSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Home-screen widget'**
+  String get widgetSection;
+
+  /// No description provided for @widgetSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows the nearest countdown or event on your Android home screen. Skin, icon and background image are up to you.'**
+  String get widgetSectionSubtitle;
+
+  /// No description provided for @widgetBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get widgetBackground;
+
+  /// No description provided for @widgetSkinSolid.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid'**
+  String get widgetSkinSolid;
+
+  /// No description provided for @widgetSkinGradient.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient'**
+  String get widgetSkinGradient;
+
+  /// No description provided for @widgetSkinImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get widgetSkinImage;
+
+  /// No description provided for @widgetBackgroundImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Background image'**
+  String get widgetBackgroundImage;
+
+  /// No description provided for @widgetPickImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick image'**
+  String get widgetPickImage;
+
+  /// No description provided for @widgetClearImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get widgetClearImage;
+
+  /// No description provided for @widgetTextColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Text colour'**
+  String get widgetTextColor;
+
+  /// No description provided for @widgetAccentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent colour'**
+  String get widgetAccentColor;
+
+  /// No description provided for @widgetIconStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon style'**
+  String get widgetIconStyle;
+
+  /// No description provided for @widgetIconOutlined.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlined'**
+  String get widgetIconOutlined;
+
+  /// No description provided for @widgetIconFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled'**
+  String get widgetIconFilled;
+
+  /// No description provided for @widgetCornerRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Corner radius'**
+  String get widgetCornerRadius;
+
+  /// No description provided for @widgetShowCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Show countdown'**
+  String get widgetShowCountdown;
+
+  /// No description provided for @widgetShowEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Show next event'**
+  String get widgetShowEvent;
+
+  /// No description provided for @widgetTransparent.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent background'**
+  String get widgetTransparent;
+
+  /// No description provided for @widgetRefreshNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh widget now'**
+  String get widgetRefreshNow;
+
+  /// No description provided for @widgetAddToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to home screen'**
+  String get widgetAddToHome;
+
+  /// No description provided for @widgetAddToHomeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If the launcher supports it, confirm the system dialog to pin the widget.'**
+  String get widgetAddToHomeHint;
+
+  /// No description provided for @widgetRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget refreshed'**
+  String get widgetRefreshed;
+
+  /// No description provided for @widgetBackgroundService.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep running in background'**
+  String get widgetBackgroundService;
+
+  /// No description provided for @widgetBackgroundServiceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Android requires a silent, minimal notification for this. It keeps widget refreshes and reminders alive when the system would otherwise kill the process.'**
+  String get widgetBackgroundServiceHint;
+
+  /// No description provided for @widgetBatteryOptimization.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore battery optimizations'**
+  String get widgetBatteryOptimization;
+
+  /// No description provided for @widgetBatteryOptimizationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets the system stop killing Toki in the background. Opens a system dialog.'**
+  String get widgetBatteryOptimizationHint;
+
+  /// No description provided for @widgetBatteryOptimizationDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested'**
+  String get widgetBatteryOptimizationDone;
+
+  /// No description provided for @widgetNextEventTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next event'**
+  String get widgetNextEventTitle;
+
+  /// No description provided for @widgetNextEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {name} · {time}'**
+  String widgetNextEvent(String name, String time);
+
+  /// No description provided for @widgetNoUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing scheduled'**
+  String get widgetNoUpcoming;
+
+  /// No description provided for @widgetUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String widgetUpdatedAt(Object time);
+
+  /// No description provided for @widgetCountdownPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Already passed'**
+  String get widgetCountdownPast;
+
+  /// No description provided for @widgetRemainingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d {hours} h left'**
+  String widgetRemainingDays(int days, int hours);
+
+  /// No description provided for @widgetRemainingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min left'**
+  String widgetRemainingHours(int hours, int minutes);
+
+  /// No description provided for @widgetRemainingMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min left'**
+  String widgetRemainingMinutes(int minutes);
+
   /// No description provided for @homeTodayEvents.
   ///
   /// In en, this message translates to:

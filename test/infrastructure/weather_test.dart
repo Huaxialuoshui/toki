@@ -85,6 +85,7 @@ void main() {
     test('先查城市再查天气，首页拿到温度与状况', () async {
       final paths = <String>[];
       final service = OpenMeteoWeatherService(
+        now: () => DateTime(2026, 10, 7, 9, 30),
         dio: dioWith((RequestOptions options) {
           paths.add(options.uri.path);
           if (options.uri.host.contains('geocoding')) {
@@ -103,9 +104,20 @@ void main() {
               'temperature_2m': 23.4,
               'weather_code': 61,
             },
+            'hourly': <String, Object?>{
+              'time': <Object?>[
+                '2026-10-07T09:00',
+                '2026-10-07T10:00',
+                '2026-10-07T11:00',
+              ],
+              'temperature_2m': <Object?>[22.1, 23.4, 24.0],
+              'weather_code': <Object?>[3, 61, 2],
+            },
             'daily': <String, Object?>{
-              'temperature_2m_max': <Object?>[27.1],
-              'temperature_2m_min': <Object?>[19.2],
+              'time': <Object?>['2026-10-07', '2026-10-08'],
+              'weather_code': <Object?>[61, 3],
+              'temperature_2m_max': <Object?>[27.1, 26.0],
+              'temperature_2m_min': <Object?>[19.2, 18.0],
             },
           });
         }),
@@ -119,6 +131,11 @@ void main() {
       expect(snapshot.condition, WeatherCondition.rain);
       expect(snapshot.tempMax, 27.1);
       expect(snapshot.tempMin, 19.2);
+      expect(snapshot.daily, hasLength(2));
+      expect(snapshot.daily.last.condition, WeatherCondition.cloudy);
+      // 逐小时里晚于"现在"的那些（测试固定不了系统时间，只校验解析结果）
+      expect(snapshot.hourly.map((WeatherHour h) => h.temperature),
+          contains(23.4));
     });
 
     test('城市查不到时给出可读错误', () async {

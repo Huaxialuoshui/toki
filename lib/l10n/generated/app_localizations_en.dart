@@ -147,6 +147,125 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get widgetSection => 'Home-screen widget';
+
+  @override
+  String get widgetSectionSubtitle =>
+      'Shows the nearest countdown or event on your Android home screen. Skin, icon and background image are up to you.';
+
+  @override
+  String get widgetBackground => 'Background';
+
+  @override
+  String get widgetSkinSolid => 'Solid';
+
+  @override
+  String get widgetSkinGradient => 'Gradient';
+
+  @override
+  String get widgetSkinImage => 'Image';
+
+  @override
+  String get widgetBackgroundImage => 'Background image';
+
+  @override
+  String get widgetPickImage => 'Pick image';
+
+  @override
+  String get widgetClearImage => 'Remove image';
+
+  @override
+  String get widgetTextColor => 'Text colour';
+
+  @override
+  String get widgetAccentColor => 'Accent colour';
+
+  @override
+  String get widgetIconStyle => 'Icon style';
+
+  @override
+  String get widgetIconOutlined => 'Outlined';
+
+  @override
+  String get widgetIconFilled => 'Filled';
+
+  @override
+  String get widgetCornerRadius => 'Corner radius';
+
+  @override
+  String get widgetShowCountdown => 'Show countdown';
+
+  @override
+  String get widgetShowEvent => 'Show next event';
+
+  @override
+  String get widgetTransparent => 'Translucent background';
+
+  @override
+  String get widgetRefreshNow => 'Refresh widget now';
+
+  @override
+  String get widgetAddToHome => 'Add to home screen';
+
+  @override
+  String get widgetAddToHomeHint =>
+      'If the launcher supports it, confirm the system dialog to pin the widget.';
+
+  @override
+  String get widgetRefreshed => 'Widget refreshed';
+
+  @override
+  String get widgetBackgroundService => 'Keep running in background';
+
+  @override
+  String get widgetBackgroundServiceHint =>
+      'Android requires a silent, minimal notification for this. It keeps widget refreshes and reminders alive when the system would otherwise kill the process.';
+
+  @override
+  String get widgetBatteryOptimization => 'Ignore battery optimizations';
+
+  @override
+  String get widgetBatteryOptimizationHint =>
+      'Lets the system stop killing Toki in the background. Opens a system dialog.';
+
+  @override
+  String get widgetBatteryOptimizationDone => 'Requested';
+
+  @override
+  String get widgetNextEventTitle => 'Next event';
+
+  @override
+  String widgetNextEvent(String name, String time) {
+    return 'Next: $name · $time';
+  }
+
+  @override
+  String get widgetNoUpcoming => 'Nothing scheduled';
+
+  @override
+  String widgetUpdatedAt(Object time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String get widgetCountdownPast => 'Already passed';
+
+  @override
+  String widgetRemainingDays(int days, int hours) {
+    return '$days d $hours h left';
+  }
+
+  @override
+  String widgetRemainingHours(int hours, int minutes) {
+    return '$hours h $minutes min left';
+  }
+
+  @override
+  String widgetRemainingMinutes(int minutes) {
+    return '$minutes min left';
+  }
+
+  @override
   String get homeTodayEvents => 'Today\'s schedule';
 
   @override

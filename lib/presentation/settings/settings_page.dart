@@ -23,6 +23,7 @@ import 'chat_appearance_section.dart';
 import 'digest_section.dart';
 import 'sync_section.dart';
 import 'weather_section.dart';
+import 'widget_section.dart';
 import '../../application/ai/tool_permissions.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
@@ -282,6 +283,12 @@ class SettingsPage extends ConsumerWidget {
             icon: Icons.cloud_sync_outlined,
           ),
           const SyncSection(),
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: l10n.widgetSection,
+            icon: Icons.widgets_outlined,
+          ),
+          const WidgetSection(),
           const SizedBox(height: 16),
           SectionHeader(
             title: l10n.settingsBackupSection,

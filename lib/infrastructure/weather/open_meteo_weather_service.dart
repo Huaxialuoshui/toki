@@ -13,15 +13,20 @@ class OpenMeteoWeatherService implements WeatherService {
     Dio? dio,
     this.languageCode = 'zh',
     Duration timeout = const Duration(seconds: 10),
-  }) : _dio = dio ??
+    DateTime Function()? now,
+  })  : _dio = dio ??
             Dio(
               BaseOptions(
                 connectTimeout: timeout,
                 receiveTimeout: timeout,
               ),
-            );
+            ),
+        _now = now ?? DateTime.now;
 
   final Dio _dio;
+
+  /// 取"当前时间"的方式（测试里可以注入固定时间）。
+  final DateTime Function() _now;
 
   /// 城市搜索结果的语言（跟界面语言走）。
   final String languageCode;
@@ -41,16 +46,26 @@ class OpenMeteoWeatherService implements WeatherService {
     final weather = await _current(
       latitude: place.latitude,
       longitude: place.longitude,
+      label: place.name,
+      withCoordinates: false,
     );
 
-    return WeatherSnapshot(
-      city: place.name,
-      condition: WeatherCondition.fromCode(weather.code),
-      temperature: weather.temperature,
-      tempMax: weather.max,
-      tempMin: weather.min,
-      fetchedAt: DateTime.now(),
+    return weather.snapshot;
+  }
+
+  @override
+  Future<WeatherSnapshot> fetchByCoordinates({
+    required double latitude,
+    required double longitude,
+    String label = '当前位置',
+  }) async {
+    final weather = await _current(
+      latitude: latitude,
+      longitude: longitude,
+      label: label,
+      withCoordinates: true,
     );
+    return weather.snapshot;
   }
 
   Future<_Place> _geocode(String city) async {
@@ -93,6 +108,8 @@ class OpenMeteoWeatherService implements WeatherService {
   Future<_Reading> _current({
     required double latitude,
     required double longitude,
+    required String label,
+    required bool withCoordinates,
   }) async {
     final Response<dynamic> response;
     try {
@@ -102,8 +119,10 @@ class OpenMeteoWeatherService implements WeatherService {
           'latitude': latitude,
           'longitude': longitude,
           'current': 'temperature_2m,weather_code',
-          'daily': 'temperature_2m_max,temperature_2m_min',
-          'forecast_days': 1,
+          'hourly': 'temperature_2m,weather_code',
+          'daily': 'weather_code,temperature_2m_max,temperature_2m_min',
+          'forecast_days': 5,
+          'forecast_hours': 24,
           'timezone': 'auto',
         },
       );
@@ -121,20 +140,88 @@ class OpenMeteoWeatherService implements WeatherService {
         current is Map ? (current['weather_code'] as num?)?.toInt() : null;
     if (temperature == null) throw const AppException('天气：返回里没有温度');
 
-    final daily = data['daily'];
-    double? firstOf(String key) {
-      if (daily is! Map) return null;
-      final list = daily[key];
-      if (list is! List || list.isEmpty) return null;
-      return (list.first as num?)?.toDouble();
-    }
+    final days = _parseDays(data['daily']);
+    final hours = _parseHours(data['hourly']);
+    final now = _now();
+    final upcoming = hours
+        .where((WeatherHour h) =>
+            !h.time.isBefore(now.subtract(const Duration(hours: 1))))
+        .take(12)
+        .toList(growable: false);
 
     return _Reading(
-      temperature: temperature,
-      code: code,
-      max: firstOf('temperature_2m_max'),
-      min: firstOf('temperature_2m_min'),
+      snapshot: WeatherSnapshot(
+        city: label,
+        condition: WeatherCondition.fromCode(code),
+        temperature: temperature,
+        tempMax: days.isEmpty ? null : days.first.tempMax,
+        tempMin: days.isEmpty ? null : days.first.tempMin,
+        hourly: upcoming,
+        daily: days,
+        latitude: withCoordinates ? latitude : null,
+        longitude: withCoordinates ? longitude : null,
+        fetchedAt: _now(),
+      ),
     );
+  }
+
+  /// 解析 `daily`：时间数组 + 天气码数组 + 高低温数组（索引对齐）。
+  static List<WeatherDay> _parseDays(Object? raw) {
+    if (raw is! Map) return const <WeatherDay>[];
+    final times = raw['time'];
+    if (times is! List) return const <WeatherDay>[];
+    final codes = raw['weather_code'];
+    final maxes = raw['temperature_2m_max'];
+    final mins = raw['temperature_2m_min'];
+
+    T? at<T>(Object? list, int index) {
+      if (list is! List || index >= list.length) return null;
+      return list[index] as T?;
+    }
+
+    final days = <WeatherDay>[];
+    for (var i = 0; i < times.length; i++) {
+      final date = DateTime.tryParse('${times[i]}');
+      if (date == null) continue;
+      days.add(
+        WeatherDay(
+          date: date,
+          condition: WeatherCondition.fromCode(at<num>(codes, i)?.toInt()),
+          tempMax: at<num>(maxes, i)?.toDouble(),
+          tempMin: at<num>(mins, i)?.toDouble(),
+        ),
+      );
+    }
+    return days;
+  }
+
+  /// 解析 `hourly`（时间 / 温度 / 天气码）。
+  static List<WeatherHour> _parseHours(Object? raw) {
+    if (raw is! Map) return const <WeatherHour>[];
+    final times = raw['time'];
+    if (times is! List) return const <WeatherHour>[];
+    final temps = raw['temperature_2m'];
+    final codes = raw['weather_code'];
+
+    T? at<T>(Object? list, int index) {
+      if (list is! List || index >= list.length) return null;
+      return list[index] as T?;
+    }
+
+    final hours = <WeatherHour>[];
+    for (var i = 0; i < times.length; i++) {
+      final time = DateTime.tryParse('${times[i]}');
+      final temp = at<num>(temps, i)?.toDouble();
+      if (time == null || temp == null) continue;
+      hours.add(
+        WeatherHour(
+          time: time,
+          temperature: temp,
+          condition: WeatherCondition.fromCode(at<num>(codes, i)?.toInt()),
+        ),
+      );
+    }
+    return hours;
   }
 
   String _describe(DioException error, String fallback) {
@@ -157,15 +244,7 @@ class _Place {
 }
 
 class _Reading {
-  const _Reading({
-    required this.temperature,
-    required this.code,
-    this.max,
-    this.min,
-  });
+  const _Reading({required this.snapshot});
 
-  final double temperature;
-  final int? code;
-  final double? max;
-  final double? min;
+  final WeatherSnapshot snapshot;
 }

@@ -29,6 +29,8 @@ class AppSettingsStore {
   static const String _activeChatSessionKey = 'settings.chatSessionId';
   static const String _weatherCityKey = 'settings.weatherCity';
   static const String _weatherCacheKey = 'settings.weatherCache';
+  static const String _weatherLocationsKey = 'settings.weatherLocations';
+  static const String _widgetConfigKey = 'settings.widgetConfig';
   static const String _digestMorningKey = 'settings.digest.morning';
   static const String _digestEveningKey = 'settings.digest.evening';
 
@@ -145,6 +147,19 @@ class AppSettingsStore {
       await _preferences.setString(_weatherCacheKey, json);
     }
   }
+
+  /// 天气历史位置（JSON 数组字符串）。
+  String? readWeatherLocations() =>
+      _preferences.getString(_weatherLocationsKey);
+
+  Future<void> writeWeatherLocations(String json) =>
+      _preferences.setString(_weatherLocationsKey, json);
+
+  /// 桌面小组件外观配置（JSON 字符串）。
+  String? readWidgetConfig() => _preferences.getString(_widgetConfigKey);
+
+  Future<void> writeWidgetConfig(String json) =>
+      _preferences.setString(_widgetConfigKey, json);
 
   /// AI 每日计划 / 每日总结开关（规格 §14），默认都关闭。
   bool readMorningDigestEnabled() =>

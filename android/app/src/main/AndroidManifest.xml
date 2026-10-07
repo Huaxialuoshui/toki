@@ -11,6 +11,13 @@
          否则打包出来的 APK 完全没有网络权限（AI 与天气都会静默失败）。 -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 天气按 GPS 取位置（只取一次，不做后台持续定位） -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!-- 可选的"常驻后台"前台服务 + 电池优化白名单 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
         android:label="toki"
@@ -38,6 +45,36 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- 桌面小组件 -->
+        <receiver
+            android:name=".TokiWidgetProvider"
+            android:exported="true"
+            android:label="Toki">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.toki.toki.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/toki_widget_info" />
+        </receiver>
+
+        <!-- 开机 / 应用更新后重新排期小组件刷新与常驻服务 -->
+        <receiver
+            android:name=".TokiBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 可选的常驻后台服务（默认关闭；通知为最低重要性、静音） -->
+        <service
+            android:name=".TokiBackgroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

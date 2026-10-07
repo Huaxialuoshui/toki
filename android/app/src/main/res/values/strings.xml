@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">日程与倒计时的小组件，可在应用里自定义皮肤、图标与背景图片</string>
+    <string name="widget_refresh">刷新小组件</string>
+</resources>

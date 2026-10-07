@@ -5,6 +5,7 @@ import '../application/settings/settings_controller.dart';
 import '../application/app_startup.dart';
 import '../application/notification/reminder_sync.dart';
 import '../application/theme/theme_controller.dart';
+import '../application/widget/widget_controller.dart';
 import '../application/theme/theme_mapper.dart';
 import '../core/extensions/l10n_extension.dart';
 import '../domain/entities/glass_style.dart';
@@ -28,6 +29,8 @@ class TokiApp extends ConsumerWidget {
     // 通知：请求权限 + 首次排期同步，并在提醒变化时自动重排。
     ref.watch(notificationStartupProvider);
     ref.watch(reminderAutoSyncProvider);
+    // 日程 / 倒计时 / 小组件外观一变，就把状态推给原生桌面小组件。
+    ref.watch(widgetAutoSyncProvider);
 
     final resolution = ref.watch(themeResolutionProvider);
     final locale = ref.watch(localeControllerProvider);

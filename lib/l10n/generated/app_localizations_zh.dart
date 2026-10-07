@@ -144,6 +144,123 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get widgetSection => '桌面小组件';
+
+  @override
+  String get widgetSectionSubtitle =>
+      '在 Android 桌面显示最近的倒计时或日程；皮肤、图标、背景图片都可以自己定。';
+
+  @override
+  String get widgetBackground => '背景';
+
+  @override
+  String get widgetSkinSolid => '纯色';
+
+  @override
+  String get widgetSkinGradient => '渐变';
+
+  @override
+  String get widgetSkinImage => '图片';
+
+  @override
+  String get widgetBackgroundImage => '背景图片';
+
+  @override
+  String get widgetPickImage => '选择图片';
+
+  @override
+  String get widgetClearImage => '移除图片';
+
+  @override
+  String get widgetTextColor => '文字颜色';
+
+  @override
+  String get widgetAccentColor => '强调色';
+
+  @override
+  String get widgetIconStyle => '图标风格';
+
+  @override
+  String get widgetIconOutlined => '描边';
+
+  @override
+  String get widgetIconFilled => '实心';
+
+  @override
+  String get widgetCornerRadius => '圆角';
+
+  @override
+  String get widgetShowCountdown => '显示倒计时';
+
+  @override
+  String get widgetShowEvent => '显示下一个日程';
+
+  @override
+  String get widgetTransparent => '半透明背景';
+
+  @override
+  String get widgetRefreshNow => '立即刷新小组件';
+
+  @override
+  String get widgetAddToHome => '添加到桌面';
+
+  @override
+  String get widgetAddToHomeHint => '启动器支持的话，确认系统弹窗即可把小组件钉到桌面。';
+
+  @override
+  String get widgetRefreshed => '小组件已刷新';
+
+  @override
+  String get widgetBackgroundService => '常驻后台运行';
+
+  @override
+  String get widgetBackgroundServiceHint =>
+      'Android 要求前台服务显示一条静音通知；它能让小组件刷新与提醒在系统回收进程时依然存活。';
+
+  @override
+  String get widgetBatteryOptimization => '加入电池优化白名单';
+
+  @override
+  String get widgetBatteryOptimizationHint => '让系统尽量不杀 Toki 的后台进程，会打开系统确认框。';
+
+  @override
+  String get widgetBatteryOptimizationDone => '已发起请求';
+
+  @override
+  String get widgetNextEventTitle => '下一个日程';
+
+  @override
+  String widgetNextEvent(String name, String time) {
+    return '下一个：$name · $time';
+  }
+
+  @override
+  String get widgetNoUpcoming => '暂时没有安排';
+
+  @override
+  String widgetUpdatedAt(Object time) {
+    return '更新于 $time';
+  }
+
+  @override
+  String get widgetCountdownPast => '已过期';
+
+  @override
+  String widgetRemainingDays(int days, int hours) {
+    return '还有 $days 天 $hours 小时';
+  }
+
+  @override
+  String widgetRemainingHours(int hours, int minutes) {
+    return '还有 $hours 小时 $minutes 分';
+  }
+
+  @override
+  String widgetRemainingMinutes(int minutes) {
+    return '还有 $minutes 分钟';
+  }
+
+  @override
   String get homeTodayEvents => '今日事项';
 
   @override

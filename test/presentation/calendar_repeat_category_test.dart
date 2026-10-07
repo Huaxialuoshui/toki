@@ -134,9 +134,11 @@ void main() {
         );
     await tester.pumpAndSettle();
 
-    await tester.tap(
-      find.byKey(ValueKey<String>('category-delete-${created.id}')),
-    );
+    final deleteButton =
+        find.byKey(ValueKey<String>('category-delete-${created.id}'));
+    await tester.ensureVisible(deleteButton);
+    await tester.pumpAndSettle();
+    await tester.tap(deleteButton);
     await tester.pumpAndSettle();
     await tester.tap(
       find.byKey(const ValueKey<String>('category-delete-confirm')),
