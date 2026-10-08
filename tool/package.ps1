@@ -159,10 +159,58 @@ if ($androidSdk) {
     Write-Log '          flutter config --android-sdk <你的 SDK 路径>' 'Yellow'
 }
 
-$jdk = $flutterConfig['jdk-dir']
-if ($jdk -and (Test-Path $jdk)) {
-    $env:JAVA_HOME = $jdk
-    Write-Log "      JDK：$jdk"
+# --- 1c. 构建实际会用哪个 JDK ---------------------------------------------
+# Flutter 找 JDK 的顺序是：flutter config 的 jdk-dir → Android Studio 自带的
+# JBR → JAVA_HOME（JBR 排在 JAVA_HOME **前面**）。所以 jdk-dir 没设时，机器上
+# 装没装 Android Studio、它自带什么版本，就决定了构建用哪个 JDK。
+# 踩过一次坑：AGP 8.1.0 + Java 21 会让 jlink 直接失败，而日志里一个字都没提
+# JDK，很难查。所以这里按同样的顺序解析出来，显式打一行。
+$jdkSource = 'JAVA_HOME'
+$javaHome = $flutterConfig['jdk-dir']
+if ($javaHome -and $javaHome -ne '(Not set)' -and (Test-Path $javaHome)) {
+    $jdkSource = 'flutter config 的 jdk-dir'
+} else {
+    $javaHome = $null
+    foreach ($candidate in @(
+            (Join-Path $env:ProgramFiles 'Android\Android Studio\jbr'),
+            (Join-Path ${env:ProgramFiles(x86)} 'Android\Android Studio\jbr'),
+            (Join-Path $env:LOCALAPPDATA 'Programs\Android Studio\jbr'))) {
+        if (-not $javaHome -and $candidate -and (Test-Path (Join-Path $candidate 'bin\java.exe'))) {
+            $javaHome = $candidate
+            $jdkSource = 'Android Studio 自带 JBR（flutter 优先选它）'
+        }
+    }
+    if (-not $javaHome -and $env:JAVA_HOME) { $javaHome = $env:JAVA_HOME }
+}
+
+$javaVersion = '未知'
+$javaMajor = 0
+if ($javaHome) {
+    $env:JAVA_HOME = $javaHome
+    $javaExe = Join-Path $javaHome 'bin\java.exe'
+    if (Test-Path $javaExe) {
+        # java -version 是往 stderr 写的；$ErrorActionPreference='Stop' 会把它
+        # 当成终止性错误直接崩掉脚本（和 Invoke-Tool 里处理的是同一件事）。
+        $previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $javaLine = & $javaExe -version 2>&1 | Select-Object -First 1
+        } finally {
+            $ErrorActionPreference = $previous
+        }
+        if ("$javaLine" -match '"([^"]+)"') { $javaVersion = $Matches[1] }
+        if ($javaVersion -match '^(\d+)') { $javaMajor = [int]$Matches[1] }
+    }
+    Write-Log "      JDK：$javaHome（$jdkSource，$javaVersion）"
+    if ($javaMajor -gt 0 -and $javaMajor -lt 17) {
+        Write-Log "      [!] JDK $javaMajor 太旧：Android Gradle Plugin 8.x 需要 JDK 17 以上。" 'Yellow'
+        Write-Log '          换成 17：flutter config --jdk-dir "C:\Program Files\Java\jdk-17"' 'Yellow'
+    } elseif ($javaMajor -ge 23) {
+        Write-Log "      [!] JDK $javaMajor 比 Gradle 8.3 支持的版本新，构建可能失败。" 'Yellow'
+        Write-Log '          换成 17：flutter config --jdk-dir "C:\Program Files\Java\jdk-17"' 'Yellow'
+    }
+} else {
+    Write-Log '      [!] 没找到 JDK，构建大概率会失败。装个 JDK 17 再跑。' 'Yellow'
 }
 
 # --- 2. 版本号 ------------------------------------------------------------

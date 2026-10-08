@@ -21,6 +21,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        // flutter_local_notifications（19.x）的 AAR 元数据要求开启它：
+        // 插件用了 java.time，开 desugaring 才能在 Android 8 以下也跑得起来。
+        coreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -60,4 +63,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }
