@@ -16,6 +16,7 @@ import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/storage/app_settings_store.dart';
 import 'ai_providers.dart';
 import 'context_service.dart';
+import 'persona_prompt.dart';
 import 'tool_permissions.dart';
 import 'tools/ai_tool.dart';
 import 'tools/tool_registry.dart';
@@ -315,8 +316,9 @@ class ChatController extends Notifier<ChatStreamState> {
     try {
       // Phase 9：按用户问题动态收集上下文（今天/相关日程/倒计时/当前时间），
       // 只算一次，后续轮次靠工具结果补充细节。
+      // 纯聊天人设不碰日历：连"当前时间"都不注入，只靠对话本身。
       final question = await _latestUserQuestion(session.id);
-      final context = question == null
+      final context = question == null || !PersonaPrompt.usesCalendar(persona)
           ? null
           : await ref.read(contextServiceProvider).buildContext(question);
 

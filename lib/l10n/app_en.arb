@@ -477,6 +477,9 @@
   "avatarClear": "Remove",
   "avatarChange": "Change avatar",
   "aiPersonaDefaultPrompt": "You are the user's personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.",
+  "aiPersonaCalendarAssistant": "Acting as a calendar assistant",
+  "aiPersonaCalendarAssistantHint": "On: today's events and countdowns are sent to the AI as context, and it may add, edit or delete them with tools. Off: pure chat / roleplay — no schedule data is sent, no tools are offered, and schedule talk stays conversation and reminders.",
+  "aiPersonaChatOnly": "Chat only",
   "aiPersonaSwitched": "Switched to {name}",
   "@aiPersonaSwitched": {
     "placeholders": {

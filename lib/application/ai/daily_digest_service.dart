@@ -14,6 +14,7 @@ import '../settings/settings_controller.dart';
 import 'ai_providers.dart';
 import 'chat_controller.dart';
 import 'context_service.dart';
+import 'persona_prompt.dart';
 
 /// AI 每日计划 / 每日总结（规格 §14）。
 ///
@@ -103,7 +104,11 @@ class DailyDigestService {
   }
 
   String _systemPrompt(AiPersona? persona) {
-    final base = persona?.systemPrompt?.trim();
+    // 每日计划 / 总结本身就是日程功能：当前人设是"纯聊天"时不能用它的
+    // 扮演提示词写日程摘要，否则会得到一段跑题的剧本。
+    final base = PersonaPrompt.isCalendarAssistant(persona)
+        ? persona?.systemPrompt?.trim()
+        : null;
     if (base != null && base.isNotEmpty) return base;
     return '你是用户的私人日程助手，回答简短、直接、口语化。';
   }

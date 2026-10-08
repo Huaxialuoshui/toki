@@ -2204,6 +2204,17 @@ class $AiPersonasTable extends AiPersonas
               'enabled_tools', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<List<String>>($AiPersonasTable.$converterenabledTools);
+  static const VerificationMeta _calendarAssistantEnabledMeta =
+      const VerificationMeta('calendarAssistantEnabled');
+  @override
+  late final GeneratedColumn<bool> calendarAssistantEnabled =
+      GeneratedColumn<bool>(
+          'calendar_assistant_enabled', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintIsAlways(
+              'CHECK ("calendar_assistant_enabled" IN (0, 1))'),
+          defaultValue: const Constant(true));
   static const VerificationMeta _temperatureMeta =
       const VerificationMeta('temperature');
   @override
@@ -2236,6 +2247,7 @@ class $AiPersonasTable extends AiPersonas
         userNickname,
         systemPrompt,
         enabledTools,
+        calendarAssistantEnabled,
         temperature,
         createdAt,
         updatedAt
@@ -2301,6 +2313,13 @@ class $AiPersonasTable extends AiPersonas
           systemPrompt.isAcceptableOrUnknown(
               data['system_prompt']!, _systemPromptMeta));
     }
+    if (data.containsKey('calendar_assistant_enabled')) {
+      context.handle(
+          _calendarAssistantEnabledMeta,
+          calendarAssistantEnabled.isAcceptableOrUnknown(
+              data['calendar_assistant_enabled']!,
+              _calendarAssistantEnabledMeta));
+    }
     if (data.containsKey('temperature')) {
       context.handle(
           _temperatureMeta,
@@ -2349,6 +2368,9 @@ class $AiPersonasTable extends AiPersonas
       enabledTools: $AiPersonasTable.$converterenabledTools.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}enabled_tools'])!),
+      calendarAssistantEnabled: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool,
+          data['${effectivePrefix}calendar_assistant_enabled'])!,
       temperature: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}temperature'])!,
       createdAt: attachedDatabase.typeMapping
@@ -2380,6 +2402,10 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
   final String? userNickname;
   final String? systemPrompt;
   final List<String> enabledTools;
+
+  /// 是否作为日历助手。关掉就是"纯聊天 / 扮演"：不注入日程上下文、不给工具，
+  /// 只用 systemPrompt 里用户自己写的提示词。默认打开（老数据保持原行为）。
+  final bool calendarAssistantEnabled;
   final double temperature;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -2394,6 +2420,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       this.userNickname,
       this.systemPrompt,
       required this.enabledTools,
+      required this.calendarAssistantEnabled,
       required this.temperature,
       required this.createdAt,
       required this.updatedAt});
@@ -2427,6 +2454,8 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       map['enabled_tools'] = Variable<String>(
           $AiPersonasTable.$converterenabledTools.toSql(enabledTools));
     }
+    map['calendar_assistant_enabled'] =
+        Variable<bool>(calendarAssistantEnabled);
     map['temperature'] = Variable<double>(temperature);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -2458,6 +2487,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           ? const Value.absent()
           : Value(systemPrompt),
       enabledTools: Value(enabledTools),
+      calendarAssistantEnabled: Value(calendarAssistantEnabled),
       temperature: Value(temperature),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -2478,6 +2508,8 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       userNickname: serializer.fromJson<String?>(json['userNickname']),
       systemPrompt: serializer.fromJson<String?>(json['systemPrompt']),
       enabledTools: serializer.fromJson<List<String>>(json['enabledTools']),
+      calendarAssistantEnabled:
+          serializer.fromJson<bool>(json['calendarAssistantEnabled']),
       temperature: serializer.fromJson<double>(json['temperature']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -2497,6 +2529,8 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       'userNickname': serializer.toJson<String?>(userNickname),
       'systemPrompt': serializer.toJson<String?>(systemPrompt),
       'enabledTools': serializer.toJson<List<String>>(enabledTools),
+      'calendarAssistantEnabled':
+          serializer.toJson<bool>(calendarAssistantEnabled),
       'temperature': serializer.toJson<double>(temperature),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -2514,6 +2548,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           Value<String?> userNickname = const Value.absent(),
           Value<String?> systemPrompt = const Value.absent(),
           List<String>? enabledTools,
+          bool? calendarAssistantEnabled,
           double? temperature,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
@@ -2531,6 +2566,8 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
         systemPrompt:
             systemPrompt.present ? systemPrompt.value : this.systemPrompt,
         enabledTools: enabledTools ?? this.enabledTools,
+        calendarAssistantEnabled:
+            calendarAssistantEnabled ?? this.calendarAssistantEnabled,
         temperature: temperature ?? this.temperature,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -2558,6 +2595,9 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       enabledTools: data.enabledTools.present
           ? data.enabledTools.value
           : this.enabledTools,
+      calendarAssistantEnabled: data.calendarAssistantEnabled.present
+          ? data.calendarAssistantEnabled.value
+          : this.calendarAssistantEnabled,
       temperature:
           data.temperature.present ? data.temperature.value : this.temperature,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2578,6 +2618,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           ..write('userNickname: $userNickname, ')
           ..write('systemPrompt: $systemPrompt, ')
           ..write('enabledTools: $enabledTools, ')
+          ..write('calendarAssistantEnabled: $calendarAssistantEnabled, ')
           ..write('temperature: $temperature, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -2597,6 +2638,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
       userNickname,
       systemPrompt,
       enabledTools,
+      calendarAssistantEnabled,
       temperature,
       createdAt,
       updatedAt);
@@ -2614,6 +2656,7 @@ class AiPersonaRow extends DataClass implements Insertable<AiPersonaRow> {
           other.userNickname == this.userNickname &&
           other.systemPrompt == this.systemPrompt &&
           other.enabledTools == this.enabledTools &&
+          other.calendarAssistantEnabled == this.calendarAssistantEnabled &&
           other.temperature == this.temperature &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -2630,6 +2673,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
   final Value<String?> userNickname;
   final Value<String?> systemPrompt;
   final Value<List<String>> enabledTools;
+  final Value<bool> calendarAssistantEnabled;
   final Value<double> temperature;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -2645,6 +2689,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     this.userNickname = const Value.absent(),
     this.systemPrompt = const Value.absent(),
     this.enabledTools = const Value.absent(),
+    this.calendarAssistantEnabled = const Value.absent(),
     this.temperature = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2661,6 +2706,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     this.userNickname = const Value.absent(),
     this.systemPrompt = const Value.absent(),
     required List<String> enabledTools,
+    this.calendarAssistantEnabled = const Value.absent(),
     this.temperature = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -2681,6 +2727,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
     Expression<String>? userNickname,
     Expression<String>? systemPrompt,
     Expression<String>? enabledTools,
+    Expression<bool>? calendarAssistantEnabled,
     Expression<double>? temperature,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -2697,6 +2744,8 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       if (userNickname != null) 'user_nickname': userNickname,
       if (systemPrompt != null) 'system_prompt': systemPrompt,
       if (enabledTools != null) 'enabled_tools': enabledTools,
+      if (calendarAssistantEnabled != null)
+        'calendar_assistant_enabled': calendarAssistantEnabled,
       if (temperature != null) 'temperature': temperature,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2715,6 +2764,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       Value<String?>? userNickname,
       Value<String?>? systemPrompt,
       Value<List<String>>? enabledTools,
+      Value<bool>? calendarAssistantEnabled,
       Value<double>? temperature,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
@@ -2730,6 +2780,8 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       userNickname: userNickname ?? this.userNickname,
       systemPrompt: systemPrompt ?? this.systemPrompt,
       enabledTools: enabledTools ?? this.enabledTools,
+      calendarAssistantEnabled:
+          calendarAssistantEnabled ?? this.calendarAssistantEnabled,
       temperature: temperature ?? this.temperature,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2771,6 +2823,10 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
       map['enabled_tools'] = Variable<String>(
           $AiPersonasTable.$converterenabledTools.toSql(enabledTools.value));
     }
+    if (calendarAssistantEnabled.present) {
+      map['calendar_assistant_enabled'] =
+          Variable<bool>(calendarAssistantEnabled.value);
+    }
     if (temperature.present) {
       map['temperature'] = Variable<double>(temperature.value);
     }
@@ -2799,6 +2855,7 @@ class AiPersonasCompanion extends UpdateCompanion<AiPersonaRow> {
           ..write('userNickname: $userNickname, ')
           ..write('systemPrompt: $systemPrompt, ')
           ..write('enabledTools: $enabledTools, ')
+          ..write('calendarAssistantEnabled: $calendarAssistantEnabled, ')
           ..write('temperature: $temperature, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -6960,6 +7017,7 @@ typedef $$AiPersonasTableCreateCompanionBuilder = AiPersonasCompanion Function({
   Value<String?> userNickname,
   Value<String?> systemPrompt,
   required List<String> enabledTools,
+  Value<bool> calendarAssistantEnabled,
   Value<double> temperature,
   required DateTime createdAt,
   required DateTime updatedAt,
@@ -6976,6 +7034,7 @@ typedef $$AiPersonasTableUpdateCompanionBuilder = AiPersonasCompanion Function({
   Value<String?> userNickname,
   Value<String?> systemPrompt,
   Value<List<String>> enabledTools,
+  Value<bool> calendarAssistantEnabled,
   Value<double> temperature,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -7042,6 +7101,10 @@ class $$AiPersonasTableFilterComposer
       get enabledTools => $composableBuilder(
           column: $table.enabledTools,
           builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<bool> get calendarAssistantEnabled => $composableBuilder(
+      column: $table.calendarAssistantEnabled,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get temperature => $composableBuilder(
       column: $table.temperature, builder: (column) => ColumnFilters(column));
@@ -7117,6 +7180,10 @@ class $$AiPersonasTableOrderingComposer
       column: $table.enabledTools,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get calendarAssistantEnabled => $composableBuilder(
+      column: $table.calendarAssistantEnabled,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get temperature => $composableBuilder(
       column: $table.temperature, builder: (column) => ColumnOrderings(column));
 
@@ -7166,6 +7233,9 @@ class $$AiPersonasTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get enabledTools =>
       $composableBuilder(
           column: $table.enabledTools, builder: (column) => column);
+
+  GeneratedColumn<bool> get calendarAssistantEnabled => $composableBuilder(
+      column: $table.calendarAssistantEnabled, builder: (column) => column);
 
   GeneratedColumn<double> get temperature => $composableBuilder(
       column: $table.temperature, builder: (column) => column);
@@ -7231,6 +7301,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             Value<String?> userNickname = const Value.absent(),
             Value<String?> systemPrompt = const Value.absent(),
             Value<List<String>> enabledTools = const Value.absent(),
+            Value<bool> calendarAssistantEnabled = const Value.absent(),
             Value<double> temperature = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -7247,6 +7318,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             userNickname: userNickname,
             systemPrompt: systemPrompt,
             enabledTools: enabledTools,
+            calendarAssistantEnabled: calendarAssistantEnabled,
             temperature: temperature,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -7263,6 +7335,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             Value<String?> userNickname = const Value.absent(),
             Value<String?> systemPrompt = const Value.absent(),
             required List<String> enabledTools,
+            Value<bool> calendarAssistantEnabled = const Value.absent(),
             Value<double> temperature = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
@@ -7279,6 +7352,7 @@ class $$AiPersonasTableTableManager extends RootTableManager<
             userNickname: userNickname,
             systemPrompt: systemPrompt,
             enabledTools: enabledTools,
+            calendarAssistantEnabled: calendarAssistantEnabled,
             temperature: temperature,
             createdAt: createdAt,
             updatedAt: updatedAt,

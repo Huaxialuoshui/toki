@@ -84,6 +84,11 @@ class _PersonaRow extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      // 关掉日历助手的人设标一下"纯聊天"，免得忘了它不给工具。
+                      if (!persona.calendarAssistantEnabled) ...<Widget>[
+                        const SizedBox(height: 2),
+                        const PersonaChatOnlyBadge(),
+                      ],
                       if ((persona.description ?? '').isNotEmpty)
                         Text(
                           persona.description!,
@@ -118,6 +123,57 @@ Future<void> showPersonaEditor(
       persona: persona,
     ),
   );
+}
+
+/// 「作为日历助手」开关：左边标题 + 说明，右边一个开关。
+///
+/// 不做成整个卡片可点：说明比较长，误触的代价是"以为还能管日程"。
+class _CalendarAssistantSwitch extends StatelessWidget {
+  const _CalendarAssistantSwitch({
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final bool enabled;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                l10n.aiPersonaCalendarAssistant,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                l10n.aiPersonaCalendarAssistantHint,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Switch(
+          key: const ValueKey<String>('persona-calendar-assistant'),
+          value: value,
+          onChanged: enabled ? onChanged : null,
+        ),
+      ],
+    );
+  }
 }
 
 class _PersonaEditorDialog extends ConsumerStatefulWidget {
@@ -161,6 +217,7 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
   late final TextEditingController _systemPrompt;
 
   late double _temperature;
+  bool _calendarAssistant = true;
   bool _busy = false;
 
   bool get _isEditing => widget.persona != null;
@@ -180,6 +237,7 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
     _speakingStyle = TextEditingController(text: persona?.speakingStyle ?? '');
     _nickname = TextEditingController(text: persona?.userNickname ?? '');
     _systemPrompt = TextEditingController(text: persona?.systemPrompt ?? '');
+    _calendarAssistant = persona?.calendarAssistantEnabled ?? true;
     _temperature = persona?.temperature ?? 0.7;
   }
 
@@ -213,12 +271,29 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
       personality: clean(_personality),
       speakingStyle: clean(_speakingStyle),
       userNickname: clean(_nickname),
-      systemPrompt: clean(_systemPrompt) ?? l10n.aiPersonaDefaultPrompt,
+      // 内置的日程助手提示词只在"作为日历助手"时兜底；纯聊天人设没写就留空，
+      // 运行时一条 system 消息都不注入。
+      systemPrompt: clean(_systemPrompt) ??
+          (_calendarAssistant ? l10n.aiPersonaDefaultPrompt : null),
       enabledTools: persona?.enabledTools ?? const <String>[],
+      calendarAssistantEnabled: _calendarAssistant,
       temperature: _temperature,
       createdAt: persona?.createdAt ?? now,
       updatedAt: now,
     );
+  }
+
+  /// 切换「作为日历助手」。
+  void _setCalendarAssistant(bool value) {
+    setState(() {
+      _calendarAssistant = value;
+      // 关掉日历助手时，提示词里可能还留着新建人设时自动带上的日程助手文案；
+      // 纯聊天只该用用户自己写的提示词，所以顺手清掉，让用户写自己的。
+      if (!value &&
+          _systemPrompt.text.trim() == context.l10n.aiPersonaDefaultPrompt) {
+        _systemPrompt.clear();
+      }
+    });
   }
 
   @override
@@ -320,6 +395,12 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
                               }),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 12),
+                        _CalendarAssistantSwitch(
+                          value: _calendarAssistant,
+                          enabled: !_busy,
+                          onChanged: _setCalendarAssistant,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(

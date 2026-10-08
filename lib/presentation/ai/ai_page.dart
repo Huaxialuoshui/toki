@@ -354,7 +354,13 @@ class _AiPageState extends ConsumerState<AiPage> {
 
     return PageScaffold(
       title: l10n.navAi,
-      subtitle: '${persona.name} · ${persona.description ?? ''}',
+      // 纯聊天人设顺手标一下：聊着聊着容易忘了它其实不给工具。
+      subtitle: <String>[
+        persona.name,
+        if ((persona.description ?? '').trim().isNotEmpty)
+          persona.description!.trim(),
+        if (!persona.calendarAssistantEnabled) l10n.aiPersonaChatOnly,
+      ].join(' · '),
       actions: <Widget>[
         if (providers.isNotEmpty)
           _ProviderSwitcher(
@@ -733,7 +739,17 @@ class _PersonaSwitcher extends StatelessWidget {
               children: <Widget>[
                 PersonaAvatar(persona: persona, radius: 12),
                 const SizedBox(width: 10),
-                Expanded(child: Text(persona.name)),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(persona.name),
+                      if (!persona.calendarAssistantEnabled)
+                        const PersonaChatOnlyBadge(),
+                    ],
+                  ),
+                ),
                 if (persona.id == active.id)
                   Icon(Icons.check, size: 16, color: theme.colorScheme.primary),
               ],

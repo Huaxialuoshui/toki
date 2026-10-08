@@ -18,6 +18,11 @@ class AiPersonas extends Table {
   TextColumn get userNickname => text().nullable()();
   TextColumn get systemPrompt => text().nullable()();
   TextColumn get enabledTools => text().map(const StringListConverter())();
+
+  /// 是否作为日历助手。关掉就是"纯聊天 / 扮演"：不注入日程上下文、不给工具，
+  /// 只用 systemPrompt 里用户自己写的提示词。默认打开（老数据保持原行为）。
+  BoolColumn get calendarAssistantEnabled =>
+      boolean().withDefault(const Constant(true))();
   RealColumn get temperature => real().withDefault(const Constant(0.7))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

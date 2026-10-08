@@ -1913,6 +1913,24 @@ abstract class AppLocalizations {
   /// **'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.'**
   String get aiPersonaDefaultPrompt;
 
+  /// No description provided for @aiPersonaCalendarAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Acting as a calendar assistant'**
+  String get aiPersonaCalendarAssistant;
+
+  /// No description provided for @aiPersonaCalendarAssistantHint.
+  ///
+  /// In en, this message translates to:
+  /// **'On: today\'s events and countdowns are sent to the AI as context, and it may add, edit or delete them with tools. Off: pure chat / roleplay — no schedule data is sent, no tools are offered, and schedule talk stays conversation and reminders.'**
+  String get aiPersonaCalendarAssistantHint;
+
+  /// No description provided for @aiPersonaChatOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat only'**
+  String get aiPersonaChatOnly;
+
   /// No description provided for @aiPersonaSwitched.
   ///
   /// In en, this message translates to:

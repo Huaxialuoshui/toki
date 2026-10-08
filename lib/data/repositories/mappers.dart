@@ -173,6 +173,7 @@ extension AiPersonaRowMapper on AiPersonaRow {
         userNickname: userNickname,
         systemPrompt: systemPrompt,
         enabledTools: enabledTools,
+        calendarAssistantEnabled: calendarAssistantEnabled,
         temperature: temperature,
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -191,6 +192,8 @@ AiPersonasCompanion aiPersonaToCompanion(AiPersona persona) =>
       userNickname: Value<String?>(persona.userNickname),
       systemPrompt: Value<String?>(persona.systemPrompt),
       enabledTools: Value<List<String>>(persona.enabledTools),
+      calendarAssistantEnabled:
+          Value<bool>(persona.calendarAssistantEnabled),
       temperature: Value<double>(persona.temperature),
       createdAt: Value<DateTime>(persona.createdAt),
       updatedAt: Value<DateTime>(persona.updatedAt),

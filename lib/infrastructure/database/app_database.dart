@@ -43,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   /// 当前结构版本。备份文件里会带上它，用来判断"这份备份能不能直接恢复"。
-  static const int currentSchemaVersion = 6;
+  static const int currentSchemaVersion = 7;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -81,6 +81,13 @@ class AppDatabase extends _$AppDatabase {
             // v6：助手消息保存思考内容（多轮工具调用时回传）；人设头像支持底色。
             await m.addColumn(chatMessages, chatMessages.reasoningContent);
             await m.addColumn(aiPersonas, aiPersonas.avatarColor);
+          }
+          if (from < 7) {
+            // v7：人设可以关掉"作为日历助手"，变成纯聊天 / 扮演。
+            await m.addColumn(
+              aiPersonas,
+              aiPersonas.calendarAssistantEnabled,
+            );
           }
         },
         beforeOpen: (OpeningDetails details) async {

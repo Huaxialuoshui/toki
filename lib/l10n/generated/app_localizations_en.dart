@@ -964,6 +964,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPersonaDefaultPrompt => 'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
 
   @override
+  String get aiPersonaCalendarAssistant => 'Acting as a calendar assistant';
+
+  @override
+  String get aiPersonaCalendarAssistantHint => 'On: today\'s events and countdowns are sent to the AI as context, and it may add, edit or delete them with tools. Off: pure chat / roleplay — no schedule data is sent, no tools are offered, and schedule talk stays conversation and reminders.';
+
+  @override
+  String get aiPersonaChatOnly => 'Chat only';
+
+  @override
   String aiPersonaSwitched(String name) {
     return 'Switched to $name';
   }

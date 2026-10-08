@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
 
+import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/ai_persona.dart';
 import 'image_source.dart';
+
+/// 「纯聊天」小徽标：关掉日历助手（[AiPersona.calendarAssistantEnabled]）时，
+/// 在人设列表和切换菜单里标一下，避免以为它还在读写日程。
+class PersonaChatOnlyBadge extends StatelessWidget {
+  const PersonaChatOnlyBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.primary;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Icon(Icons.chat_bubble_outline, size: 12, color: color),
+        const SizedBox(width: 4),
+        Text(
+          context.l10n.aiPersonaChatOnly,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 /// 人设头像。
 ///

@@ -19,6 +19,7 @@ class AiPersona {
     this.userNickname,
     this.systemPrompt,
     this.enabledTools = const <String>[],
+    this.calendarAssistantEnabled = true,
     this.temperature = 0.7,
   });
 
@@ -43,6 +44,12 @@ class AiPersona {
   /// 允许该人设使用的工具名（Phase 8 的 ToolPermission）。
   final List<String> enabledTools;
 
+  /// 是否作为日历助手。
+  ///
+  /// 关掉之后它就是"纯聊天 / 扮演"：不注入日程上下文、不给任何工具，
+  /// 只用 [systemPrompt] 里用户自己写的提示词。默认打开，保持老数据的行为。
+  final bool calendarAssistantEnabled;
+
   final double temperature;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -62,6 +69,7 @@ class AiPersona {
     String? userNickname,
     String? systemPrompt,
     List<String>? enabledTools,
+    bool? calendarAssistantEnabled,
     double? temperature,
     DateTime? updatedAt,
   }) =>
@@ -76,6 +84,8 @@ class AiPersona {
         userNickname: userNickname ?? this.userNickname,
         systemPrompt: systemPrompt ?? this.systemPrompt,
         enabledTools: enabledTools ?? this.enabledTools,
+        calendarAssistantEnabled:
+            calendarAssistantEnabled ?? this.calendarAssistantEnabled,
         temperature: temperature ?? this.temperature,
         createdAt: createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -95,6 +105,7 @@ class AiPersona {
         other.userNickname == userNickname &&
         other.systemPrompt == systemPrompt &&
         listEquals(other.enabledTools, enabledTools) &&
+        other.calendarAssistantEnabled == calendarAssistantEnabled &&
         other.temperature == temperature &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
@@ -112,6 +123,7 @@ class AiPersona {
         userNickname,
         systemPrompt,
         Object.hashAll(enabledTools),
+        calendarAssistantEnabled,
         temperature,
         createdAt,
         updatedAt,

@@ -964,6 +964,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aiPersonaDefaultPrompt => '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
 
   @override
+  String get aiPersonaCalendarAssistant => '作为日历助手';
+
+  @override
+  String get aiPersonaCalendarAssistantHint => '打开：把今天的日程 / 倒计时作为上下文发给 AI，并允许它用工具增删改日程。关闭：纯聊天 / 扮演，不注入任何日程数据、也不给工具，提到日程只当聊天与提醒。';
+
+  @override
+  String get aiPersonaChatOnly => '纯聊天';
+
+  @override
   String aiPersonaSwitched(String name) {
     return '已切换到 $name';
   }

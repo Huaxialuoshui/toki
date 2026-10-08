@@ -9,6 +9,7 @@ import '../../../domain/repositories/reminder_repository.dart';
 import '../../../domain/services/ai_provider.dart';
 import '../../../infrastructure/clock_provider.dart';
 import '../../calendar/calendar_actions.dart';
+import '../persona_prompt.dart';
 import '../tool_permissions.dart';
 import 'ai_tool.dart';
 import 'calendar_tools.dart';
@@ -34,6 +35,10 @@ class AiToolRegistry {
     required ToolPermissions permissions,
     AiPersona? persona,
   }) {
+    // 纯聊天 / 扮演的人设一个工具都不给：连"现在几点"都不查，
+    // 免得模型把聊天聊成日程管理。
+    if (!PersonaPrompt.usesCalendar(persona)) return const <AiTool>[];
+
     final enabled = persona?.enabledTools ?? const <String>[];
     return _tools.values.where((AiTool tool) {
       if (!permissions.allows(tool.category)) return false;
