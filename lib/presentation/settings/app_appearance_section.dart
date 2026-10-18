@@ -19,6 +19,7 @@ class AppAppearanceSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final background = ref.watch(appBackgroundProvider);
     final iconStyle = ref.watch(appIconStyleProvider);
+    final autoContrast = ref.watch(appAutoContrastProvider);
 
     return GlassCard(
       child: Column(
@@ -36,6 +37,20 @@ class AppAppearanceSection extends ConsumerWidget {
             imageKeyPrefix: 'app-bg',
             onChanged: (config) =>
                 ref.read(appBackgroundProvider.notifier).update(config),
+          ),
+          SwitchListTile(
+            key: const ValueKey<String>('app-auto-contrast'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.appAutoContrast),
+            subtitle: Text(
+              l10n.appAutoContrastHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            value: autoContrast,
+            onChanged: (bool value) =>
+                ref.read(appAutoContrastProvider.notifier).update(value),
           ),
           const Divider(height: 28),
           Text(

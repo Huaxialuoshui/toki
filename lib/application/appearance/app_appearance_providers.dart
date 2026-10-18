@@ -51,6 +51,24 @@ final appBackgroundProvider =
   AppBackgroundController.new,
 );
 
+/// 根据应用背景自动选择深浅文字 / 卡片色。
+///
+/// 默认开启；用户也可以关掉，完全沿用主题里配置的文字颜色。
+class AppAutoContrastController extends Notifier<bool> {
+  @override
+  bool build() => ref.watch(appSettingsStoreProvider).readAppAutoContrast();
+
+  Future<void> update(bool value) async {
+    state = value;
+    await ref.read(appSettingsStoreProvider).writeAppAutoContrast(value);
+  }
+}
+
+final appAutoContrastProvider =
+    NotifierProvider<AppAutoContrastController, bool>(
+  AppAutoContrastController.new,
+);
+
 /// 图标风格（应用级）。
 class AppIconStyleController extends Notifier<AppIconStyle> {
   @override

@@ -198,8 +198,10 @@ class _WeatherCardBody extends ConsumerWidget {
     final weather = ref.watch(weatherProvider).valueOrNull;
 
     return GlassCard(
-      // 点一下看逐小时 / 多日预报。
-      onTap: weather == null ? null : () => showWeatherDetail(context),
+      // 有天气时点开逐小时 / 多日预报；没配置位置时直接去设置。
+      onTap: weather == null
+          ? () => context.go('/settings')
+          : () => showWeatherDetail(context),
       child: Row(
         children: <Widget>[
           Icon(
@@ -227,11 +229,13 @@ class _WeatherCardBody extends ConsumerWidget {
                 Text(
                   weather == null
                       ? l10n.homeWeatherHint
-                      : l10n.homeWeatherDetail(
+                      : '${l10n.homeWeatherDetail(
                           weather.city,
                           weather.tempMin?.round().toString() ?? '—',
                           weather.tempMax?.round().toString() ?? '—',
-                        ),
+                        )} · ${l10n.homeWeatherUpdated(
+                          _shortClock(weather.fetchedAt),
+                        )}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.66),
                   ),
@@ -264,6 +268,11 @@ class _WeatherCardBody extends ConsumerWidget {
       case WeatherCondition.unknown:
         return Icons.wb_cloudy_outlined;
     }
+  }
+
+  static String _shortClock(DateTime time) {
+    String two(int value) => value.toString().padLeft(2, '0');
+    return '${two(time.hour)}:${two(time.minute)}';
   }
 
   static String _conditionLabel(

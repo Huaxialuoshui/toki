@@ -59,11 +59,18 @@ class WidgetPublisher {
     final now = _ref.read(clockProvider).now();
     final l10n = await _localizations();
 
-    final countdown = await _nextCountdown(now);
-    final event = await _nextEvent(now);
+    final List<CountdownItem> countdowns = config.showCountdown
+        ? await _upcomingCountdowns(now)
+        : const <CountdownItem>[];
+    final List<EventOccurrence> events = config.showEvent
+        ? await _upcomingEvents(now)
+        : const <EventOccurrence>[];
+    final CountdownItem? countdown =
+        countdowns.isEmpty ? null : countdowns.first;
+    final EventOccurrence? event = events.isEmpty ? null : events.first;
 
-    final hasCountdown = config.showCountdown && countdown != null;
-    final hasEvent = config.showEvent && event != null;
+    final hasCountdown = countdown != null;
+    final hasEvent = event != null;
 
     final String title;
     final String subtitle;
@@ -88,26 +95,51 @@ class WidgetPublisher {
 
     final payload = <String, Object?>{
       'hasData': hasCountdown || hasEvent,
+      'kind': hasCountdown ? 'countdown' : (hasEvent ? 'event' : 'empty'),
       'title': title,
       'subtitle': subtitle,
       'extra': extra,
       'updatedLabel': l10n.widgetUpdatedAt(_shortTime(now)),
+      'locale': l10n.localeName,
+      'targetEpochMillis':
+          hasCountdown ? countdown.targetTime.millisecondsSinceEpoch : 0,
+      'eventEpochMillis': hasEvent ? event.start.millisecondsSinceEpoch : 0,
+      // 多带几条未来条目：原生定时重绘时可以自行推进到下一条，
+      // 不需要先打开应用把状态重新算一遍。
+      'countdowns': countdowns
+          .map(
+            (CountdownItem item) => <String, Object?>{
+              'title': item.title,
+              'targetEpochMillis': item.targetTime.millisecondsSinceEpoch,
+            },
+          )
+          .toList(growable: false),
+      'events': events
+          .map(
+            (EventOccurrence item) => <String, Object?>{
+              'title': item.event.title,
+              'startEpochMillis': item.start.millisecondsSinceEpoch,
+              'endEpochMillis': item.end.millisecondsSinceEpoch,
+              'timeLabel': _shortTime(item.start),
+            },
+          )
+          .toList(growable: false),
       'appearance': config.toJson(),
     };
     await channel.pushWidgetState(jsonEncode(payload));
   }
 
-  Future<CountdownItem?> _nextCountdown(DateTime now) async {
+  Future<List<CountdownItem>> _upcomingCountdowns(DateTime now) async {
     final items = await _ref.read(countdownRepositoryProvider).getAll();
     final upcoming = items
         .where((CountdownItem item) => item.targetTime.isAfter(now))
         .toList()
       ..sort((CountdownItem a, CountdownItem b) =>
           a.targetTime.compareTo(b.targetTime));
-    return upcoming.isEmpty ? null : upcoming.first;
+    return upcoming.take(8).toList(growable: false);
   }
 
-  Future<EventOccurrence?> _nextEvent(DateTime now) async {
+  Future<List<EventOccurrence>> _upcomingEvents(DateTime now) async {
     final horizon = now.add(const Duration(days: 30));
     final events = await _ref
         .read(calendarRepositoryProvider)
@@ -122,7 +154,7 @@ class WidgetPublisher {
     occurrences.sort(
       (EventOccurrence a, EventOccurrence b) => a.start.compareTo(b.start),
     );
-    return occurrences.isEmpty ? null : occurrences.first;
+    return occurrences.take(8).toList(growable: false);
   }
 
   Future<AppLocalizations> _localizations() {

@@ -40,7 +40,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeWeatherPlaceholder => '天气';
 
   @override
-  String get homeWeatherHint => '天气接入将在后续阶段提供';
+  String get homeWeatherHint => '点此添加城市或使用当前位置';
+
+  @override
+  String homeWeatherUpdated(String time) {
+    return '更新于 $time';
+  }
 
   @override
   String homeWeatherDetail(String city, String min, String max) {
@@ -60,7 +65,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherSection => '天气';
 
   @override
-  String get weatherSectionSubtitle => '用 Open-Meteo，不需要 API Key。城市留空时首页还是占位卡。';
+  String get weatherSectionSubtitle => '用 Open-Meteo，不需要 API Key。添加城市或使用当前位置后，首页会显示实时天气。';
 
   @override
   String get weatherClear => '晴';
@@ -127,6 +132,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get appBackgroundHint => '作用于所有页面；聊天页有自己独立的背景（见上面的区块）。';
+
+  @override
+  String get appAutoContrast => '自动适配文字颜色';
+
+  @override
+  String get appAutoContrastHint => '根据背景明暗自动切换深浅文字；背景明暗混杂时会加一层轻遮罩，避免局部深色像素压住黑色文字。';
 
   @override
   String get iconStyle => '图标风格';
@@ -294,6 +305,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get widgetRefreshNow => '立即刷新小组件';
+
+  @override
+  String get widgetAutoRefresh => '自动刷新';
+
+  @override
+  String get widgetAutoRefreshHint => '按设定频率在后台重绘小组件，不需要打开应用。';
+
+  @override
+  String get widgetRefreshFrequency => '刷新频率';
+
+  @override
+  String widgetRefreshEveryMinutes(int minutes) {
+    return '每 $minutes 分钟';
+  }
+
+  @override
+  String widgetRefreshEveryHours(int hours) {
+    return '每 $hours 小时';
+  }
+
+  @override
+  String get widgetRefreshDaily => '每天一次';
+
+  @override
+  String get widgetDailyRefreshTime => '每天刷新时间';
+
+  @override
+  String get widgetRefreshManual => '自动刷新已关闭';
+
+  @override
+  String widgetRefreshScheduled(String time) {
+    return '下次刷新：$time';
+  }
 
   @override
   String get widgetAddToHome => '添加到桌面';

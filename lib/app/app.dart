@@ -6,15 +6,13 @@ import '../application/appearance/app_appearance_providers.dart';
 import '../application/app_startup.dart';
 import '../application/notification/reminder_sync.dart';
 import '../application/theme/theme_controller.dart';
-import '../application/widget/widget_controller.dart';
 import '../application/theme/theme_mapper.dart';
+import '../application/widget/widget_controller.dart';
+import '../application/weather/weather_providers.dart';
 import '../core/extensions/l10n_extension.dart';
 import '../domain/entities/chat_appearance.dart';
-import '../domain/entities/glass_style.dart';
 import '../l10n/generated/app_localizations.dart';
-import '../shared/widgets/glass_card.dart';
-import '../shared/widgets/theme_config_scope.dart';
-import '../presentation/widgets/chat_background.dart';
+import 'adaptive_appearance.dart';
 import 'router.dart';
 
 /// 应用根组件。
@@ -34,6 +32,8 @@ class TokiApp extends ConsumerWidget {
     ref.watch(reminderAutoSyncProvider);
     // 日程 / 倒计时 / 小组件外观一变，就把状态推给原生桌面小组件。
     ref.watch(widgetAutoSyncProvider);
+    // 天气定时刷新 + 从后台回到前台时补一次。
+    ref.watch(weatherAutoRefreshProvider);
     // Windows 每次启动都会回到 exe 里的默认图标，所以启动时补一次自定义图标。
     ref.watch(appIconStartupProvider);
 
@@ -42,6 +42,7 @@ class TokiApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
     // 应用级背景：纯色 / 渐变 / 图片（默认是"透明纯色"，等于没有额外背景）。
     final appBackground = ref.watch(appBackgroundProvider);
+    final autoContrast = ref.watch(appAutoContrastProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -77,23 +78,11 @@ class TokiApp extends ConsumerWidget {
         final background = appBackground.isUnset
             ? ChatBackgroundConfig.fromColor(config.backgroundColor)
             : appBackground;
-        return ChatBackground(
-          key: const ValueKey<String>('app-background'),
-          config: background,
-          child: ThemeConfigScope(
-            config: config,
-            child: GlassTheme(
-              style: GlassStyle.fromThemeConfig(config),
-              // 字号缩放在这里生效：ThemeData 的文本样式在部分平台没有显式 fontSize，
-              // 用 textScaler 才能对所有文字生效。
-              child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(config.fontScale),
-                ),
-                child: child ?? const SizedBox.shrink(),
-              ),
-            ),
-          ),
+        return AdaptiveAppearance(
+          baseConfig: config,
+          background: background,
+          enabled: autoContrast,
+          child: child ?? const SizedBox.shrink(),
         );
       },
     );

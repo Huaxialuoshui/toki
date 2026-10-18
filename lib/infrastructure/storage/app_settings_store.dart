@@ -32,6 +32,7 @@ class AppSettingsStore {
   static const String _weatherLocationsKey = 'settings.weatherLocations';
   static const String _widgetConfigKey = 'settings.widgetConfig';
   static const String _appBackgroundKey = 'settings.appBackground';
+  static const String _appAutoContrastKey = 'settings.appAutoContrast';
   static const String _iconStyleKey = 'settings.iconStyle';
   static const String _appIconKey = 'settings.appIcon';
   static const String _digestMorningKey = 'settings.digest.morning';
@@ -169,6 +170,13 @@ class AppSettingsStore {
 
   Future<void> writeAppBackground(String json) =>
       _preferences.setString(_appBackgroundKey, json);
+
+  /// 背景与文字自动对比度（默认开启）。
+  bool readAppAutoContrast() =>
+      _preferences.getBool(_appAutoContrastKey) ?? true;
+
+  Future<void> writeAppAutoContrast(bool value) =>
+      _preferences.setBool(_appAutoContrastKey, value);
 
   /// 图标风格：`outlined` / `filled`。
   String? readIconStyle() => _preferences.getString(_iconStyleKey);

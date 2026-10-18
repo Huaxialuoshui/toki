@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toki/domain/entities/chat_appearance.dart';
 import 'package:toki/presentation/widgets/chat_background.dart';
+import 'package:toki/presentation/widgets/page_scaffold.dart';
 
 import '../helpers/test_app.dart';
 
@@ -65,6 +66,45 @@ void main() {
     expect(background.config.gradientColors, <int>[0xFF102030, 0xFF405060]);
     expect(background.config.blurAmount, 8);
     expect(background.config.overlayOpacity, 0.25);
+  });
+
+  tokiWidgetTest('深色应用背景会自动切换成浅色文字', (tester) async {
+    const saved = ChatBackgroundConfig(
+      type: ChatBackgroundType.solid,
+      solidColor: 0xFF0B0D12,
+    );
+    await pumpTokiApp(
+      tester,
+      size: surface,
+      seedDatabase: false,
+      initialPreferences: <String, Object>{
+        'settings.appBackground': jsonEncode(saved.toJson()),
+      },
+    );
+
+    final BuildContext page = tester.element(find.byType(PageScaffold).first);
+    final Color text = Theme.of(page).colorScheme.onSurface;
+    expect(text.computeLuminance(), greaterThan(0.5));
+
+    // 背景层仍然是用户选的那张深色底，没有被硬改成别的颜色。
+    expect(appBackgroundOf(tester).config.solidColor, 0xFF0B0D12);
+  });
+
+  tokiWidgetTest('明暗混杂的应用背景会加一层轻遮罩', (tester) async {
+    const saved = ChatBackgroundConfig(
+      type: ChatBackgroundType.gradient,
+      gradientColors: <int>[0xFF000000, 0xFFFFFFFF],
+    );
+    await pumpTokiApp(
+      tester,
+      size: surface,
+      seedDatabase: false,
+      initialPreferences: <String, Object>{
+        'settings.appBackground': jsonEncode(saved.toJson()),
+      },
+    );
+
+    expect(appBackgroundOf(tester).config.overlayOpacity, greaterThan(0));
   });
 
   tokiWidgetTest('设置页可以切换应用背景为渐变并持久化', (tester) async {

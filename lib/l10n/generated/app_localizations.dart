@@ -164,8 +164,14 @@ abstract class AppLocalizations {
   /// No description provided for @homeWeatherHint.
   ///
   /// In en, this message translates to:
-  /// **'Weather integration is reserved for a later phase'**
+  /// **'Tap to add a city or use your current location'**
   String get homeWeatherHint;
+
+  /// No description provided for @homeWeatherUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String homeWeatherUpdated(String time);
 
   /// No description provided for @homeWeatherDetail.
   ///
@@ -200,7 +206,7 @@ abstract class AppLocalizations {
   /// No description provided for @weatherSectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.'**
+  /// **'Uses Open-Meteo, no API key needed. Add a city or use your current location to show live weather on the home page.'**
   String get weatherSectionSubtitle;
 
   /// No description provided for @weatherClear.
@@ -334,6 +340,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applies behind every page. Chat has its own background in the section above.'**
   String get appBackgroundHint;
+
+  /// No description provided for @appAutoContrast.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapt text colour automatically'**
+  String get appAutoContrast;
+
+  /// No description provided for @appAutoContrastHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Switches between light and dark text based on the background, and adds a subtle scrim when the image mixes light and dark areas.'**
+  String get appAutoContrastHint;
 
   /// No description provided for @iconStyle.
   ///
@@ -664,6 +682,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh widget now'**
   String get widgetRefreshNow;
+
+  /// No description provided for @widgetAutoRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic refresh'**
+  String get widgetAutoRefresh;
+
+  /// No description provided for @widgetAutoRefreshHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Redraws the widget in the background at the chosen frequency, without opening the app.'**
+  String get widgetAutoRefreshHint;
+
+  /// No description provided for @widgetRefreshFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh frequency'**
+  String get widgetRefreshFrequency;
+
+  /// No description provided for @widgetRefreshEveryMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {minutes} min'**
+  String widgetRefreshEveryMinutes(int minutes);
+
+  /// No description provided for @widgetRefreshEveryHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {hours} h'**
+  String widgetRefreshEveryHours(int hours);
+
+  /// No description provided for @widgetRefreshDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a day'**
+  String get widgetRefreshDaily;
+
+  /// No description provided for @widgetDailyRefreshTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily refresh time'**
+  String get widgetDailyRefreshTime;
+
+  /// No description provided for @widgetRefreshManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic refresh is off'**
+  String get widgetRefreshManual;
+
+  /// No description provided for @widgetRefreshScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Next refresh: {time}'**
+  String widgetRefreshScheduled(String time);
 
   /// No description provided for @widgetAddToHome.
   ///

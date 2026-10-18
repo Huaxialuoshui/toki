@@ -14,6 +14,9 @@ import android.graphics.Shader
 import android.widget.RemoteViews
 import org.json.JSONObject
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
@@ -38,12 +41,19 @@ object TokiWidgetRenderer {
         val views = RemoteViews(context.packageName, R.layout.toki_widget)
         val state = readState(context)
         val appearance = state?.optJSONObject("appearance") ?: JSONObject()
+        val locale = localeOf(state)
+        val now = System.currentTimeMillis()
 
-        val hasData = state != null && state.optBoolean("hasData", true)
-        val title = if (hasData) state!!.optString("title", "Toki") else "Toki"
-        val subtitle = if (hasData) state!!.optString("subtitle", "") else "还没有日程"
-        val extra = if (hasData) state!!.optString("extra", "") else "打开应用添加"
-        val updated = if (hasData) state!!.optString("updatedLabel", "") else ""
+        val content = liveContent(state, locale, now)
+        val updated = if (content.hasData) {
+            text(
+                locale,
+                "更新于 ${clock(now)}",
+                "Updated ${clock(now)}",
+            )
+        } else {
+            ""
+        }
 
         val textColor = appearance.optInt("textColor", 0xFFECF0F8.toInt())
         val mutedColor = withAlpha(textColor, 0.7f)
@@ -69,11 +79,11 @@ object TokiWidgetRenderer {
         )
         views.setInt(R.id.widget_refresh, "setColorFilter", mutedColor)
 
-        views.setTextViewText(R.id.widget_title, title)
+        views.setTextViewText(R.id.widget_title, content.title)
         views.setTextColor(R.id.widget_title, accentColor)
-        views.setTextViewText(R.id.widget_subtitle, subtitle)
+        views.setTextViewText(R.id.widget_subtitle, content.subtitle)
         views.setTextColor(R.id.widget_subtitle, textColor)
-        views.setTextViewText(R.id.widget_extra, extra)
+        views.setTextViewText(R.id.widget_extra, content.extra)
         views.setTextColor(R.id.widget_extra, mutedColor)
         views.setTextViewText(R.id.widget_updated, updated)
         views.setTextColor(R.id.widget_updated, withAlpha(mutedColor, 0.8f))
@@ -83,7 +93,7 @@ object TokiWidgetRenderer {
         return views
     }
 
-    private fun readState(context: Context): JSONObject? {
+    fun readState(context: Context): JSONObject? {
         val file = stateFile(context)
         if (!file.exists()) return null
         return try {
@@ -92,6 +102,150 @@ object TokiWidgetRenderer {
             null
         }
     }
+
+    /** 读取小组件刷新设置；旧版状态没有这些字段时沿用原来的 15 分钟节拍。 */
+    fun refreshSchedule(context: Context): RefreshSchedule {
+        val state = readState(context)
+        val appearance = state?.optJSONObject("appearance") ?: JSONObject()
+        val minutes = appearance.optInt("refreshIntervalMinutes", 15)
+            .coerceAtLeast(15)
+        return RefreshSchedule(
+            enabled = appearance.optBoolean("autoRefresh", true),
+            intervalMinutes = if (minutes >= 24 * 60) 24 * 60 else minutes,
+            dailyHour = appearance.optInt("dailyRefreshHour", 7).coerceIn(0, 23),
+            dailyMinute = appearance.optInt("dailyRefreshMinute", 0).coerceIn(0, 59),
+        )
+    }
+
+    /**
+     * 每次重绘都从状态里的未来条目重新选一条，这样倒计时结束后会自动
+     * 跳到下一条，而不是一直停在"已过期"。
+     */
+    private fun liveContent(
+        state: JSONObject?,
+        locale: String,
+        now: Long,
+    ): WidgetContent {
+        if (state == null) return emptyContent(locale)
+
+        val countdowns = state.optJSONArray("countdowns")
+        val events = state.optJSONArray("events")
+        if (countdowns != null || events != null) {
+            val countdown = firstFutureCountdown(countdowns, now)
+            val event = firstActiveEvent(events, now)
+            if (countdown != null) {
+                val title = countdown.optString("title", "Toki")
+                val subtitle = remainingText(
+                    countdown.optLong("targetEpochMillis", 0L),
+                    locale,
+                    now,
+                )
+                val extra = if (event == null) {
+                    ""
+                } else {
+                    val name = event.optString("title", "")
+                    val time = event.optString("timeLabel", "")
+                    if (locale.startsWith("en")) {
+                        "Next: $name · $time"
+                    } else {
+                        "下一个：$name · $time"
+                    }
+                }
+                return WidgetContent(true, title, subtitle, extra)
+            }
+            if (event != null) {
+                return WidgetContent(
+                    true,
+                    text(locale, "下一个日程", "Next event"),
+                    event.optString("title", ""),
+                    event.optString("timeLabel", ""),
+                )
+            }
+            return emptyContent(locale)
+        }
+
+        // 兼容旧版 widget_state.json：没有条目数组时退回原来的一行文本逻辑。
+        if (!state.optBoolean("hasData", false)) return emptyContent(locale)
+        val subtitle = if (state.optString("kind") == "countdown") {
+            remainingText(
+                state.optLong("targetEpochMillis", 0L),
+                locale,
+                now,
+            )
+        } else {
+            state.optString("subtitle", "")
+        }
+        return WidgetContent(
+            true,
+            state.optString("title", "Toki"),
+            subtitle,
+            state.optString("extra", ""),
+        )
+    }
+
+    private fun emptyContent(locale: String): WidgetContent = WidgetContent(
+        false,
+        "Toki",
+        text(locale, "还没有日程", "Nothing scheduled"),
+        text(locale, "打开应用添加", "Open Toki to add"),
+    )
+
+    private fun firstFutureCountdown(countdowns: org.json.JSONArray?, now: Long): JSONObject? {
+        if (countdowns == null) return null
+        for (index in 0 until countdowns.length()) {
+            val item = countdowns.optJSONObject(index) ?: continue
+            if (item.optLong("targetEpochMillis", 0L) > now) return item
+        }
+        return null
+    }
+
+    private fun firstActiveEvent(events: org.json.JSONArray?, now: Long): JSONObject? {
+        if (events == null) return null
+        for (index in 0 until events.length()) {
+            val item = events.optJSONObject(index) ?: continue
+            val end = item.optLong("endEpochMillis", item.optLong("startEpochMillis", 0L))
+            if (end > now) return item
+        }
+        return null
+    }
+
+    private fun remainingText(target: Long, locale: String, now: Long): String {
+        if (target <= 0L) return text(locale, "还没有日程", "Nothing scheduled")
+        val remaining = target - now
+        if (remaining <= 0L) {
+            return text(locale, "已过期", "Already passed")
+        }
+        val totalMinutes = remaining / 60_000L
+        val days = totalMinutes / (24 * 60)
+        val hours = (totalMinutes % (24 * 60)) / 60
+        val minutes = totalMinutes % 60
+        return when {
+            days > 0 -> if (locale.startsWith("en")) {
+                "${days}d ${hours}h left"
+            } else {
+                "还有 ${days} 天 ${hours} 小时"
+            }
+            hours > 0 -> if (locale.startsWith("en")) {
+                "${hours}h ${minutes}m left"
+            } else {
+                "还有 ${hours} 小时 ${minutes} 分"
+            }
+            else -> if (locale.startsWith("en")) {
+                "${minutes} min left"
+            } else {
+                "还有 ${minutes} 分钟"
+            }
+        }
+    }
+
+    private fun localeOf(state: JSONObject?): String =
+        state?.optString("locale", "zh")?.takeIf { it.isNotBlank() } ?: "zh"
+
+    private fun text(locale: String, chinese: String, english: String): String =
+        if (locale.startsWith("en")) english else chinese
+
+    private fun clock(epochMillis: Long): String =
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(epochMillis))
 
     /**
      * 背景统一画成位图：纯色 / 线性渐变 / 用户图片，都按圆角裁剪。
@@ -184,4 +338,20 @@ object TokiWidgetRenderer {
         val a = ((color ushr 24) and 0xFF) * alpha
         return (a.toInt().coerceIn(0, 255) shl 24) or (color and 0x00FFFFFF)
     }
+
+    data class RefreshSchedule(
+        val enabled: Boolean,
+        val intervalMinutes: Int,
+        val dailyHour: Int,
+        val dailyMinute: Int,
+    ) {
+        val isDaily: Boolean get() = intervalMinutes >= 24 * 60
+    }
+
+    private data class WidgetContent(
+        val hasData: Boolean,
+        val title: String,
+        val subtitle: String,
+        val extra: String,
+    )
 }

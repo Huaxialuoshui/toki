@@ -7,7 +7,9 @@ import '../../application/device/device_providers.dart';
 import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/widget_config.dart';
+import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/device/device_channel.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/image_edit_button.dart';
 
@@ -212,6 +214,76 @@ class _WidgetSectionState extends ConsumerState<WidgetSection> {
             onChanged: (bool value) =>
                 _update(config.copyWith(showEvent: value)),
           ),
+          const Divider(height: 24),
+          SwitchListTile(
+            key: const ValueKey<String>('widget-auto-refresh'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.widgetAutoRefresh),
+            subtitle: Text(
+              l10n.widgetAutoRefreshHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            value: config.autoRefresh,
+            onChanged: (bool value) =>
+                _update(config.copyWith(autoRefresh: value)),
+          ),
+          if (config.autoRefresh) ...<Widget>[
+            _Label(l10n.widgetRefreshFrequency),
+            DropdownButtonFormField<int>(
+              key: const ValueKey<String>('widget-refresh-interval'),
+              value: config.refreshIntervalMinutes,
+              isExpanded: true,
+              decoration: const InputDecoration(isDense: true),
+              items: <DropdownMenuItem<int>>[
+                for (final int minutes in WidgetConfig.refreshIntervalOptions)
+                  DropdownMenuItem<int>(
+                    value: minutes,
+                    child: Text(_refreshLabel(l10n, minutes)),
+                  ),
+              ],
+              onChanged: (int? value) {
+                if (value == null) return;
+                _update(config.copyWith(refreshIntervalMinutes: value));
+              },
+            ),
+            if (config.refreshesDaily)
+              ListTile(
+                key: const ValueKey<String>('widget-daily-refresh-time'),
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.schedule_outlined, size: 20),
+                title: Text(l10n.widgetDailyRefreshTime),
+                trailing: Text(
+                  _clock(config.dailyRefreshHour, config.dailyRefreshMinute),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: _pickDailyRefreshTime,
+              ),
+            Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 8),
+              child: Text(
+                l10n.widgetRefreshScheduled(
+                  _nextRefreshLabel(config, ref.read(clockProvider).now()),
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 8),
+              child: Text(
+                l10n.widgetRefreshManual,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
           const SizedBox(height: 4),
           Wrap(
             spacing: 10,
@@ -310,6 +382,60 @@ class _WidgetSectionState extends ConsumerState<WidgetSection> {
       _backgroundService = actual;
       _busy = false;
     });
+  }
+
+  Future<void> _pickDailyRefreshTime() async {
+    final config = _config;
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: config.dailyRefreshHour,
+        minute: config.dailyRefreshMinute,
+      ),
+    );
+    if (picked == null || !mounted) return;
+    await _update(
+      config.copyWith(
+        dailyRefreshHour: picked.hour,
+        dailyRefreshMinute: picked.minute,
+        refreshIntervalMinutes: 24 * 60,
+      ),
+    );
+  }
+
+  static String _refreshLabel(AppLocalizations l10n, int minutes) {
+    if (minutes >= 24 * 60) return l10n.widgetRefreshDaily;
+    if (minutes % 60 == 0) {
+      return l10n.widgetRefreshEveryHours(minutes ~/ 60);
+    }
+    return l10n.widgetRefreshEveryMinutes(minutes);
+  }
+
+  static String _clock(int hour, int minute) {
+    String two(int value) => value.toString().padLeft(2, '0');
+    return '${two(hour)}:${two(minute)}';
+  }
+
+  static String _nextRefreshLabel(WidgetConfig config, DateTime now) {
+    if (config.refreshesDaily) {
+      var next = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        config.dailyRefreshHour,
+        config.dailyRefreshMinute,
+      );
+      if (!next.isAfter(now)) next = next.add(const Duration(days: 1));
+      return _shortDateTime(next);
+    }
+    final next = now.add(Duration(minutes: config.refreshIntervalMinutes));
+    return _shortDateTime(next);
+  }
+
+  static String _shortDateTime(DateTime time) {
+    String two(int value) => value.toString().padLeft(2, '0');
+    return '${time.month}/${time.day} '
+        '${two(time.hour)}:${two(time.minute)}';
   }
 
   Future<void> _requestBatteryOptimization() async {

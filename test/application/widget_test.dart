@@ -35,6 +35,10 @@ void main() {
         cornerRadius: 12,
         transparent: true,
         showEvent: false,
+        autoRefresh: false,
+        refreshIntervalMinutes: 1440,
+        dailyRefreshHour: 8,
+        dailyRefreshMinute: 30,
       );
 
       final restored = WidgetConfig.fromJson(config.toJson());
@@ -45,6 +49,10 @@ void main() {
       expect(restored.cornerRadius, 12);
       expect(restored.transparent, isTrue);
       expect(restored.showEvent, isFalse);
+      expect(restored.autoRefresh, isFalse);
+      expect(restored.refreshIntervalMinutes, 1440);
+      expect(restored.dailyRefreshHour, 8);
+      expect(restored.dailyRefreshMinute, 30);
       expect(restored, config);
     });
 
@@ -53,6 +61,8 @@ void main() {
       expect(restored.skin, WidgetSkin.solid);
       expect(restored.iconStyle, WidgetIconStyle.outlined);
       expect(restored.imagePath, isNull);
+      expect(restored.autoRefresh, isTrue);
+      expect(restored.refreshIntervalMinutes, 15);
 
       final cleared =
           restored.copyWith(imagePath: '/x.png').copyWith(clearImage: true);
@@ -132,7 +142,20 @@ void main() {
       expect(payload['title'], '期末考试');
       expect(payload['subtitle'], contains('7'));
       expect(payload['hasData'], isTrue);
+      expect(payload['kind'], 'countdown');
+      expect(
+        payload['targetEpochMillis'],
+        DateTime(2026, 10, 14, 9).millisecondsSinceEpoch,
+      );
+      expect(payload['locale'], isNotEmpty);
+      expect((payload['countdowns'] as List).first['title'], '期末考试');
+      expect(
+        (payload['countdowns'] as List).first['targetEpochMillis'],
+        DateTime(2026, 10, 14, 9).millisecondsSinceEpoch,
+      );
       expect((payload['appearance'] as Map)['backgroundType'], 'solid');
+      expect((payload['appearance'] as Map)['autoRefresh'], isTrue);
+      expect((payload['appearance'] as Map)['refreshIntervalMinutes'], 15);
     });
   });
 }

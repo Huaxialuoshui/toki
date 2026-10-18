@@ -40,7 +40,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeWeatherPlaceholder => 'Weather';
 
   @override
-  String get homeWeatherHint => 'Weather integration is reserved for a later phase';
+  String get homeWeatherHint => 'Tap to add a city or use your current location';
+
+  @override
+  String homeWeatherUpdated(String time) {
+    return 'Updated $time';
+  }
 
   @override
   String homeWeatherDetail(String city, String min, String max) {
@@ -60,7 +65,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherSection => 'Weather';
 
   @override
-  String get weatherSectionSubtitle => 'Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.';
+  String get weatherSectionSubtitle => 'Uses Open-Meteo, no API key needed. Add a city or use your current location to show live weather on the home page.';
 
   @override
   String get weatherClear => 'Clear';
@@ -127,6 +132,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appBackgroundHint => 'Applies behind every page. Chat has its own background in the section above.';
+
+  @override
+  String get appAutoContrast => 'Adapt text colour automatically';
+
+  @override
+  String get appAutoContrastHint => 'Switches between light and dark text based on the background, and adds a subtle scrim when the image mixes light and dark areas.';
 
   @override
   String get iconStyle => 'Icon style';
@@ -294,6 +305,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetRefreshNow => 'Refresh widget now';
+
+  @override
+  String get widgetAutoRefresh => 'Automatic refresh';
+
+  @override
+  String get widgetAutoRefreshHint => 'Redraws the widget in the background at the chosen frequency, without opening the app.';
+
+  @override
+  String get widgetRefreshFrequency => 'Refresh frequency';
+
+  @override
+  String widgetRefreshEveryMinutes(int minutes) {
+    return 'Every $minutes min';
+  }
+
+  @override
+  String widgetRefreshEveryHours(int hours) {
+    return 'Every $hours h';
+  }
+
+  @override
+  String get widgetRefreshDaily => 'Once a day';
+
+  @override
+  String get widgetDailyRefreshTime => 'Daily refresh time';
+
+  @override
+  String get widgetRefreshManual => 'Automatic refresh is off';
+
+  @override
+  String widgetRefreshScheduled(String time) {
+    return 'Next refresh: $time';
+  }
 
   @override
   String get widgetAddToHome => 'Add to home screen';

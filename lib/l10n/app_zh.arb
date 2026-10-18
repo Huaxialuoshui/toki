@@ -13,13 +13,21 @@
 
   "homeGreeting": "欢迎回来",
   "homeWeatherPlaceholder": "天气",
-  "homeWeatherHint": "天气接入将在后续阶段提供",
+  "homeWeatherHint": "点此添加城市或使用当前位置",
+  "homeWeatherUpdated": "更新于 {time}",
+  "@homeWeatherUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "homeWeatherDetail": "{city} · 最低 {min}° / 最高 {max}°",
   "weatherCity": "城市",
   "weatherCityHint": "例如 上海 / Shanghai",
   "weatherCitySaved": "城市已保存",
   "weatherSection": "天气",
-  "weatherSectionSubtitle": "用 Open-Meteo，不需要 API Key。城市留空时首页还是占位卡。",
+  "weatherSectionSubtitle": "用 Open-Meteo，不需要 API Key。添加城市或使用当前位置后，首页会显示实时天气。",
   "weatherClear": "晴",
   "weatherPartlyCloudy": "多云",
   "weatherCloudy": "阴",
@@ -42,6 +50,8 @@
   "weatherNoForecast": "暂无预报数据",
   "appBackground": "应用背景",
   "appBackgroundHint": "作用于所有页面；聊天页有自己独立的背景（见上面的区块）。",
+  "appAutoContrast": "自动适配文字颜色",
+  "appAutoContrastHint": "根据背景明暗自动切换深浅文字；背景明暗混杂时会加一层轻遮罩，避免局部深色像素压住黑色文字。",
   "iconStyle": "图标风格",
   "iconStyleOutlined": "描边",
   "iconStyleFilled": "实心",
@@ -97,6 +107,36 @@
   "widgetShowEvent": "显示下一个日程",
   "widgetTransparent": "半透明背景",
   "widgetRefreshNow": "立即刷新小组件",
+  "widgetAutoRefresh": "自动刷新",
+  "widgetAutoRefreshHint": "按设定频率在后台重绘小组件，不需要打开应用。",
+  "widgetRefreshFrequency": "刷新频率",
+  "widgetRefreshEveryMinutes": "每 {minutes} 分钟",
+  "@widgetRefreshEveryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetRefreshEveryHours": "每 {hours} 小时",
+  "@widgetRefreshEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetRefreshDaily": "每天一次",
+  "widgetDailyRefreshTime": "每天刷新时间",
+  "widgetRefreshManual": "自动刷新已关闭",
+  "widgetRefreshScheduled": "下次刷新：{time}",
+  "@widgetRefreshScheduled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "widgetAddToHome": "添加到桌面",
   "widgetAddToHomeHint": "启动器支持的话，确认系统弹窗即可把小组件钉到桌面。",
   "widgetRefreshed": "小组件已刷新",

@@ -46,6 +46,10 @@ class WidgetConfig {
     this.transparent = false,
     this.showCountdown = true,
     this.showEvent = true,
+    this.autoRefresh = true,
+    this.refreshIntervalMinutes = 15,
+    this.dailyRefreshHour = 7,
+    this.dailyRefreshMinute = 0,
   });
 
   final WidgetSkin skin;
@@ -69,6 +73,29 @@ class WidgetConfig {
   final bool showCountdown;
   final bool showEvent;
 
+  /// 是否由 Android 的 AlarmManager 自动重绘小组件。
+  final bool autoRefresh;
+
+  /// 自动刷新间隔；1440 表示每天一次。
+  final int refreshIntervalMinutes;
+
+  /// 每天一次模式下的本地刷新时间。
+  final int dailyRefreshHour;
+  final int dailyRefreshMinute;
+
+  bool get refreshesDaily => refreshIntervalMinutes >= 24 * 60;
+
+  /// 可选刷新频率（分钟）。15 分钟是 Android 的合理下限。
+  static const List<int> refreshIntervalOptions = <int>[
+    15,
+    30,
+    60,
+    180,
+    360,
+    720,
+    1440,
+  ];
+
   WidgetConfig copyWith({
     WidgetSkin? skin,
     int? backgroundColor,
@@ -84,6 +111,10 @@ class WidgetConfig {
     bool? transparent,
     bool? showCountdown,
     bool? showEvent,
+    bool? autoRefresh,
+    int? refreshIntervalMinutes,
+    int? dailyRefreshHour,
+    int? dailyRefreshMinute,
   }) {
     return WidgetConfig(
       skin: skin ?? this.skin,
@@ -99,6 +130,11 @@ class WidgetConfig {
       transparent: transparent ?? this.transparent,
       showCountdown: showCountdown ?? this.showCountdown,
       showEvent: showEvent ?? this.showEvent,
+      autoRefresh: autoRefresh ?? this.autoRefresh,
+      refreshIntervalMinutes:
+          refreshIntervalMinutes ?? this.refreshIntervalMinutes,
+      dailyRefreshHour: dailyRefreshHour ?? this.dailyRefreshHour,
+      dailyRefreshMinute: dailyRefreshMinute ?? this.dailyRefreshMinute,
     );
   }
 
@@ -118,6 +154,10 @@ class WidgetConfig {
         'backgroundAlpha': transparent ? 200 : 255,
         'showCountdown': showCountdown,
         'showEvent': showEvent,
+        'autoRefresh': autoRefresh,
+        'refreshIntervalMinutes': refreshIntervalMinutes,
+        'dailyRefreshHour': dailyRefreshHour,
+        'dailyRefreshMinute': dailyRefreshMinute,
       };
 
   static WidgetConfig fromJson(Map<String, Object?> json) => WidgetConfig(
@@ -137,7 +177,28 @@ class WidgetConfig {
         transparent: json['transparent'] == true,
         showCountdown: json['showCountdown'] != false,
         showEvent: json['showEvent'] != false,
+        autoRefresh: json['autoRefresh'] != false,
+        refreshIntervalMinutes: _clampRefreshInterval(
+          (json['refreshIntervalMinutes'] as num?)?.toInt(),
+        ),
+        dailyRefreshHour: ((json['dailyRefreshHour'] as num?)?.toInt() ?? 7)
+            .clamp(0, 23)
+            .toInt(),
+        dailyRefreshMinute: ((json['dailyRefreshMinute'] as num?)?.toInt() ?? 0)
+            .clamp(0, 59)
+            .toInt(),
       );
+
+  static int _clampRefreshInterval(int? raw) {
+    if (raw == null) return 15;
+    if (raw <= 15) return 15;
+    if (raw <= 30) return 30;
+    if (raw <= 60) return 60;
+    if (raw <= 180) return 180;
+    if (raw <= 360) return 360;
+    if (raw <= 720) return 720;
+    return 1440;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -154,7 +215,11 @@ class WidgetConfig {
       other.cornerRadius == cornerRadius &&
       other.transparent == transparent &&
       other.showCountdown == showCountdown &&
-      other.showEvent == showEvent;
+      other.showEvent == showEvent &&
+      other.autoRefresh == autoRefresh &&
+      other.refreshIntervalMinutes == refreshIntervalMinutes &&
+      other.dailyRefreshHour == dailyRefreshHour &&
+      other.dailyRefreshMinute == dailyRefreshMinute;
 
   @override
   int get hashCode => Object.hash(
@@ -171,5 +236,9 @@ class WidgetConfig {
         transparent,
         showCountdown,
         showEvent,
+        autoRefresh,
+        refreshIntervalMinutes,
+        dailyRefreshHour,
+        dailyRefreshMinute,
       );
 }

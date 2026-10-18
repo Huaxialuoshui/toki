@@ -13,7 +13,15 @@
 
   "homeGreeting": "Welcome back",
   "homeWeatherPlaceholder": "Weather",
-  "homeWeatherHint": "Weather integration is reserved for a later phase",
+  "homeWeatherHint": "Tap to add a city or use your current location",
+  "homeWeatherUpdated": "Updated {time}",
+  "@homeWeatherUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "homeWeatherDetail": "{city} · Low {min}° / High {max}°",
   "@homeWeatherDetail": {
     "placeholders": {
@@ -32,7 +40,7 @@
   "weatherCityHint": "e.g. Shanghai / 上海",
   "weatherCitySaved": "City saved",
   "weatherSection": "Weather",
-  "weatherSectionSubtitle": "Uses Open-Meteo, no API key needed. The card on the home page stays a placeholder while the city is empty.",
+  "weatherSectionSubtitle": "Uses Open-Meteo, no API key needed. Add a city or use your current location to show live weather on the home page.",
   "weatherClear": "Clear",
   "weatherPartlyCloudy": "Partly cloudy",
   "weatherCloudy": "Overcast",
@@ -55,6 +63,8 @@
   "weatherNoForecast": "No forecast data",
   "appBackground": "App background",
   "appBackgroundHint": "Applies behind every page. Chat has its own background in the section above.",
+  "appAutoContrast": "Adapt text colour automatically",
+  "appAutoContrastHint": "Switches between light and dark text based on the background, and adds a subtle scrim when the image mixes light and dark areas.",
   "iconStyle": "Icon style",
   "iconStyleOutlined": "Outlined",
   "iconStyleFilled": "Filled",
@@ -110,6 +120,36 @@
   "widgetShowEvent": "Show next event",
   "widgetTransparent": "Translucent background",
   "widgetRefreshNow": "Refresh widget now",
+  "widgetAutoRefresh": "Automatic refresh",
+  "widgetAutoRefreshHint": "Redraws the widget in the background at the chosen frequency, without opening the app.",
+  "widgetRefreshFrequency": "Refresh frequency",
+  "widgetRefreshEveryMinutes": "Every {minutes} min",
+  "@widgetRefreshEveryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetRefreshEveryHours": "Every {hours} h",
+  "@widgetRefreshEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetRefreshDaily": "Once a day",
+  "widgetDailyRefreshTime": "Daily refresh time",
+  "widgetRefreshManual": "Automatic refresh is off",
+  "widgetRefreshScheduled": "Next refresh: {time}",
+  "@widgetRefreshScheduled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "widgetAddToHome": "Add to home screen",
   "widgetAddToHomeHint": "If the launcher supports it, confirm the system dialog to pin the widget.",
   "widgetRefreshed": "Widget refreshed",

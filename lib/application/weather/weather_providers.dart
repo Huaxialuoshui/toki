@@ -159,7 +159,9 @@ final weatherProvider = FutureProvider<WeatherSnapshot?>((ref) async {
 
   final now = ref.watch(clockProvider).now();
   final cached = _readCache(store, location);
-  if (cached != null && cached.isFresh(now)) return cached;
+  if (cached != null && cached.isFresh(now, ttl: kWeatherCacheTtl)) {
+    return cached;
+  }
 
   try {
     final service = ref.watch(weatherServiceProvider);
@@ -182,6 +184,28 @@ final weatherProvider = FutureProvider<WeatherSnapshot?>((ref) async {
     debugPrint('获取天气失败（${location.label}）：$error');
     return cached;
   }
+});
+
+/// 天气自动刷新：应用在前台时定时重查；从后台回来时也补一次。
+///
+/// Open-Meteo 的 `current` 本身会随时间变化，所以这里不再把缓存当成
+/// "固定温度"长期显示。缓存 TTL 比刷新间隔略短，保证每次节拍都会真正
+/// 发一次请求（网络失败时仍回落到上一份快照）。
+const Duration kWeatherRefreshInterval = Duration(minutes: 10);
+const Duration kWeatherCacheTtl = Duration(minutes: 8);
+
+final weatherAutoRefreshProvider = Provider<void>((ref) {
+  final Timer timer = Timer.periodic(
+    kWeatherRefreshInterval,
+    (_) => ref.invalidate(weatherProvider),
+  );
+  final AppLifecycleListener lifecycle = AppLifecycleListener(
+    onResume: () => ref.invalidate(weatherProvider),
+  );
+  ref.onDispose(() {
+    timer.cancel();
+    lifecycle.dispose();
+  });
 });
 
 /// 读取缓存；只有"和当前位置同一条"的缓存才算数。
