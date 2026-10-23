@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -135,6 +136,7 @@ class AiChatRequest {
     this.temperature,
     this.maxTokens,
     this.tools = const <AiToolDefinition>[],
+    this.cancelToken,
   });
 
   final List<AiMessage> messages;
@@ -143,6 +145,22 @@ class AiChatRequest {
 
   /// 允许模型调用的工具；为空表示纯聊天。
   final List<AiToolDefinition> tools;
+
+  /// 可选取消令牌；支持时 Provider 应真正中止底层 HTTP 请求。
+  final AiCancellationToken? cancelToken;
+}
+
+/// 领域层取消令牌，不暴露 Dio 类型。
+class AiCancellationToken {
+  final Completer<void> _completer = Completer<void>();
+
+  bool get isCancelled => _completer.isCompleted;
+
+  Future<void> get whenCancelled => _completer.future;
+
+  void cancel() {
+    if (!_completer.isCompleted) _completer.complete();
+  }
 }
 
 /// 非流式回复。

@@ -24,6 +24,7 @@ class CalendarEvent {
     this.repeatRule,
     this.repeatUntil,
     this.reminderMinutes,
+    this.taskId,
     this.status = EventStatus.scheduled,
   });
 
@@ -45,6 +46,9 @@ class CalendarEvent {
 
   /// 提前提醒分钟数（如 5 / 10 / 30 / 60 / 1440）。
   final int? reminderMinutes;
+
+  /// 关联任务；为空表示独立日程。
+  final String? taskId;
 
   final EventStatus status;
   final DateTime createdAt;
@@ -74,6 +78,8 @@ class CalendarEvent {
     String? repeatRule,
     DateTime? repeatUntil,
     int? reminderMinutes,
+    String? taskId,
+    bool clearTaskId = false,
     EventStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -91,6 +97,7 @@ class CalendarEvent {
       repeatRule: repeatRule ?? this.repeatRule,
       repeatUntil: repeatUntil ?? this.repeatUntil,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
+      taskId: clearTaskId ? null : (taskId ?? this.taskId),
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -113,6 +120,7 @@ class CalendarEvent {
         other.repeatRule == repeatRule &&
         other.repeatUntil == repeatUntil &&
         other.reminderMinutes == reminderMinutes &&
+        other.taskId == taskId &&
         other.status == status &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
@@ -132,6 +140,7 @@ class CalendarEvent {
         repeatRule,
         repeatUntil,
         reminderMinutes,
+        taskId,
         status,
         createdAt,
         updatedAt,

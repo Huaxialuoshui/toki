@@ -11,6 +11,7 @@ import '../../infrastructure/database/app_database.dart';
 abstract final class BackupTables {
   static const List<String> ordered = <String>[
     'calendar_categories',
+    'tasks',
     'calendar_events',
     'countdowns',
     'reminders',
@@ -19,6 +20,9 @@ abstract final class BackupTables {
     'chat_sessions',
     'chat_messages',
     'theme_configs',
+    'planning_preferences',
+    'daily_plans',
+    'daily_plan_items',
     'daily_digests',
   ];
 }
@@ -106,6 +110,11 @@ class BackupStore {
             .map((CalendarCategoryRow r) =>
                 r.toJson(serializer: _backupSerializer))
             .toList();
+      case 'tasks':
+        final rows = await _db.select(_db.tasks).get();
+        return rows
+            .map((TaskRow r) => r.toJson(serializer: _backupSerializer))
+            .toList();
       case 'calendar_events':
         final rows = await _db.select(_db.calendarEvents).get();
         return rows
@@ -147,6 +156,23 @@ class BackupStore {
         return rows
             .map((ThemeConfigRow r) => r.toJson(serializer: _backupSerializer))
             .toList();
+      case 'planning_preferences':
+        final rows = await _db.select(_db.planningPreferenceSettings).get();
+        return rows
+            .map((PlanningPreferenceRow r) =>
+                r.toJson(serializer: _backupSerializer))
+            .toList();
+      case 'daily_plans':
+        final rows = await _db.select(_db.dailyPlans).get();
+        return rows
+            .map((DailyPlanRow r) => r.toJson(serializer: _backupSerializer))
+            .toList();
+      case 'daily_plan_items':
+        final rows = await _db.select(_db.dailyPlanItems).get();
+        return rows
+            .map(
+                (DailyPlanItemRow r) => r.toJson(serializer: _backupSerializer))
+            .toList();
       case 'daily_digests':
         final rows = await _db.select(_db.dailyDigests).get();
         return rows
@@ -161,6 +187,8 @@ class BackupStore {
     switch (table) {
       case 'calendar_categories':
         await _db.delete(_db.calendarCategories).go();
+      case 'tasks':
+        await _db.delete(_db.tasks).go();
       case 'calendar_events':
         await _db.delete(_db.calendarEvents).go();
       case 'countdowns':
@@ -177,6 +205,12 @@ class BackupStore {
         await _db.delete(_db.chatMessages).go();
       case 'theme_configs':
         await _db.delete(_db.themeConfigs).go();
+      case 'planning_preferences':
+        await _db.delete(_db.planningPreferenceSettings).go();
+      case 'daily_plans':
+        await _db.delete(_db.dailyPlans).go();
+      case 'daily_plan_items':
+        await _db.delete(_db.dailyPlanItems).go();
       case 'daily_digests':
         await _db.delete(_db.dailyDigests).go();
     }
@@ -184,44 +218,104 @@ class BackupStore {
 
   /// 单行写入失败时补上"是哪张表、哪一行"，避免只报一个 SQLite 错误码。
   Future<void> _insertRow(String table, Map<String, dynamic> row) async {
+    final normalized = _withDefaults(table, row);
     try {
       switch (table) {
         case 'calendar_categories':
-          await _db.into(_db.calendarCategories).insertOnConflictUpdate(
-              CalendarCategoryRow.fromJson(row, serializer: _backupSerializer));
+          await _db
+              .into(_db.calendarCategories)
+              .insertOnConflictUpdate(CalendarCategoryRow.fromJson(
+                normalized,
+                serializer: _backupSerializer,
+              ));
+        case 'tasks':
+          await _db.into(_db.tasks).insertOnConflictUpdate(
+              TaskRow.fromJson(normalized, serializer: _backupSerializer));
         case 'calendar_events':
-          await _db.into(_db.calendarEvents).insertOnConflictUpdate(
-              CalendarEventRow.fromJson(row, serializer: _backupSerializer));
+          await _db
+              .into(_db.calendarEvents)
+              .insertOnConflictUpdate(CalendarEventRow.fromJson(
+                normalized,
+                serializer: _backupSerializer,
+              ));
         case 'countdowns':
           await _db.into(_db.countdowns).insertOnConflictUpdate(
-              CountdownRow.fromJson(row, serializer: _backupSerializer));
+              CountdownRow.fromJson(normalized, serializer: _backupSerializer));
         case 'reminders':
           await _db.into(_db.reminders).insertOnConflictUpdate(
-              ReminderRow.fromJson(row, serializer: _backupSerializer));
+              ReminderRow.fromJson(normalized, serializer: _backupSerializer));
         case 'ai_personas':
           await _db.into(_db.aiPersonas).insertOnConflictUpdate(
-              AiPersonaRow.fromJson(row, serializer: _backupSerializer));
+              AiPersonaRow.fromJson(normalized, serializer: _backupSerializer));
         case 'ai_providers':
           await _db.into(_db.aiProviders).insertOnConflictUpdate(
-              AiProviderRow.fromJson(row, serializer: _backupSerializer));
+              AiProviderRow.fromJson(normalized,
+                  serializer: _backupSerializer));
         case 'chat_sessions':
           await _db.into(_db.chatSessions).insertOnConflictUpdate(
-              ChatSessionRow.fromJson(row, serializer: _backupSerializer));
+              ChatSessionRow.fromJson(normalized,
+                  serializer: _backupSerializer));
         case 'chat_messages':
           await _db.into(_db.chatMessages).insertOnConflictUpdate(
-              ChatMessageRow.fromJson(row, serializer: _backupSerializer));
+              ChatMessageRow.fromJson(normalized,
+                  serializer: _backupSerializer));
         case 'theme_configs':
           await _db.into(_db.themeConfigs).insertOnConflictUpdate(
-              ThemeConfigRow.fromJson(row, serializer: _backupSerializer));
+              ThemeConfigRow.fromJson(normalized,
+                  serializer: _backupSerializer));
+        case 'planning_preferences':
+          await _db.into(_db.planningPreferenceSettings).insertOnConflictUpdate(
+                PlanningPreferenceRow.fromJson(
+                  normalized,
+                  serializer: _backupSerializer,
+                ),
+              );
+        case 'daily_plans':
+          await _db.into(_db.dailyPlans).insertOnConflictUpdate(
+              DailyPlanRow.fromJson(normalized, serializer: _backupSerializer));
+        case 'daily_plan_items':
+          await _db
+              .into(_db.dailyPlanItems)
+              .insertOnConflictUpdate(DailyPlanItemRow.fromJson(
+                normalized,
+                serializer: _backupSerializer,
+              ));
         case 'daily_digests':
-          await _db.into(_db.dailyDigests).insertOnConflictUpdate(
-              DailyDigestRow.fromJson(row, serializer: _backupSerializer));
+          await _db
+              .into(_db.dailyDigests)
+              .insertOnConflictUpdate(DailyDigestRow.fromJson(
+                normalized,
+                serializer: _backupSerializer,
+              ));
       }
     } catch (error) {
       throw BackupException(
         BackupErrorCode.corrupted,
         detail: '$table / ${row['id'] ?? row['sessionId'] ?? '?'} → $error',
       );
+    }
+  }
+
+  /// 旧备份缺少后加的列时补上可空值 / 默认值，避免 fromJson 直接失败。
+  /// 已有值优先，不会被默认值覆盖。
+  Map<String, dynamic> _withDefaults(
+    String table,
+    Map<String, dynamic> row,
+  ) {
+    switch (table) {
+      case 'calendar_events':
+        return <String, dynamic>{'taskId': null, ...row};
+      case 'daily_digests':
+        return <String, dynamic>{
+          'planId': null,
+          'feedback': null,
+          'metricsJson': null,
+          'updatedAt': null,
+          'userEdited': false,
+          ...row,
+        };
+      default:
+        return row;
     }
   }
 }

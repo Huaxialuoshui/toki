@@ -5,6 +5,7 @@ import '../application/settings/settings_controller.dart';
 import '../application/appearance/app_appearance_providers.dart';
 import '../application/app_startup.dart';
 import '../application/notification/reminder_sync.dart';
+import '../application/planning/daily_automation_service.dart';
 import '../application/theme/theme_controller.dart';
 import '../application/theme/theme_mapper.dart';
 import '../application/widget/widget_controller.dart';
@@ -27,6 +28,7 @@ class TokiApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 触发启动初始化（debug 构建下为数据库写入示例数据）。
     ref.watch(appStartupProvider);
+    ref.watch(dailyAutomationLifecycleProvider);
     // 通知：请求权限 + 首次排期同步，并在提醒变化时自动重排。
     ref.watch(notificationStartupProvider);
     ref.watch(reminderAutoSyncProvider);

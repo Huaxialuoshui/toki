@@ -55,6 +55,11 @@ class DriftDailyDigestRepository implements DailyDigestRepository {
               dayKey: Value<String>(digest.dayKey),
               content: Value<String>(digest.content),
               createdAt: Value<DateTime>(digest.createdAt),
+              planId: Value<String?>(digest.planId),
+              feedback: Value<String?>(digest.feedback),
+              metricsJson: Value<String?>(digest.metricsJson),
+              updatedAt: Value<DateTime?>(digest.updatedAt),
+              userEdited: Value<bool>(digest.userEdited),
             ),
           );
 
@@ -77,5 +82,10 @@ class DriftDailyDigestRepository implements DailyDigestRepository {
         dayKey: row.dayKey,
         content: row.content,
         createdAt: row.createdAt,
+        planId: row.planId,
+        feedback: row.feedback,
+        metricsJson: row.metricsJson,
+        updatedAt: row.updatedAt,
+        userEdited: row.userEdited,
       );
 }

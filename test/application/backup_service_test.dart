@@ -6,10 +6,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toki/application/backup/backup_service.dart';
 import 'package:toki/core/clock.dart';
 import 'package:toki/data/backup/backup_store.dart';
+import 'package:toki/data/repositories/drift_planning_preferences_repository.dart';
+import 'package:toki/data/repositories/drift_task_repository.dart';
 import 'package:toki/domain/entities/backup.dart';
 import 'package:toki/domain/entities/calendar_event.dart';
 import 'package:toki/domain/entities/chat_message.dart';
 import 'package:toki/domain/entities/countdown_item.dart';
+import 'package:toki/domain/entities/planning_preferences.dart';
+import 'package:toki/domain/entities/task_item.dart';
 import 'package:toki/infrastructure/backup/backup_file_store.dart';
 import 'package:toki/infrastructure/database/app_database.dart';
 
@@ -330,5 +334,108 @@ void main() {
     expect(document.summary.total, 8);
     expect(document.summary.exportedAt, clock.now());
     expect(document.summary.appVersion, isNotEmpty);
+  });
+
+  test('v7 旧备份缺少新表 / 新列时仍可恢复，旧数据不被覆盖', () async {
+    const legacy = '{"format":"toki-backup","formatVersion":1,'
+        '"schemaVersion":7,"tables":{'
+        '"calendar_events":[{"id":"event-legacy","title":"旧日程",'
+        '"description":null,"startTime":"2026-10-18T09:00:00.000",'
+        '"endTime":"2026-10-18T10:00:00.000","allDay":false,'
+        '"location":null,"categoryId":null,"color":null,"repeatRule":null,'
+        '"repeatUntil":null,"reminderMinutes":null,"status":"scheduled",'
+        '"createdAt":"2026-10-18T08:00:00.000",'
+        '"updatedAt":"2026-10-18T08:00:00.000"}],'
+        '"daily_digests":[{"id":"digest-legacy","kind":"morning",'
+        '"dayKey":"2026-10-18","content":"旧版计划摘要",'
+        '"createdAt":"2026-10-18T08:00:00.000"}]}}';
+
+    await service.restore(legacy, mode: RestoreMode.merge);
+
+    final event = await database
+        .customSelect(
+          "SELECT task_id FROM calendar_events WHERE id = 'event-legacy'",
+        )
+        .getSingle();
+    expect(event.read<String?>('task_id'), null);
+
+    final digest = await database
+        .customSelect(
+          'SELECT content, plan_id, user_edited FROM daily_digests '
+          "WHERE id = 'digest-legacy'",
+        )
+        .getSingle();
+    expect(digest.read<String>('content'), '旧版计划摘要');
+    expect(digest.read<String?>('plan_id'), null);
+    expect(digest.read<int>('user_edited'), 0);
+  });
+
+  test('任务、计划、条目与规划偏好会进入备份并完整恢复', () async {
+    final taskRepository = DriftTaskRepository(database);
+    await taskRepository.upsert(
+      TaskItem(
+        id: 'task-1',
+        title: '备份任务',
+        priority: TaskPriority.high,
+        status: TaskStatus.open,
+        source: TaskSource.manual,
+        estimatedMinutes: 45,
+        postponeCount: 0,
+        createdAt: clock.now(),
+        updatedAt: clock.now(),
+      ),
+    );
+
+    final preferencesRepository = DriftPlanningPreferencesRepository(
+      database,
+      clock: clock,
+    );
+    await preferencesRepository.save(
+      PlanningPreferences(
+        createdAt: clock.now(),
+        updatedAt: clock.now(),
+        focusMinutes: 90,
+      ),
+    );
+
+    await database.into(database.dailyPlans).insert(
+          DailyPlansCompanion.insert(
+            id: 'plan-1',
+            dayKey: '2026-10-18',
+            revision: 1,
+            createdAt: clock.now(),
+            updatedAt: clock.now(),
+          ),
+        );
+    await database.into(database.dailyPlanItems).insert(
+          DailyPlanItemsCompanion.insert(
+            id: 'item-1',
+            planId: 'plan-1',
+            titleSnapshot: '备份任务',
+            taskId: const Value<String>('task-1'),
+            createdAt: clock.now(),
+            updatedAt: clock.now(),
+          ),
+        );
+
+    final backup = await service.export(includeApiKeys: false);
+    final document = service.parse(backup.json);
+    expect(document.summary.counts['tasks'], 1);
+    expect(document.summary.counts['daily_plans'], 1);
+    expect(document.summary.counts['daily_plan_items'], 1);
+    expect(document.summary.counts['planning_preferences'], 1);
+
+    await database.delete(database.dailyPlanItems).go();
+    await database.delete(database.dailyPlans).go();
+    await database.delete(database.planningPreferenceSettings).go();
+    await database.delete(database.tasks).go();
+
+    await service.restore(backup.json, mode: RestoreMode.merge);
+
+    expect((await taskRepository.findById('task-1'))!.title, '备份任务');
+    expect((await preferencesRepository.load()).focusMinutes, 90);
+    final planItem = await database.select(database.dailyPlanItems).getSingle();
+    expect(planItem.planId, 'plan-1');
+    expect(planItem.taskId, 'task-1');
   });
 }

@@ -5,16 +5,25 @@ import '../../../data/repositories/repository_providers.dart';
 import '../../../domain/entities/ai_persona.dart';
 import '../../../domain/repositories/calendar_repository.dart';
 import '../../../domain/repositories/countdown_repository.dart';
+import '../../../domain/repositories/daily_plan_repository.dart';
 import '../../../domain/repositories/reminder_repository.dart';
+import '../../../domain/repositories/task_repository.dart';
 import '../../../domain/services/ai_provider.dart';
+import '../../../domain/services/transaction_runner.dart';
 import '../../../infrastructure/clock_provider.dart';
 import '../../calendar/calendar_actions.dart';
+import '../../planning/daily_planning_service.dart';
+import '../../planning/daily_review_service.dart';
+import '../../planning/plan_actions.dart';
+import '../../planning/planning_context.dart';
 import '../persona_prompt.dart';
+import '../../tasks/task_actions.dart';
 import '../tool_permissions.dart';
 import 'ai_tool.dart';
 import 'calendar_tools.dart';
 import 'countdown_tools.dart';
 import 'reminder_tools.dart';
+import 'planning_tools.dart';
 import 'system_tools.dart';
 
 /// 工具注册表：统一管理 AI 能调用的全部工具。
@@ -41,7 +50,10 @@ class AiToolRegistry {
 
     final enabled = persona?.enabledTools ?? const <String>[];
     return _tools.values.where((AiTool tool) {
-      if (!permissions.allows(tool.category)) return false;
+      if (!tool.requiredCategories
+          .every((AiToolCategory category) => permissions.allows(category))) {
+        return false;
+      }
       // 人设的 enabledTools 为空表示不限制。
       if (enabled.isNotEmpty && !enabled.contains(tool.name)) return false;
       return true;
@@ -64,7 +76,7 @@ class AiToolRegistry {
         .toList(growable: false);
   }
 
-  /// 生产环境的标准工具集（15 个）。
+  /// 生产环境的标准工具集（25 个）。
   factory AiToolRegistry.standard({
     required ToolDependencies bundle,
   }) {
@@ -83,6 +95,27 @@ class AiToolRegistry {
         reminders: bundle.reminders,
         clock: bundle.clock,
       ),
+      if (bundle.plans != null &&
+          bundle.tasks != null &&
+          bundle.taskActions != null &&
+          bundle.planActions != null &&
+          bundle.planningService != null &&
+          bundle.reviewService != null &&
+          bundle.contextBuilder != null &&
+          bundle.transactionRunner != null)
+        ...buildPlanningTools(
+          plans: bundle.plans!,
+          tasks: bundle.tasks!,
+          events: bundle.calendar,
+          taskActions: bundle.taskActions!,
+          planActions: bundle.planActions!,
+          planningService: bundle.planningService!,
+          reviewService: bundle.reviewService!,
+          contextBuilder: bundle.contextBuilder!,
+          calendarActions: bundle.calendarActions,
+          transactionRunner: bundle.transactionRunner!,
+          clock: bundle.clock,
+        ),
     ]);
   }
 }
@@ -94,6 +127,14 @@ class ToolDependencies {
     required this.countdowns,
     required this.reminders,
     required this.calendarActions,
+    this.plans,
+    this.tasks,
+    this.taskActions,
+    this.planActions,
+    this.planningService,
+    this.reviewService,
+    this.contextBuilder,
+    this.transactionRunner,
     required this.clock,
   });
 
@@ -101,6 +142,14 @@ class ToolDependencies {
   final CountdownRepository countdowns;
   final ReminderRepository reminders;
   final CalendarActions calendarActions;
+  final DailyPlanRepository? plans;
+  final TaskRepository? tasks;
+  final TaskActions? taskActions;
+  final PlanActions? planActions;
+  final DailyPlanningService? planningService;
+  final DailyReviewService? reviewService;
+  final PlanningContextBuilder? contextBuilder;
+  final TransactionRunner? transactionRunner;
   final Clock clock;
 }
 
@@ -111,6 +160,14 @@ final aiToolRegistryProvider = Provider<AiToolRegistry>(
       countdowns: ref.watch(countdownRepositoryProvider),
       reminders: ref.watch(reminderRepositoryProvider),
       calendarActions: ref.watch(calendarActionsProvider),
+      plans: ref.watch(dailyPlanRepositoryProvider),
+      tasks: ref.watch(taskRepositoryProvider),
+      taskActions: ref.watch(taskActionsProvider),
+      planActions: ref.watch(planActionsProvider),
+      planningService: ref.watch(dailyPlanningServiceProvider),
+      reviewService: ref.watch(dailyReviewServiceProvider),
+      contextBuilder: ref.watch(planningContextBuilderProvider),
+      transactionRunner: ref.watch(transactionRunnerProvider),
       clock: ref.watch(clockProvider),
     ),
   ),

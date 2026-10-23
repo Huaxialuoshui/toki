@@ -2945,6 +2945,912 @@ abstract class AppLocalizations {
   /// **'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.'**
   String get settingsPhaseNote;
 
+  /// No description provided for @taskSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get taskSection;
+
+  /// No description provided for @taskPageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks do not need a time, and completing or archiving one never deletes linked events.'**
+  String get taskPageSubtitle;
+
+  /// No description provided for @taskBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get taskBack;
+
+  /// No description provided for @taskNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get taskNew;
+
+  /// No description provided for @taskEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit task'**
+  String get taskEdit;
+
+  /// No description provided for @taskCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get taskCancel;
+
+  /// No description provided for @taskSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get taskSave;
+
+  /// No description provided for @taskSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Task saved'**
+  String get taskSaved;
+
+  /// No description provided for @taskSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save task'**
+  String get taskSaveFailed;
+
+  /// No description provided for @taskFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Task title'**
+  String get taskFieldTitle;
+
+  /// No description provided for @taskTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a task title'**
+  String get taskTitleRequired;
+
+  /// No description provided for @taskFieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get taskFieldNotes;
+
+  /// No description provided for @taskFieldPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get taskFieldPriority;
+
+  /// No description provided for @taskFieldDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get taskFieldDue;
+
+  /// No description provided for @taskNoDue.
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get taskNoDue;
+
+  /// No description provided for @taskClearDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear due date'**
+  String get taskClearDue;
+
+  /// No description provided for @taskFieldEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated time'**
+  String get taskFieldEstimate;
+
+  /// No description provided for @taskFieldActual.
+  ///
+  /// In en, this message translates to:
+  /// **'Actual time'**
+  String get taskFieldActual;
+
+  /// No description provided for @taskMinutesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get taskMinutesUnit;
+
+  /// No description provided for @taskEstimateInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated time must be a non-negative whole number'**
+  String get taskEstimateInvalid;
+
+  /// No description provided for @taskDueOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {time}'**
+  String taskDueOn(String time);
+
+  /// No description provided for @taskPriorityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get taskPriorityLow;
+
+  /// No description provided for @taskPriorityNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get taskPriorityNormal;
+
+  /// No description provided for @taskPriorityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get taskPriorityHigh;
+
+  /// No description provided for @taskPriorityUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get taskPriorityUrgent;
+
+  /// No description provided for @taskStatusBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get taskStatusBlocked;
+
+  /// No description provided for @taskEstimateValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. {minutes} min'**
+  String taskEstimateValue(int minutes);
+
+  /// No description provided for @taskEmptyActive.
+  ///
+  /// In en, this message translates to:
+  /// **'No open tasks'**
+  String get taskEmptyActive;
+
+  /// No description provided for @taskEmptyCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed tasks yet'**
+  String get taskEmptyCompleted;
+
+  /// No description provided for @taskEmptyArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived tasks'**
+  String get taskEmptyArchived;
+
+  /// No description provided for @taskFilterActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {count}'**
+  String taskFilterActive(int count);
+
+  /// No description provided for @taskFilterCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed {count}'**
+  String taskFilterCompleted(int count);
+
+  /// No description provided for @taskFilterArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived {count}'**
+  String taskFilterArchived(int count);
+
+  /// No description provided for @taskMoreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get taskMoreActions;
+
+  /// No description provided for @taskResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as open'**
+  String get taskResume;
+
+  /// No description provided for @taskBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as blocked'**
+  String get taskBlock;
+
+  /// No description provided for @taskPostponeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Postpone to tomorrow'**
+  String get taskPostponeTomorrow;
+
+  /// No description provided for @taskRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from archive'**
+  String get taskRestore;
+
+  /// No description provided for @taskArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get taskArchive;
+
+  /// No description provided for @taskCompletedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Task completed'**
+  String get taskCompletedToast;
+
+  /// No description provided for @taskReopened.
+  ///
+  /// In en, this message translates to:
+  /// **'Task reopened'**
+  String get taskReopened;
+
+  /// No description provided for @taskPostponed.
+  ///
+  /// In en, this message translates to:
+  /// **'Task postponed'**
+  String get taskPostponed;
+
+  /// No description provided for @taskArchivedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Task archived'**
+  String get taskArchivedToast;
+
+  /// No description provided for @taskRestoredToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Task restored'**
+  String get taskRestoredToast;
+
+  /// No description provided for @taskMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Task not found'**
+  String get taskMissing;
+
+  /// No description provided for @taskNotActive.
+  ///
+  /// In en, this message translates to:
+  /// **'This task cannot be changed in its current state'**
+  String get taskNotActive;
+
+  /// No description provided for @taskNotCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'The task is not completed'**
+  String get taskNotCompleted;
+
+  /// No description provided for @taskSummaryCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'{active} open · {completed} completed · {overdue} overdue'**
+  String taskSummaryCounts(int active, int completed, int overdue);
+
+  /// No description provided for @planSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s plan'**
+  String get planSection;
+
+  /// No description provided for @planGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate today\'s plan'**
+  String get planGenerate;
+
+  /// No description provided for @planRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get planRegenerate;
+
+  /// No description provided for @planViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View full plan'**
+  String get planViewAll;
+
+  /// No description provided for @planNoPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'No structured plan for today yet'**
+  String get planNoPlan;
+
+  /// No description provided for @planNoPlanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI creates a draft first; tasks and events are written only after you confirm.'**
+  String get planNoPlanHint;
+
+  /// No description provided for @planLegacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy plan summary'**
+  String get planLegacyTitle;
+
+  /// No description provided for @planLegacyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an old Markdown summary, not a structured plan.'**
+  String get planLegacyHint;
+
+  /// No description provided for @planPendingDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'A new draft is waiting for review'**
+  String get planPendingDraft;
+
+  /// No description provided for @planDraftPendingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The current plan remains active until you apply the new draft.'**
+  String get planDraftPendingHint;
+
+  /// No description provided for @planGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s goals'**
+  String get planGoalTitle;
+
+  /// No description provided for @planAvailableWindows.
+  ///
+  /// In en, this message translates to:
+  /// **'Available time'**
+  String get planAvailableWindows;
+
+  /// No description provided for @planFixedSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed schedule'**
+  String get planFixedSchedule;
+
+  /// No description provided for @planNoFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'No fixed events today'**
+  String get planNoFixed;
+
+  /// No description provided for @planTimelineMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get planTimelineMorning;
+
+  /// No description provided for @planTimelineAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get planTimelineAfternoon;
+
+  /// No description provided for @planTimelineEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get planTimelineEvening;
+
+  /// No description provided for @planTimelineUnscheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Unscheduled'**
+  String get planTimelineUnscheduled;
+
+  /// No description provided for @planNoItems.
+  ///
+  /// In en, this message translates to:
+  /// **'This plan has no items yet'**
+  String get planNoItems;
+
+  /// No description provided for @planApplyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept all'**
+  String get planApplyAll;
+
+  /// No description provided for @planApplySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply selected ({count})'**
+  String planApplySelected(int count);
+
+  /// No description provided for @planAdjustTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust time'**
+  String get planAdjustTime;
+
+  /// No description provided for @planRemoveItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from plan'**
+  String get planRemoveItem;
+
+  /// No description provided for @planCancelPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel plan'**
+  String get planCancelPlan;
+
+  /// No description provided for @planCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this plan?'**
+  String get planCancelConfirmTitle;
+
+  /// No description provided for @planCancelConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks and events already created will be kept.'**
+  String get planCancelConfirmBody;
+
+  /// No description provided for @planCompleteDay.
+  ///
+  /// In en, this message translates to:
+  /// **'End today'**
+  String get planCompleteDay;
+
+  /// No description provided for @planCompleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End today\'s plan?'**
+  String get planCompleteConfirmTitle;
+
+  /// No description provided for @planCompleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The plan will be marked complete; unfinished tasks are kept.'**
+  String get planCompleteConfirmBody;
+
+  /// No description provided for @planApplyPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply this plan?'**
+  String get planApplyPreviewTitle;
+
+  /// No description provided for @planApplyPreviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the tasks and events below will be created. The latest data is checked again before writing.'**
+  String get planApplyPreviewBody;
+
+  /// No description provided for @planApplyCreateTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Create task: {title}'**
+  String planApplyCreateTask(String title);
+
+  /// No description provided for @planApplyMatchTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Link existing task: {title}'**
+  String planApplyMatchTask(String title);
+
+  /// No description provided for @planApplyCreateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Create event: {title} · {time}'**
+  String planApplyCreateEvent(String title, String time);
+
+  /// No description provided for @planApplyScheduleTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule task: {title} · {time}'**
+  String planApplyScheduleTask(String title, String time);
+
+  /// No description provided for @planApplySkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip {count}'**
+  String planApplySkipped(int count);
+
+  /// No description provided for @planApplyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get planApplyConfirm;
+
+  /// No description provided for @planApplyCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get planApplyCancel;
+
+  /// No description provided for @planApplyResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {tasks} tasks and {events} events; skipped {skipped}'**
+  String planApplyResult(int tasks, int events, int skipped);
+
+  /// No description provided for @planApplyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not apply plan'**
+  String get planApplyFailed;
+
+  /// No description provided for @planStale.
+  ///
+  /// In en, this message translates to:
+  /// **'The plan is out of date. Please regenerate it.'**
+  String get planStale;
+
+  /// No description provided for @planConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'The calendar changed. Please review the plan again.'**
+  String get planConflict;
+
+  /// No description provided for @planGenerationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate today\'s plan'**
+  String get planGenerationTitle;
+
+  /// No description provided for @planGoalField.
+  ///
+  /// In en, this message translates to:
+  /// **'Most important thing today'**
+  String get planGoalField;
+
+  /// No description provided for @planNotesField.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra constraints / times to avoid'**
+  String get planNotesField;
+
+  /// No description provided for @planEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get planEnergy;
+
+  /// No description provided for @planEnergyLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get planEnergyLow;
+
+  /// No description provided for @planEnergyNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get planEnergyNormal;
+
+  /// No description provided for @planEnergyHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get planEnergyHigh;
+
+  /// No description provided for @planGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating plan…'**
+  String get planGenerating;
+
+  /// No description provided for @planNoProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'No AI provider configured yet'**
+  String get planNoProvider;
+
+  /// No description provided for @planGenerateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate plan'**
+  String get planGenerateFailed;
+
+  /// No description provided for @planGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan draft created'**
+  String get planGenerated;
+
+  /// No description provided for @planStatusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs review'**
+  String get planStatusDraft;
+
+  /// No description provided for @planStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get planStatusConfirmed;
+
+  /// No description provided for @planStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get planStatusInProgress;
+
+  /// No description provided for @planStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get planStatusCompleted;
+
+  /// No description provided for @planStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get planStatusCancelled;
+
+  /// No description provided for @planStatusSuperseded.
+  ///
+  /// In en, this message translates to:
+  /// **'Superseded'**
+  String get planStatusSuperseded;
+
+  /// No description provided for @planRevision.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {revision}'**
+  String planRevision(int revision);
+
+  /// No description provided for @planUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String planUpdatedAt(String time);
+
+  /// No description provided for @planGeneratedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {time}'**
+  String planGeneratedAt(String time);
+
+  /// No description provided for @planIssuesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Risks & suggestions'**
+  String get planIssuesTitle;
+
+  /// No description provided for @planIssueOverbooked.
+  ///
+  /// In en, this message translates to:
+  /// **'The plan may exceed your available time'**
+  String get planIssueOverbooked;
+
+  /// No description provided for @planIssueNoBreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough break between consecutive items'**
+  String get planIssueNoBreak;
+
+  /// No description provided for @planIssueAllDay.
+  ///
+  /// In en, this message translates to:
+  /// **'There is an all-day event; check your available time'**
+  String get planIssueAllDay;
+
+  /// No description provided for @planIssueUnscheduledDueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'A task is due soon but is not scheduled'**
+  String get planIssueUnscheduledDueSoon;
+
+  /// No description provided for @planIssueCompletedFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'A completed task still has a future event'**
+  String get planIssueCompletedFuture;
+
+  /// No description provided for @planIssueDeadlineRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'An item may exceed the task deadline'**
+  String get planIssueDeadlineRisk;
+
+  /// No description provided for @planIssueRepeatedPostpone.
+  ///
+  /// In en, this message translates to:
+  /// **'This task has been postponed several times'**
+  String get planIssueRepeatedPostpone;
+
+  /// No description provided for @planIssueDetached.
+  ///
+  /// In en, this message translates to:
+  /// **'An applied event was deleted; schedule it again'**
+  String get planIssueDetached;
+
+  /// No description provided for @planNoProviderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a provider in Settings first. Tasks and the calendar still work.'**
+  String get planNoProviderHint;
+
+  /// No description provided for @planUnscheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Unscheduled'**
+  String get planUnscheduled;
+
+  /// No description provided for @planTaskCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get planTaskCompleted;
+
+  /// No description provided for @planTaskOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Not completed'**
+  String get planTaskOpen;
+
+  /// No description provided for @planNoDue.
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get planNoDue;
+
+  /// No description provided for @planningPreferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning preferences'**
+  String get planningPreferencesTitle;
+
+  /// No description provided for @planningPreferencesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'These preferences are included in backups and only affect plan generation.'**
+  String get planningPreferencesHint;
+
+  /// No description provided for @planningWorkdayStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Work starts'**
+  String get planningWorkdayStart;
+
+  /// No description provided for @planningWorkdayEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Work ends'**
+  String get planningWorkdayEnd;
+
+  /// No description provided for @planningLunchStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch starts'**
+  String get planningLunchStart;
+
+  /// No description provided for @planningLunchEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch ends'**
+  String get planningLunchEnd;
+
+  /// No description provided for @planningFocusMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus block (minutes)'**
+  String get planningFocusMinutes;
+
+  /// No description provided for @planningBreakMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Break (minutes)'**
+  String get planningBreakMinutes;
+
+  /// No description provided for @planningSlotMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Time slot (minutes)'**
+  String get planningSlotMinutes;
+
+  /// No description provided for @planningDefaultPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Default priority'**
+  String get planningDefaultPriority;
+
+  /// No description provided for @planningWeekdaysOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Use default hours on weekdays only'**
+  String get planningWeekdaysOnly;
+
+  /// No description provided for @planningReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset defaults'**
+  String get planningReset;
+
+  /// No description provided for @planningSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning preferences saved'**
+  String get planningSaved;
+
+  /// No description provided for @planningResetDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning preferences reset'**
+  String get planningResetDone;
+
+  /// No description provided for @reviewMetricsLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned {total} · Completed {completed} · Open {open} · Unknown events {unknown}'**
+  String reviewMetricsLine(int total, int completed, int open, int unknown);
+
+  /// No description provided for @reviewLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing local metrics only; the AI summary is unavailable or not generated yet.'**
+  String get reviewLocalOnly;
+
+  /// No description provided for @reviewGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate evening review'**
+  String get reviewGenerate;
+
+  /// No description provided for @reviewRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate review'**
+  String get reviewRegenerate;
+
+  /// No description provided for @reviewGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewing today\'s progress…'**
+  String get reviewGenerating;
+
+  /// No description provided for @reviewFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate the review; the previous one was kept'**
+  String get reviewFailed;
+
+  /// No description provided for @reviewEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit review'**
+  String get reviewEdit;
+
+  /// No description provided for @reviewEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit today\'s review'**
+  String get reviewEditTitle;
+
+  /// No description provided for @reviewContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Review text'**
+  String get reviewContent;
+
+  /// No description provided for @reviewFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulties / feedback'**
+  String get reviewFeedback;
+
+  /// No description provided for @reviewSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save review'**
+  String get reviewSave;
+
+  /// No description provided for @reviewSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Review saved'**
+  String get reviewSaved;
+
+  /// No description provided for @reviewNoTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No planned tasks today; only local metrics are available.'**
+  String get reviewNoTasks;
+
   /// No description provided for @mockEventDefense.
   ///
   /// In en, this message translates to:

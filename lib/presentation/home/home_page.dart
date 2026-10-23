@@ -13,14 +13,15 @@ import '../../domain/entities/ai_persona.dart';
 import '../../domain/entities/countdown_item.dart';
 import '../../domain/services/recurrence.dart';
 import '../../domain/entities/weather.dart';
-import '../../domain/entities/daily_digest.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/mock/mock_data.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/async_hint.dart';
 import '../widgets/countdown_card.dart';
-import 'daily_digest_card.dart';
+import 'daily_review_card.dart';
+import 'task_summary_card.dart';
+import 'today_plan_card.dart';
 import 'weather_detail_sheet.dart';
 import '../widgets/event_tile.dart';
 import '../widgets/page_scaffold.dart';
@@ -66,8 +67,9 @@ class HomePage extends ConsumerWidget {
               ),
             ),
           const _WeatherCard(),
-          const DailyDigestCard(kind: DailyDigestKind.morning),
-          const DailyDigestCard(kind: DailyDigestKind.evening),
+          const TaskSummaryCard(),
+          const TodayPlanCard(),
+          const DailyReviewCard(),
           const SizedBox(height: 24),
           SectionHeader(
             title: l10n.homeTodayEvents,

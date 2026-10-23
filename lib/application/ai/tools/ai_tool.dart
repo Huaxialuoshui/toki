@@ -26,6 +26,17 @@ typedef AiToolHandler = Future<AiToolResult> Function(
   Map<String, Object?> args,
 );
 
+@immutable
+class AiToolPreview {
+  const AiToolPreview(this.lines);
+
+  final List<String> lines;
+}
+
+typedef AiToolPreviewHandler = Future<AiToolPreview?> Function(
+  Map<String, Object?> args,
+);
+
 /// 一个可以被 AI 调用的工具。
 abstract class AiTool {
   const AiTool();
@@ -40,6 +51,12 @@ abstract class AiTool {
   /// 危险操作需要用户二次确认（删除，以及批量修改）。
   bool get requiresConfirmation => category == AiToolCategory.delete;
 
+  /// 该工具需要的全部权限类别；默认只要求自己的类别。
+  Set<AiToolCategory> get requiredCategories => <AiToolCategory>{category};
+
+  /// 可选的人类可读变更预览。
+  Future<AiToolPreview?> preview(Map<String, Object?> args) async => null;
+
   Future<AiToolResult> execute(Map<String, Object?> args);
 }
 
@@ -52,7 +69,9 @@ class SimpleAiTool extends AiTool {
     required this.parameters,
     required this.handler,
     this.confirm = false,
-  });
+    this.previewHandler,
+    Set<AiToolCategory>? requiredCategories,
+  }) : _requiredCategories = requiredCategories;
 
   @override
   final String name;
@@ -68,9 +87,19 @@ class SimpleAiTool extends AiTool {
 
   final AiToolHandler handler;
   final bool confirm;
+  final AiToolPreviewHandler? previewHandler;
+  final Set<AiToolCategory>? _requiredCategories;
 
   @override
   bool get requiresConfirmation => confirm || category == AiToolCategory.delete;
+
+  @override
+  Set<AiToolCategory> get requiredCategories =>
+      _requiredCategories ?? <AiToolCategory>{category};
+
+  @override
+  Future<AiToolPreview?> preview(Map<String, Object?> args) async =>
+      previewHandler == null ? null : previewHandler!(args);
 
   @override
   Future<AiToolResult> execute(Map<String, Object?> args) => handler(args);

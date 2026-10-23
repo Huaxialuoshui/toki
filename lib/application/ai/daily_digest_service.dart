@@ -98,6 +98,11 @@ class DailyDigestService {
       dayKey: DailyDigest.keyFor(now),
       content: content,
       createdAt: existing?.createdAt ?? now,
+      planId: existing?.planId,
+      feedback: existing?.feedback,
+      metricsJson: existing?.metricsJson,
+      updatedAt: now,
+      userEdited: false,
     );
     await _ref.read(dailyDigestRepositoryProvider).upsert(digest);
     return digest;

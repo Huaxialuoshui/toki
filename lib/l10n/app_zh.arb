@@ -511,6 +511,306 @@
   "settingsProjectPath": "项目路径",
   "settingsPhaseNote": "Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。",
 
+  "taskSection": "任务",
+  "taskPageSubtitle": "任务可以没有时间，完成或归档都不会删除关联日程。",
+  "taskBack": "返回首页",
+  "taskNew": "新建任务",
+  "taskEdit": "编辑任务",
+  "taskCancel": "取消",
+  "taskSave": "保存",
+  "taskSaved": "任务已保存",
+  "taskSaveFailed": "任务保存失败",
+  "taskFieldTitle": "任务标题",
+  "taskTitleRequired": "请输入任务标题",
+  "taskFieldNotes": "备注",
+  "taskFieldPriority": "优先级",
+  "taskFieldDue": "截止时间",
+  "taskNoDue": "无截止时间",
+  "taskClearDue": "清除截止时间",
+  "taskFieldEstimate": "预计耗时",
+  "taskFieldActual": "实际耗时",
+  "taskMinutesUnit": "分钟",
+  "taskEstimateInvalid": "预计耗时必须是非负整数",
+  "taskDueOn": "截止 {time}",
+  "@taskDueOn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "taskPriorityLow": "低",
+  "taskPriorityNormal": "普通",
+  "taskPriorityHigh": "高",
+  "taskPriorityUrgent": "紧急",
+  "taskStatusBlocked": "已阻塞",
+  "taskEstimateValue": "预计 {minutes} 分钟",
+  "@taskEstimateValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "taskEmptyActive": "没有待办任务",
+  "taskEmptyCompleted": "还没有已完成任务",
+  "taskEmptyArchived": "没有归档任务",
+  "taskFilterActive": "未完成 {count}",
+  "@taskFilterActive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskFilterCompleted": "已完成 {count}",
+  "@taskFilterCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskFilterArchived": "已归档 {count}",
+  "@taskFilterArchived": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskMoreActions": "更多操作",
+  "taskResume": "恢复为未完成",
+  "taskBlock": "标记为阻塞",
+  "taskPostponeTomorrow": "延后到明天",
+  "taskRestore": "从归档恢复",
+  "taskArchive": "归档",
+  "taskCompletedToast": "任务已完成",
+  "taskReopened": "任务已恢复为未完成",
+  "taskPostponed": "任务已延后",
+  "taskArchivedToast": "任务已归档",
+  "taskRestoredToast": "任务已恢复",
+  "taskMissing": "任务不存在",
+  "taskNotActive": "当前任务状态不能执行该操作",
+  "taskNotCompleted": "任务尚未完成",
+  "taskSummaryCounts": "{active} 个未完成 · {completed} 个已完成 · {overdue} 个逾期",
+  "@taskSummaryCounts": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "overdue": {
+        "type": "int"
+      }
+    }
+  },
+
+  "planSection": "今日计划",
+  "planGenerate": "生成今日计划",
+  "planRegenerate": "重新生成",
+  "planViewAll": "查看完整计划",
+  "planNoPlan": "今天还没有结构化计划",
+  "planNoPlanHint": "AI 会先给出草稿，你确认后才会写入任务和日历。",
+  "planLegacyTitle": "旧版计划摘要",
+  "planLegacyHint": "这是旧版 Markdown 摘要，不是结构化计划。",
+  "planPendingDraft": "有新草稿待审核",
+  "planDraftPendingHint": "当前计划仍有效；只有应用新草稿后才会替换。",
+  "planGoalTitle": "今日目标",
+  "planAvailableWindows": "可用时间",
+  "planFixedSchedule": "固定日程",
+  "planNoFixed": "今天没有固定日程",
+  "planTimelineMorning": "上午",
+  "planTimelineAfternoon": "下午",
+  "planTimelineEvening": "晚间",
+  "planTimelineUnscheduled": "待安排",
+  "planNoItems": "这个计划还没有条目",
+  "planApplyAll": "全部接受",
+  "planApplySelected": "应用选中（{count}）",
+  "@planApplySelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planAdjustTime": "调整时间",
+  "planRemoveItem": "移出计划",
+  "planCancelPlan": "取消计划",
+  "planCancelConfirmTitle": "取消这个计划？",
+  "planCancelConfirmBody": "已经创建的任务和日程会保留，不会被删除。",
+  "planCompleteDay": "结束今天",
+  "planCompleteConfirmTitle": "结束今天的计划？",
+  "planCompleteConfirmBody": "计划会标记为已完成，未完成任务仍然保留。",
+  "planApplyPreviewTitle": "确认应用计划",
+  "planApplyPreviewBody": "只会创建下列任务和日程；应用前会再次检查最新数据。",
+  "planApplyCreateTask": "新建任务：{title}",
+  "@planApplyCreateTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyMatchTask": "关联已有任务：{title}",
+  "@planApplyMatchTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyCreateEvent": "创建日程：{title} · {time}",
+  "@planApplyCreateEvent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyScheduleTask": "安排任务：{title} · {time}",
+  "@planApplyScheduleTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplySkipped": "跳过 {count} 条",
+  "@planApplySkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planApplyConfirm": "确认应用",
+  "planApplyCancel": "暂不应用",
+  "planApplyResult": "已创建 {tasks} 个任务、{events} 个日程；跳过 {skipped} 条",
+  "@planApplyResult": {
+    "placeholders": {
+      "tasks": {
+        "type": "int"
+      },
+      "events": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "planApplyFailed": "应用计划失败",
+  "planStale": "计划已过期，请重新生成",
+  "planConflict": "计划涉及的日程已经变化，请重新审核",
+  "planGenerationTitle": "生成今日计划",
+  "planGoalField": "今天最重要的事",
+  "planNotesField": "补充约束 / 不想安排的时间",
+  "planEnergy": "精力状态",
+  "planEnergyLow": "偏低",
+  "planEnergyNormal": "正常",
+  "planEnergyHigh": "充沛",
+  "planGenerating": "正在生成计划…",
+  "planNoProvider": "还没有配置 AI 服务商",
+  "planGenerateFailed": "生成计划失败",
+  "planGenerated": "计划草稿已生成",
+  "planStatusDraft": "待审核",
+  "planStatusConfirmed": "已确认",
+  "planStatusInProgress": "执行中",
+  "planStatusCompleted": "已完成",
+  "planStatusCancelled": "已取消",
+  "planStatusSuperseded": "已废弃",
+  "planRevision": "第 {revision} 版",
+  "@planRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "planUpdatedAt": "更新于 {time}",
+  "@planUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planGeneratedAt": "生成于 {time}",
+  "@planGeneratedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planIssuesTitle": "风险与建议",
+  "planIssueOverbooked": "安排可能超出可用时间",
+  "planIssueNoBreak": "连续安排之间没有足够休息",
+  "planIssueAllDay": "今天有全天日程，请确认可用时间",
+  "planIssueUnscheduledDueSoon": "有任务临近截止但还未安排",
+  "planIssueCompletedFuture": "有任务已完成但对应日程仍在未来",
+  "planIssueDeadlineRisk": "安排可能超过任务截止时间",
+  "planIssueRepeatedPostpone": "任务已经多次延期",
+  "planIssueDetached": "已应用日程被删除，请重新安排",
+  "planNoProviderHint": "请先在设置里添加服务商；任务和日历功能仍然可用。",
+  "planUnscheduled": "未安排",
+  "planTaskCompleted": "已完成",
+  "planTaskOpen": "未完成",
+  "planNoDue": "无截止时间",
+
+  "planningPreferencesTitle": "规划偏好",
+  "planningPreferencesHint": "这些偏好会随备份恢复，只影响计划生成，不会修改已有日程。",
+  "planningWorkdayStart": "工作开始",
+  "planningWorkdayEnd": "工作结束",
+  "planningLunchStart": "午休开始",
+  "planningLunchEnd": "午休结束",
+  "planningFocusMinutes": "单次专注分钟",
+  "planningBreakMinutes": "休息间隔分钟",
+  "planningSlotMinutes": "时间粒度分钟",
+  "planningDefaultPriority": "默认优先级",
+  "planningWeekdaysOnly": "仅工作日使用默认时段",
+  "planningReset": "恢复默认",
+  "planningSaved": "规划偏好已保存",
+  "planningResetDone": "已恢复默认规划偏好",
+  "reviewMetricsLine": "计划 {total} · 完成 {completed} · 未完成 {open} · 状态未知日程 {unknown}",
+  "@reviewMetricsLine": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "open": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewLocalOnly": "当前显示本地统计；AI 总结生成失败或尚未生成。",
+  "reviewGenerate": "生成晚间复盘",
+  "reviewRegenerate": "重新生成复盘",
+  "reviewGenerating": "正在整理今天的执行情况…",
+  "reviewFailed": "生成复盘失败，旧复盘已保留",
+  "reviewEdit": "编辑复盘",
+  "reviewEditTitle": "编辑今日复盘",
+  "reviewContent": "复盘正文",
+  "reviewFeedback": "今天遇到的困难 / 反馈",
+  "reviewSave": "保存复盘",
+  "reviewSaved": "复盘已保存",
+  "reviewNoTasks": "今天没有计划任务，只有本地统计可用。",
+
   "mockEventDefense": "毕业设计答辩",
   "mockEventProjectDeadline": "课程项目截止",
   "mockEventLabMeeting": "课题组例会",

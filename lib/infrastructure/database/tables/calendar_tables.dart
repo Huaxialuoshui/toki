@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../domain/entities/calendar_event.dart';
+import 'task_tables.dart';
 
 /// 日历分类。
 @DataClassName('CalendarCategoryRow')
@@ -22,6 +23,7 @@ class CalendarCategories extends Table {
 /// 日历事件（规格 §5）。
 @DataClassName('CalendarEventRow')
 @TableIndex(name: 'idx_events_start_time', columns: <Symbol>{#startTime})
+@TableIndex(name: 'idx_events_task_id', columns: <Symbol>{#taskId})
 class CalendarEvents extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
@@ -44,6 +46,10 @@ class CalendarEvents extends Table {
 
   /// 提前提醒分钟数。
   IntColumn get reminderMinutes => integer().nullable()();
+
+  /// 关联任务；任务删除时置空，绝不级联删除用户日程。
+  TextColumn get taskId =>
+      text().nullable().references(Tasks, #id, onDelete: KeyAction.setNull)();
   TextColumn get status => textEnum<EventStatus>()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

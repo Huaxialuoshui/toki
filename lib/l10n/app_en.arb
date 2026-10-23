@@ -784,6 +784,306 @@
   "settingsProjectPath": "Project path",
   "settingsPhaseNote": "Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.",
 
+  "taskSection": "Tasks",
+  "taskPageSubtitle": "Tasks do not need a time, and completing or archiving one never deletes linked events.",
+  "taskBack": "Back to home",
+  "taskNew": "New task",
+  "taskEdit": "Edit task",
+  "taskCancel": "Cancel",
+  "taskSave": "Save",
+  "taskSaved": "Task saved",
+  "taskSaveFailed": "Could not save task",
+  "taskFieldTitle": "Task title",
+  "taskTitleRequired": "Enter a task title",
+  "taskFieldNotes": "Notes",
+  "taskFieldPriority": "Priority",
+  "taskFieldDue": "Due",
+  "taskNoDue": "No due date",
+  "taskClearDue": "Clear due date",
+  "taskFieldEstimate": "Estimated time",
+  "taskFieldActual": "Actual time",
+  "taskMinutesUnit": "min",
+  "taskEstimateInvalid": "Estimated time must be a non-negative whole number",
+  "taskDueOn": "Due {time}",
+  "@taskDueOn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "taskPriorityLow": "Low",
+  "taskPriorityNormal": "Normal",
+  "taskPriorityHigh": "High",
+  "taskPriorityUrgent": "Urgent",
+  "taskStatusBlocked": "Blocked",
+  "taskEstimateValue": "Est. {minutes} min",
+  "@taskEstimateValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "taskEmptyActive": "No open tasks",
+  "taskEmptyCompleted": "No completed tasks yet",
+  "taskEmptyArchived": "No archived tasks",
+  "taskFilterActive": "Open {count}",
+  "@taskFilterActive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskFilterCompleted": "Completed {count}",
+  "@taskFilterCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskFilterArchived": "Archived {count}",
+  "@taskFilterArchived": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taskMoreActions": "More actions",
+  "taskResume": "Mark as open",
+  "taskBlock": "Mark as blocked",
+  "taskPostponeTomorrow": "Postpone to tomorrow",
+  "taskRestore": "Restore from archive",
+  "taskArchive": "Archive",
+  "taskCompletedToast": "Task completed",
+  "taskReopened": "Task reopened",
+  "taskPostponed": "Task postponed",
+  "taskArchivedToast": "Task archived",
+  "taskRestoredToast": "Task restored",
+  "taskMissing": "Task not found",
+  "taskNotActive": "This task cannot be changed in its current state",
+  "taskNotCompleted": "The task is not completed",
+  "taskSummaryCounts": "{active} open · {completed} completed · {overdue} overdue",
+  "@taskSummaryCounts": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "overdue": {
+        "type": "int"
+      }
+    }
+  },
+
+  "planSection": "Today's plan",
+  "planGenerate": "Generate today's plan",
+  "planRegenerate": "Regenerate",
+  "planViewAll": "View full plan",
+  "planNoPlan": "No structured plan for today yet",
+  "planNoPlanHint": "The AI creates a draft first; tasks and events are written only after you confirm.",
+  "planLegacyTitle": "Legacy plan summary",
+  "planLegacyHint": "This is an old Markdown summary, not a structured plan.",
+  "planPendingDraft": "A new draft is waiting for review",
+  "planDraftPendingHint": "The current plan remains active until you apply the new draft.",
+  "planGoalTitle": "Today's goals",
+  "planAvailableWindows": "Available time",
+  "planFixedSchedule": "Fixed schedule",
+  "planNoFixed": "No fixed events today",
+  "planTimelineMorning": "Morning",
+  "planTimelineAfternoon": "Afternoon",
+  "planTimelineEvening": "Evening",
+  "planTimelineUnscheduled": "Unscheduled",
+  "planNoItems": "This plan has no items yet",
+  "planApplyAll": "Accept all",
+  "planApplySelected": "Apply selected ({count})",
+  "@planApplySelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planAdjustTime": "Adjust time",
+  "planRemoveItem": "Remove from plan",
+  "planCancelPlan": "Cancel plan",
+  "planCancelConfirmTitle": "Cancel this plan?",
+  "planCancelConfirmBody": "Tasks and events already created will be kept.",
+  "planCompleteDay": "End today",
+  "planCompleteConfirmTitle": "End today's plan?",
+  "planCompleteConfirmBody": "The plan will be marked complete; unfinished tasks are kept.",
+  "planApplyPreviewTitle": "Apply this plan?",
+  "planApplyPreviewBody": "Only the tasks and events below will be created. The latest data is checked again before writing.",
+  "planApplyCreateTask": "Create task: {title}",
+  "@planApplyCreateTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyMatchTask": "Link existing task: {title}",
+  "@planApplyMatchTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyCreateEvent": "Create event: {title} · {time}",
+  "@planApplyCreateEvent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplyScheduleTask": "Schedule task: {title} · {time}",
+  "@planApplyScheduleTask": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planApplySkipped": "Skip {count}",
+  "@planApplySkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planApplyConfirm": "Apply",
+  "planApplyCancel": "Not now",
+  "planApplyResult": "Created {tasks} tasks and {events} events; skipped {skipped}",
+  "@planApplyResult": {
+    "placeholders": {
+      "tasks": {
+        "type": "int"
+      },
+      "events": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "planApplyFailed": "Could not apply plan",
+  "planStale": "The plan is out of date. Please regenerate it.",
+  "planConflict": "The calendar changed. Please review the plan again.",
+  "planGenerationTitle": "Generate today's plan",
+  "planGoalField": "Most important thing today",
+  "planNotesField": "Extra constraints / times to avoid",
+  "planEnergy": "Energy",
+  "planEnergyLow": "Low",
+  "planEnergyNormal": "Normal",
+  "planEnergyHigh": "High",
+  "planGenerating": "Generating plan…",
+  "planNoProvider": "No AI provider configured yet",
+  "planGenerateFailed": "Could not generate plan",
+  "planGenerated": "Plan draft created",
+  "planStatusDraft": "Needs review",
+  "planStatusConfirmed": "Confirmed",
+  "planStatusInProgress": "In progress",
+  "planStatusCompleted": "Completed",
+  "planStatusCancelled": "Cancelled",
+  "planStatusSuperseded": "Superseded",
+  "planRevision": "Version {revision}",
+  "@planRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "planUpdatedAt": "Updated {time}",
+  "@planUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planGeneratedAt": "Created {time}",
+  "@planGeneratedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planIssuesTitle": "Risks & suggestions",
+  "planIssueOverbooked": "The plan may exceed your available time",
+  "planIssueNoBreak": "Not enough break between consecutive items",
+  "planIssueAllDay": "There is an all-day event; check your available time",
+  "planIssueUnscheduledDueSoon": "A task is due soon but is not scheduled",
+  "planIssueCompletedFuture": "A completed task still has a future event",
+  "planIssueDeadlineRisk": "An item may exceed the task deadline",
+  "planIssueRepeatedPostpone": "This task has been postponed several times",
+  "planIssueDetached": "An applied event was deleted; schedule it again",
+  "planNoProviderHint": "Add a provider in Settings first. Tasks and the calendar still work.",
+  "planUnscheduled": "Unscheduled",
+  "planTaskCompleted": "Completed",
+  "planTaskOpen": "Not completed",
+  "planNoDue": "No due date",
+
+  "planningPreferencesTitle": "Planning preferences",
+  "planningPreferencesHint": "These preferences are included in backups and only affect plan generation.",
+  "planningWorkdayStart": "Work starts",
+  "planningWorkdayEnd": "Work ends",
+  "planningLunchStart": "Lunch starts",
+  "planningLunchEnd": "Lunch ends",
+  "planningFocusMinutes": "Focus block (minutes)",
+  "planningBreakMinutes": "Break (minutes)",
+  "planningSlotMinutes": "Time slot (minutes)",
+  "planningDefaultPriority": "Default priority",
+  "planningWeekdaysOnly": "Use default hours on weekdays only",
+  "planningReset": "Reset defaults",
+  "planningSaved": "Planning preferences saved",
+  "planningResetDone": "Planning preferences reset",
+  "reviewMetricsLine": "Planned {total} · Completed {completed} · Open {open} · Unknown events {unknown}",
+  "@reviewMetricsLine": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "open": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewLocalOnly": "Showing local metrics only; the AI summary is unavailable or not generated yet.",
+  "reviewGenerate": "Generate evening review",
+  "reviewRegenerate": "Regenerate review",
+  "reviewGenerating": "Reviewing today's progress…",
+  "reviewFailed": "Could not generate the review; the previous one was kept",
+  "reviewEdit": "Edit review",
+  "reviewEditTitle": "Edit today's review",
+  "reviewContent": "Review text",
+  "reviewFeedback": "Difficulties / feedback",
+  "reviewSave": "Save review",
+  "reviewSaved": "Review saved",
+  "reviewNoTasks": "No planned tasks today; only local metrics are available.",
+
   "mockEventDefense": "Thesis defense",
   "mockEventProjectDeadline": "Course project deadline",
   "mockEventLabMeeting": "Lab meeting",

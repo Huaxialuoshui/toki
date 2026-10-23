@@ -6,9 +6,11 @@ import '../presentation/ai/ai_page.dart';
 import '../presentation/calendar/calendar_page.dart';
 import '../presentation/countdown/countdown_page.dart';
 import '../presentation/home/home_page.dart';
+import '../presentation/planning/plan_detail_page.dart';
 import '../presentation/settings/settings_page.dart';
 import '../presentation/settings/theme_editor_page.dart';
 import '../presentation/shell/app_shell.dart';
+import '../presentation/tasks/task_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -28,6 +30,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: '/home',
                 name: 'home',
                 builder: (context, state) => const HomePage(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'tasks',
+                    name: 'tasks',
+                    builder: (context, state) => const TaskPage(),
+                  ),
+                  GoRoute(
+                    path: 'plan',
+                    name: 'plan',
+                    builder: (context, state) => const PlanDetailPage(),
+                  ),
+                ],
               ),
             ],
           ),

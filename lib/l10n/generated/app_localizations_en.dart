@@ -1514,6 +1514,493 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPhaseNote => 'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.';
 
   @override
+  String get taskSection => 'Tasks';
+
+  @override
+  String get taskPageSubtitle => 'Tasks do not need a time, and completing or archiving one never deletes linked events.';
+
+  @override
+  String get taskBack => 'Back to home';
+
+  @override
+  String get taskNew => 'New task';
+
+  @override
+  String get taskEdit => 'Edit task';
+
+  @override
+  String get taskCancel => 'Cancel';
+
+  @override
+  String get taskSave => 'Save';
+
+  @override
+  String get taskSaved => 'Task saved';
+
+  @override
+  String get taskSaveFailed => 'Could not save task';
+
+  @override
+  String get taskFieldTitle => 'Task title';
+
+  @override
+  String get taskTitleRequired => 'Enter a task title';
+
+  @override
+  String get taskFieldNotes => 'Notes';
+
+  @override
+  String get taskFieldPriority => 'Priority';
+
+  @override
+  String get taskFieldDue => 'Due';
+
+  @override
+  String get taskNoDue => 'No due date';
+
+  @override
+  String get taskClearDue => 'Clear due date';
+
+  @override
+  String get taskFieldEstimate => 'Estimated time';
+
+  @override
+  String get taskFieldActual => 'Actual time';
+
+  @override
+  String get taskMinutesUnit => 'min';
+
+  @override
+  String get taskEstimateInvalid => 'Estimated time must be a non-negative whole number';
+
+  @override
+  String taskDueOn(String time) {
+    return 'Due $time';
+  }
+
+  @override
+  String get taskPriorityLow => 'Low';
+
+  @override
+  String get taskPriorityNormal => 'Normal';
+
+  @override
+  String get taskPriorityHigh => 'High';
+
+  @override
+  String get taskPriorityUrgent => 'Urgent';
+
+  @override
+  String get taskStatusBlocked => 'Blocked';
+
+  @override
+  String taskEstimateValue(int minutes) {
+    return 'Est. $minutes min';
+  }
+
+  @override
+  String get taskEmptyActive => 'No open tasks';
+
+  @override
+  String get taskEmptyCompleted => 'No completed tasks yet';
+
+  @override
+  String get taskEmptyArchived => 'No archived tasks';
+
+  @override
+  String taskFilterActive(int count) {
+    return 'Open $count';
+  }
+
+  @override
+  String taskFilterCompleted(int count) {
+    return 'Completed $count';
+  }
+
+  @override
+  String taskFilterArchived(int count) {
+    return 'Archived $count';
+  }
+
+  @override
+  String get taskMoreActions => 'More actions';
+
+  @override
+  String get taskResume => 'Mark as open';
+
+  @override
+  String get taskBlock => 'Mark as blocked';
+
+  @override
+  String get taskPostponeTomorrow => 'Postpone to tomorrow';
+
+  @override
+  String get taskRestore => 'Restore from archive';
+
+  @override
+  String get taskArchive => 'Archive';
+
+  @override
+  String get taskCompletedToast => 'Task completed';
+
+  @override
+  String get taskReopened => 'Task reopened';
+
+  @override
+  String get taskPostponed => 'Task postponed';
+
+  @override
+  String get taskArchivedToast => 'Task archived';
+
+  @override
+  String get taskRestoredToast => 'Task restored';
+
+  @override
+  String get taskMissing => 'Task not found';
+
+  @override
+  String get taskNotActive => 'This task cannot be changed in its current state';
+
+  @override
+  String get taskNotCompleted => 'The task is not completed';
+
+  @override
+  String taskSummaryCounts(int active, int completed, int overdue) {
+    return '$active open · $completed completed · $overdue overdue';
+  }
+
+  @override
+  String get planSection => 'Today\'s plan';
+
+  @override
+  String get planGenerate => 'Generate today\'s plan';
+
+  @override
+  String get planRegenerate => 'Regenerate';
+
+  @override
+  String get planViewAll => 'View full plan';
+
+  @override
+  String get planNoPlan => 'No structured plan for today yet';
+
+  @override
+  String get planNoPlanHint => 'The AI creates a draft first; tasks and events are written only after you confirm.';
+
+  @override
+  String get planLegacyTitle => 'Legacy plan summary';
+
+  @override
+  String get planLegacyHint => 'This is an old Markdown summary, not a structured plan.';
+
+  @override
+  String get planPendingDraft => 'A new draft is waiting for review';
+
+  @override
+  String get planDraftPendingHint => 'The current plan remains active until you apply the new draft.';
+
+  @override
+  String get planGoalTitle => 'Today\'s goals';
+
+  @override
+  String get planAvailableWindows => 'Available time';
+
+  @override
+  String get planFixedSchedule => 'Fixed schedule';
+
+  @override
+  String get planNoFixed => 'No fixed events today';
+
+  @override
+  String get planTimelineMorning => 'Morning';
+
+  @override
+  String get planTimelineAfternoon => 'Afternoon';
+
+  @override
+  String get planTimelineEvening => 'Evening';
+
+  @override
+  String get planTimelineUnscheduled => 'Unscheduled';
+
+  @override
+  String get planNoItems => 'This plan has no items yet';
+
+  @override
+  String get planApplyAll => 'Accept all';
+
+  @override
+  String planApplySelected(int count) {
+    return 'Apply selected ($count)';
+  }
+
+  @override
+  String get planAdjustTime => 'Adjust time';
+
+  @override
+  String get planRemoveItem => 'Remove from plan';
+
+  @override
+  String get planCancelPlan => 'Cancel plan';
+
+  @override
+  String get planCancelConfirmTitle => 'Cancel this plan?';
+
+  @override
+  String get planCancelConfirmBody => 'Tasks and events already created will be kept.';
+
+  @override
+  String get planCompleteDay => 'End today';
+
+  @override
+  String get planCompleteConfirmTitle => 'End today\'s plan?';
+
+  @override
+  String get planCompleteConfirmBody => 'The plan will be marked complete; unfinished tasks are kept.';
+
+  @override
+  String get planApplyPreviewTitle => 'Apply this plan?';
+
+  @override
+  String get planApplyPreviewBody => 'Only the tasks and events below will be created. The latest data is checked again before writing.';
+
+  @override
+  String planApplyCreateTask(String title) {
+    return 'Create task: $title';
+  }
+
+  @override
+  String planApplyMatchTask(String title) {
+    return 'Link existing task: $title';
+  }
+
+  @override
+  String planApplyCreateEvent(String title, String time) {
+    return 'Create event: $title · $time';
+  }
+
+  @override
+  String planApplyScheduleTask(String title, String time) {
+    return 'Schedule task: $title · $time';
+  }
+
+  @override
+  String planApplySkipped(int count) {
+    return 'Skip $count';
+  }
+
+  @override
+  String get planApplyConfirm => 'Apply';
+
+  @override
+  String get planApplyCancel => 'Not now';
+
+  @override
+  String planApplyResult(int tasks, int events, int skipped) {
+    return 'Created $tasks tasks and $events events; skipped $skipped';
+  }
+
+  @override
+  String get planApplyFailed => 'Could not apply plan';
+
+  @override
+  String get planStale => 'The plan is out of date. Please regenerate it.';
+
+  @override
+  String get planConflict => 'The calendar changed. Please review the plan again.';
+
+  @override
+  String get planGenerationTitle => 'Generate today\'s plan';
+
+  @override
+  String get planGoalField => 'Most important thing today';
+
+  @override
+  String get planNotesField => 'Extra constraints / times to avoid';
+
+  @override
+  String get planEnergy => 'Energy';
+
+  @override
+  String get planEnergyLow => 'Low';
+
+  @override
+  String get planEnergyNormal => 'Normal';
+
+  @override
+  String get planEnergyHigh => 'High';
+
+  @override
+  String get planGenerating => 'Generating plan…';
+
+  @override
+  String get planNoProvider => 'No AI provider configured yet';
+
+  @override
+  String get planGenerateFailed => 'Could not generate plan';
+
+  @override
+  String get planGenerated => 'Plan draft created';
+
+  @override
+  String get planStatusDraft => 'Needs review';
+
+  @override
+  String get planStatusConfirmed => 'Confirmed';
+
+  @override
+  String get planStatusInProgress => 'In progress';
+
+  @override
+  String get planStatusCompleted => 'Completed';
+
+  @override
+  String get planStatusCancelled => 'Cancelled';
+
+  @override
+  String get planStatusSuperseded => 'Superseded';
+
+  @override
+  String planRevision(int revision) {
+    return 'Version $revision';
+  }
+
+  @override
+  String planUpdatedAt(String time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String planGeneratedAt(String time) {
+    return 'Created $time';
+  }
+
+  @override
+  String get planIssuesTitle => 'Risks & suggestions';
+
+  @override
+  String get planIssueOverbooked => 'The plan may exceed your available time';
+
+  @override
+  String get planIssueNoBreak => 'Not enough break between consecutive items';
+
+  @override
+  String get planIssueAllDay => 'There is an all-day event; check your available time';
+
+  @override
+  String get planIssueUnscheduledDueSoon => 'A task is due soon but is not scheduled';
+
+  @override
+  String get planIssueCompletedFuture => 'A completed task still has a future event';
+
+  @override
+  String get planIssueDeadlineRisk => 'An item may exceed the task deadline';
+
+  @override
+  String get planIssueRepeatedPostpone => 'This task has been postponed several times';
+
+  @override
+  String get planIssueDetached => 'An applied event was deleted; schedule it again';
+
+  @override
+  String get planNoProviderHint => 'Add a provider in Settings first. Tasks and the calendar still work.';
+
+  @override
+  String get planUnscheduled => 'Unscheduled';
+
+  @override
+  String get planTaskCompleted => 'Completed';
+
+  @override
+  String get planTaskOpen => 'Not completed';
+
+  @override
+  String get planNoDue => 'No due date';
+
+  @override
+  String get planningPreferencesTitle => 'Planning preferences';
+
+  @override
+  String get planningPreferencesHint => 'These preferences are included in backups and only affect plan generation.';
+
+  @override
+  String get planningWorkdayStart => 'Work starts';
+
+  @override
+  String get planningWorkdayEnd => 'Work ends';
+
+  @override
+  String get planningLunchStart => 'Lunch starts';
+
+  @override
+  String get planningLunchEnd => 'Lunch ends';
+
+  @override
+  String get planningFocusMinutes => 'Focus block (minutes)';
+
+  @override
+  String get planningBreakMinutes => 'Break (minutes)';
+
+  @override
+  String get planningSlotMinutes => 'Time slot (minutes)';
+
+  @override
+  String get planningDefaultPriority => 'Default priority';
+
+  @override
+  String get planningWeekdaysOnly => 'Use default hours on weekdays only';
+
+  @override
+  String get planningReset => 'Reset defaults';
+
+  @override
+  String get planningSaved => 'Planning preferences saved';
+
+  @override
+  String get planningResetDone => 'Planning preferences reset';
+
+  @override
+  String reviewMetricsLine(int total, int completed, int open, int unknown) {
+    return 'Planned $total · Completed $completed · Open $open · Unknown events $unknown';
+  }
+
+  @override
+  String get reviewLocalOnly => 'Showing local metrics only; the AI summary is unavailable or not generated yet.';
+
+  @override
+  String get reviewGenerate => 'Generate evening review';
+
+  @override
+  String get reviewRegenerate => 'Regenerate review';
+
+  @override
+  String get reviewGenerating => 'Reviewing today\'s progress…';
+
+  @override
+  String get reviewFailed => 'Could not generate the review; the previous one was kept';
+
+  @override
+  String get reviewEdit => 'Edit review';
+
+  @override
+  String get reviewEditTitle => 'Edit today\'s review';
+
+  @override
+  String get reviewContent => 'Review text';
+
+  @override
+  String get reviewFeedback => 'Difficulties / feedback';
+
+  @override
+  String get reviewSave => 'Save review';
+
+  @override
+  String get reviewSaved => 'Review saved';
+
+  @override
+  String get reviewNoTasks => 'No planned tasks today; only local metrics are available.';
+
+  @override
   String get mockEventDefense => 'Thesis defense';
 
   @override

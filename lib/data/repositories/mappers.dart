@@ -10,7 +10,10 @@ import '../../domain/entities/calendar_event.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_session.dart';
 import '../../domain/entities/countdown_item.dart';
+import '../../domain/entities/daily_plan.dart';
 import '../../domain/entities/reminder.dart';
+import '../../domain/entities/task_item.dart';
+import '../../domain/entities/planning_preferences.dart';
 import '../../domain/entities/theme_config.dart';
 import '../../infrastructure/database/app_database.dart';
 
@@ -49,6 +52,7 @@ extension CalendarEventRowMapper on CalendarEventRow {
         repeatRule: repeatRule,
         repeatUntil: repeatUntil,
         reminderMinutes: reminderMinutes,
+        taskId: taskId,
         status: status,
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -70,6 +74,7 @@ CalendarEventsCompanion calendarEventToCompanion(CalendarEvent event) =>
       repeatRule: Value<String?>(event.repeatRule),
       repeatUntil: Value<DateTime?>(event.repeatUntil),
       reminderMinutes: Value<int?>(event.reminderMinutes),
+      taskId: Value<String?>(event.taskId),
       status: Value<EventStatus>(event.status),
       createdAt: Value<DateTime>(event.createdAt),
       updatedAt: Value<DateTime>(event.updatedAt),
@@ -161,6 +166,184 @@ RemindersCompanion reminderToCompanion(Reminder reminder) => RemindersCompanion(
       createdAt: Value<DateTime>(reminder.createdAt),
     );
 
+extension TaskRowMapper on TaskRow {
+  TaskItem toDomain() => TaskItem(
+        id: id,
+        title: title,
+        description: description,
+        priority: priority,
+        dueAt: dueAt,
+        estimatedMinutes: estimatedMinutes,
+        actualMinutes: actualMinutes,
+        status: status,
+        source: source,
+        sourceEventId: sourceEventId,
+        completedAt: completedAt,
+        completionNote: completionNote,
+        postponeCount: postponeCount,
+        lastPostponedAt: lastPostponedAt,
+        archivedAt: archivedAt,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+}
+
+TasksCompanion taskToCompanion(TaskItem task) => TasksCompanion(
+      id: Value<String>(task.id),
+      title: Value<String>(task.title),
+      description: Value<String?>(task.description),
+      priority: Value<TaskPriority>(task.priority),
+      dueAt: Value<DateTime?>(task.dueAt),
+      estimatedMinutes: Value<int?>(task.estimatedMinutes),
+      actualMinutes: Value<int?>(task.actualMinutes),
+      status: Value<TaskStatus>(task.status),
+      source: Value<TaskSource>(task.source),
+      sourceEventId: Value<String?>(task.sourceEventId),
+      completedAt: Value<DateTime?>(task.completedAt),
+      completionNote: Value<String?>(task.completionNote),
+      postponeCount: Value<int>(task.postponeCount),
+      lastPostponedAt: Value<DateTime?>(task.lastPostponedAt),
+      archivedAt: Value<DateTime?>(task.archivedAt),
+      createdAt: Value<DateTime>(task.createdAt),
+      updatedAt: Value<DateTime>(task.updatedAt),
+    );
+
+extension PlanningPreferenceRowMapper on PlanningPreferenceRow {
+  PlanningPreferences toDomain() => PlanningPreferences(
+        workdayStartMinute: workdayStartMinute,
+        workdayEndMinute: workdayEndMinute,
+        lunchStartMinute: lunchStartMinute,
+        lunchEndMinute: lunchEndMinute,
+        focusMinutes: focusMinutes,
+        breakMinutes: breakMinutes,
+        defaultPriority: defaultPriority,
+        slotMinutes: slotMinutes,
+        weekdaysOnly: weekdaysOnly,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+}
+
+PlanningPreferenceSettingsCompanion planningPreferencesToCompanion(
+  PlanningPreferences preferences,
+) =>
+    PlanningPreferenceSettingsCompanion(
+      id: const Value<String>('default'),
+      workdayStartMinute: Value<int>(preferences.workdayStartMinute),
+      workdayEndMinute: Value<int>(preferences.workdayEndMinute),
+      lunchStartMinute: Value<int>(preferences.lunchStartMinute),
+      lunchEndMinute: Value<int>(preferences.lunchEndMinute),
+      focusMinutes: Value<int>(preferences.focusMinutes),
+      breakMinutes: Value<int>(preferences.breakMinutes),
+      defaultPriority: Value<TaskPriority>(preferences.defaultPriority),
+      slotMinutes: Value<int>(preferences.slotMinutes),
+      weekdaysOnly: Value<bool>(preferences.weekdaysOnly),
+      createdAt: Value<DateTime>(preferences.createdAt),
+      updatedAt: Value<DateTime>(preferences.updatedAt),
+    );
+
+extension DailyPlanRowMapper on DailyPlanRow {
+  DailyPlan toDomain() => DailyPlan(
+        id: id,
+        dayKey: dayKey,
+        revision: revision,
+        status: _planStatus(status),
+        summary: summary,
+        goals: planGoalsFromJson(goalsJson),
+        constraints: PlanningConstraints.fromJsonString(constraintsJson),
+        generationSource: _generationSource(generationSource),
+        generationDiagnosticsJson: generationDiagnosticsJson,
+        confirmedAt: confirmedAt,
+        completedAt: completedAt,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+}
+
+DailyPlansCompanion dailyPlanToCompanion(DailyPlan plan) => DailyPlansCompanion(
+      id: Value<String>(plan.id),
+      dayKey: Value<String>(plan.dayKey),
+      revision: Value<int>(plan.revision),
+      status: Value<String>(plan.status.name),
+      summary: Value<String>(plan.summary),
+      goalsJson: Value<String>(planGoalsToJson(plan.goals)),
+      constraintsJson: Value<String>(jsonEncode(plan.constraints.toJson())),
+      generationSource: Value<String>(plan.generationSource.name),
+      generationDiagnosticsJson: Value<String?>(plan.generationDiagnosticsJson),
+      confirmedAt: Value<DateTime?>(plan.confirmedAt),
+      completedAt: Value<DateTime?>(plan.completedAt),
+      createdAt: Value<DateTime>(plan.createdAt),
+      updatedAt: Value<DateTime>(plan.updatedAt),
+    );
+
+extension DailyPlanItemRowMapper on DailyPlanItemRow {
+  DailyPlanItem toDomain() => DailyPlanItem(
+        id: id,
+        planId: planId,
+        taskId: taskId,
+        titleSnapshot: titleSnapshot,
+        descriptionSnapshot: descriptionSnapshot,
+        startAt: startAt,
+        endAt: endAt,
+        estimateMinutes: estimateMinutes,
+        priority: priority,
+        reason: reason,
+        source: _planItemSource(source),
+        sourceEventId: sourceEventId,
+        status: _planItemStatus(status),
+        appliedEventId: appliedEventId,
+        appliedAt: appliedAt,
+        failureReason: failureReason,
+        sortOrder: sortOrder,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+}
+
+DailyPlanItemsCompanion dailyPlanItemToCompanion(DailyPlanItem item) =>
+    DailyPlanItemsCompanion(
+      id: Value<String>(item.id),
+      planId: Value<String>(item.planId),
+      taskId: Value<String?>(item.taskId),
+      titleSnapshot: Value<String>(item.titleSnapshot),
+      descriptionSnapshot: Value<String?>(item.descriptionSnapshot),
+      startAt: Value<DateTime?>(item.startAt),
+      endAt: Value<DateTime?>(item.endAt),
+      estimateMinutes: Value<int?>(item.estimateMinutes),
+      priority: Value<TaskPriority>(item.priority),
+      reason: Value<String>(item.reason),
+      source: Value<String>(item.source.name),
+      sourceEventId: Value<String?>(item.sourceEventId),
+      status: Value<String>(item.status.name),
+      appliedEventId: Value<String?>(item.appliedEventId),
+      appliedAt: Value<DateTime?>(item.appliedAt),
+      failureReason: Value<String?>(item.failureReason),
+      sortOrder: Value<int>(item.sortOrder),
+      createdAt: Value<DateTime>(item.createdAt),
+      updatedAt: Value<DateTime>(item.updatedAt),
+    );
+
+PlanStatus _planStatus(String raw) => PlanStatus.values.firstWhere(
+      (PlanStatus value) => value.name == raw,
+      orElse: () => PlanStatus.draft,
+    );
+
+PlanGenerationSource _generationSource(String raw) =>
+    PlanGenerationSource.values.firstWhere(
+      (PlanGenerationSource value) => value.name == raw,
+      orElse: () => PlanGenerationSource.manual,
+    );
+
+PlanItemStatus _planItemStatus(String raw) => PlanItemStatus.values.firstWhere(
+      (PlanItemStatus value) => value.name == raw,
+      orElse: () => PlanItemStatus.proposed,
+    );
+
+PlanItemSource _planItemSource(String raw) => PlanItemSource.values.firstWhere(
+      (PlanItemSource value) => value.name == raw,
+      orElse: () => PlanItemSource.existingTask,
+    );
+
 extension AiPersonaRowMapper on AiPersonaRow {
   AiPersona toDomain() => AiPersona(
         id: id,
@@ -192,8 +375,7 @@ AiPersonasCompanion aiPersonaToCompanion(AiPersona persona) =>
       userNickname: Value<String?>(persona.userNickname),
       systemPrompt: Value<String?>(persona.systemPrompt),
       enabledTools: Value<List<String>>(persona.enabledTools),
-      calendarAssistantEnabled:
-          Value<bool>(persona.calendarAssistantEnabled),
+      calendarAssistantEnabled: Value<bool>(persona.calendarAssistantEnabled),
       temperature: Value<double>(persona.temperature),
       createdAt: Value<DateTime>(persona.createdAt),
       updatedAt: Value<DateTime>(persona.updatedAt),

@@ -30,7 +30,10 @@ void main() {
     addTearDown(database.close);
 
     // 从 v1 快照建库，再迁移到当前版本并校验结构一致。
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
   });
 
   test('v1 → v2 迁移会补上 chat_messages.tool_call_id', () async {
@@ -39,7 +42,10 @@ void main() {
     addTearDown(database.close);
 
     await database.customStatement('PRAGMA foreign_keys = OFF');
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     final columns = await database
         .customSelect('PRAGMA table_info(chat_messages)')
@@ -53,7 +59,10 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -67,7 +76,10 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     Future<List<String>> columnsOf(String table) => database
         .customSelect('PRAGMA table_info($table)')
@@ -91,7 +103,10 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     final columns = await database
         .customSelect('PRAGMA table_info(theme_configs)')
@@ -113,7 +128,10 @@ void main() {
     final database = AppDatabase(connection);
     addTearDown(database.close);
 
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     Future<List<String>> columnsOf(String table) => database
         .customSelect('PRAGMA table_info($table)')
@@ -136,21 +154,86 @@ void main() {
       "VALUES ('p-legacy', '小雪', '你是用户的私人日程助手。', '[]', 0, 0)",
     );
 
-    await verifier.migrateAndValidate(database, 7);
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
 
     final rows = await database
         .customSelect(
           'SELECT calendar_assistant_enabled FROM ai_personas '
           "WHERE id = 'p-legacy'",
         )
-        .map((QueryRow row) =>
-            row.read<int>('calendar_assistant_enabled'))
+        .map((QueryRow row) => row.read<int>('calendar_assistant_enabled'))
         .get();
     // 升级不能让老库里的人设突然变成纯聊天。
     expect(rows.single, 1);
   });
 
-  test('从空库创建后，10 张表全部存在', () async {
+  test('v7 → v8 迁移会新增任务 / 计划表并保留旧摘要', () async {
+    final connection = await verifier.startAt(7);
+    final database = AppDatabase(connection);
+    addTearDown(database.close);
+
+    await database.customStatement(
+      'INSERT INTO daily_digests '
+      '(id, kind, day_key, content, created_at) '
+      "VALUES ('digest-legacy', 'morning', '2026-10-18', "
+      "'旧版计划摘要', 0)",
+    );
+
+    await verifier.migrateAndValidate(
+      database,
+      AppDatabase.currentSchemaVersion,
+    );
+
+    Future<List<String>> columnsOf(String table) => database
+        .customSelect('PRAGMA table_info($table)')
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+
+    expect(await columnsOf('calendar_events'), contains('task_id'));
+    expect(
+      await columnsOf('daily_digests'),
+      containsAll(<String>[
+        'plan_id',
+        'feedback',
+        'metrics_json',
+        'updated_at',
+        'user_edited',
+      ]),
+    );
+
+    final tables = await database
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'table' "
+          "AND name IN ('tasks', 'daily_plans', 'daily_plan_items', "
+          "'planning_preferences') ORDER BY name",
+        )
+        .map((QueryRow row) => row.read<String>('name'))
+        .get();
+    expect(
+      tables,
+      <String>[
+        'daily_plan_items',
+        'daily_plans',
+        'planning_preferences',
+        'tasks',
+      ],
+    );
+
+    final digest = await database
+        .customSelect(
+          'SELECT content, plan_id, user_edited FROM daily_digests '
+          "WHERE id = 'digest-legacy'",
+        )
+        .getSingle();
+    expect(digest.read<String>('content'), '旧版计划摘要');
+    expect(digest.read<String?>('plan_id'), null);
+    expect(digest.read<int>('user_edited'), 0);
+  });
+
+  test('从空库创建后，14 张表全部存在', () async {
     // 注意：这里只是确认表都在，列级校验交给 migrateAndValidate。
     final database = AppDatabase.memory();
     addTearDown(database.close);
@@ -175,7 +258,11 @@ void main() {
         'chat_sessions',
         'countdowns',
         'daily_digests',
+        'daily_plan_items',
+        'daily_plans',
+        'planning_preferences',
         'reminders',
+        'tasks',
         'theme_configs',
       ]),
     );

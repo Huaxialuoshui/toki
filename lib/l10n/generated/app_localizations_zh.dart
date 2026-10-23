@@ -1514,6 +1514,493 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPhaseNote => 'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
 
   @override
+  String get taskSection => '任务';
+
+  @override
+  String get taskPageSubtitle => '任务可以没有时间，完成或归档都不会删除关联日程。';
+
+  @override
+  String get taskBack => '返回首页';
+
+  @override
+  String get taskNew => '新建任务';
+
+  @override
+  String get taskEdit => '编辑任务';
+
+  @override
+  String get taskCancel => '取消';
+
+  @override
+  String get taskSave => '保存';
+
+  @override
+  String get taskSaved => '任务已保存';
+
+  @override
+  String get taskSaveFailed => '任务保存失败';
+
+  @override
+  String get taskFieldTitle => '任务标题';
+
+  @override
+  String get taskTitleRequired => '请输入任务标题';
+
+  @override
+  String get taskFieldNotes => '备注';
+
+  @override
+  String get taskFieldPriority => '优先级';
+
+  @override
+  String get taskFieldDue => '截止时间';
+
+  @override
+  String get taskNoDue => '无截止时间';
+
+  @override
+  String get taskClearDue => '清除截止时间';
+
+  @override
+  String get taskFieldEstimate => '预计耗时';
+
+  @override
+  String get taskFieldActual => '实际耗时';
+
+  @override
+  String get taskMinutesUnit => '分钟';
+
+  @override
+  String get taskEstimateInvalid => '预计耗时必须是非负整数';
+
+  @override
+  String taskDueOn(String time) {
+    return '截止 $time';
+  }
+
+  @override
+  String get taskPriorityLow => '低';
+
+  @override
+  String get taskPriorityNormal => '普通';
+
+  @override
+  String get taskPriorityHigh => '高';
+
+  @override
+  String get taskPriorityUrgent => '紧急';
+
+  @override
+  String get taskStatusBlocked => '已阻塞';
+
+  @override
+  String taskEstimateValue(int minutes) {
+    return '预计 $minutes 分钟';
+  }
+
+  @override
+  String get taskEmptyActive => '没有待办任务';
+
+  @override
+  String get taskEmptyCompleted => '还没有已完成任务';
+
+  @override
+  String get taskEmptyArchived => '没有归档任务';
+
+  @override
+  String taskFilterActive(int count) {
+    return '未完成 $count';
+  }
+
+  @override
+  String taskFilterCompleted(int count) {
+    return '已完成 $count';
+  }
+
+  @override
+  String taskFilterArchived(int count) {
+    return '已归档 $count';
+  }
+
+  @override
+  String get taskMoreActions => '更多操作';
+
+  @override
+  String get taskResume => '恢复为未完成';
+
+  @override
+  String get taskBlock => '标记为阻塞';
+
+  @override
+  String get taskPostponeTomorrow => '延后到明天';
+
+  @override
+  String get taskRestore => '从归档恢复';
+
+  @override
+  String get taskArchive => '归档';
+
+  @override
+  String get taskCompletedToast => '任务已完成';
+
+  @override
+  String get taskReopened => '任务已恢复为未完成';
+
+  @override
+  String get taskPostponed => '任务已延后';
+
+  @override
+  String get taskArchivedToast => '任务已归档';
+
+  @override
+  String get taskRestoredToast => '任务已恢复';
+
+  @override
+  String get taskMissing => '任务不存在';
+
+  @override
+  String get taskNotActive => '当前任务状态不能执行该操作';
+
+  @override
+  String get taskNotCompleted => '任务尚未完成';
+
+  @override
+  String taskSummaryCounts(int active, int completed, int overdue) {
+    return '$active 个未完成 · $completed 个已完成 · $overdue 个逾期';
+  }
+
+  @override
+  String get planSection => '今日计划';
+
+  @override
+  String get planGenerate => '生成今日计划';
+
+  @override
+  String get planRegenerate => '重新生成';
+
+  @override
+  String get planViewAll => '查看完整计划';
+
+  @override
+  String get planNoPlan => '今天还没有结构化计划';
+
+  @override
+  String get planNoPlanHint => 'AI 会先给出草稿，你确认后才会写入任务和日历。';
+
+  @override
+  String get planLegacyTitle => '旧版计划摘要';
+
+  @override
+  String get planLegacyHint => '这是旧版 Markdown 摘要，不是结构化计划。';
+
+  @override
+  String get planPendingDraft => '有新草稿待审核';
+
+  @override
+  String get planDraftPendingHint => '当前计划仍有效；只有应用新草稿后才会替换。';
+
+  @override
+  String get planGoalTitle => '今日目标';
+
+  @override
+  String get planAvailableWindows => '可用时间';
+
+  @override
+  String get planFixedSchedule => '固定日程';
+
+  @override
+  String get planNoFixed => '今天没有固定日程';
+
+  @override
+  String get planTimelineMorning => '上午';
+
+  @override
+  String get planTimelineAfternoon => '下午';
+
+  @override
+  String get planTimelineEvening => '晚间';
+
+  @override
+  String get planTimelineUnscheduled => '待安排';
+
+  @override
+  String get planNoItems => '这个计划还没有条目';
+
+  @override
+  String get planApplyAll => '全部接受';
+
+  @override
+  String planApplySelected(int count) {
+    return '应用选中（$count）';
+  }
+
+  @override
+  String get planAdjustTime => '调整时间';
+
+  @override
+  String get planRemoveItem => '移出计划';
+
+  @override
+  String get planCancelPlan => '取消计划';
+
+  @override
+  String get planCancelConfirmTitle => '取消这个计划？';
+
+  @override
+  String get planCancelConfirmBody => '已经创建的任务和日程会保留，不会被删除。';
+
+  @override
+  String get planCompleteDay => '结束今天';
+
+  @override
+  String get planCompleteConfirmTitle => '结束今天的计划？';
+
+  @override
+  String get planCompleteConfirmBody => '计划会标记为已完成，未完成任务仍然保留。';
+
+  @override
+  String get planApplyPreviewTitle => '确认应用计划';
+
+  @override
+  String get planApplyPreviewBody => '只会创建下列任务和日程；应用前会再次检查最新数据。';
+
+  @override
+  String planApplyCreateTask(String title) {
+    return '新建任务：$title';
+  }
+
+  @override
+  String planApplyMatchTask(String title) {
+    return '关联已有任务：$title';
+  }
+
+  @override
+  String planApplyCreateEvent(String title, String time) {
+    return '创建日程：$title · $time';
+  }
+
+  @override
+  String planApplyScheduleTask(String title, String time) {
+    return '安排任务：$title · $time';
+  }
+
+  @override
+  String planApplySkipped(int count) {
+    return '跳过 $count 条';
+  }
+
+  @override
+  String get planApplyConfirm => '确认应用';
+
+  @override
+  String get planApplyCancel => '暂不应用';
+
+  @override
+  String planApplyResult(int tasks, int events, int skipped) {
+    return '已创建 $tasks 个任务、$events 个日程；跳过 $skipped 条';
+  }
+
+  @override
+  String get planApplyFailed => '应用计划失败';
+
+  @override
+  String get planStale => '计划已过期，请重新生成';
+
+  @override
+  String get planConflict => '计划涉及的日程已经变化，请重新审核';
+
+  @override
+  String get planGenerationTitle => '生成今日计划';
+
+  @override
+  String get planGoalField => '今天最重要的事';
+
+  @override
+  String get planNotesField => '补充约束 / 不想安排的时间';
+
+  @override
+  String get planEnergy => '精力状态';
+
+  @override
+  String get planEnergyLow => '偏低';
+
+  @override
+  String get planEnergyNormal => '正常';
+
+  @override
+  String get planEnergyHigh => '充沛';
+
+  @override
+  String get planGenerating => '正在生成计划…';
+
+  @override
+  String get planNoProvider => '还没有配置 AI 服务商';
+
+  @override
+  String get planGenerateFailed => '生成计划失败';
+
+  @override
+  String get planGenerated => '计划草稿已生成';
+
+  @override
+  String get planStatusDraft => '待审核';
+
+  @override
+  String get planStatusConfirmed => '已确认';
+
+  @override
+  String get planStatusInProgress => '执行中';
+
+  @override
+  String get planStatusCompleted => '已完成';
+
+  @override
+  String get planStatusCancelled => '已取消';
+
+  @override
+  String get planStatusSuperseded => '已废弃';
+
+  @override
+  String planRevision(int revision) {
+    return '第 $revision 版';
+  }
+
+  @override
+  String planUpdatedAt(String time) {
+    return '更新于 $time';
+  }
+
+  @override
+  String planGeneratedAt(String time) {
+    return '生成于 $time';
+  }
+
+  @override
+  String get planIssuesTitle => '风险与建议';
+
+  @override
+  String get planIssueOverbooked => '安排可能超出可用时间';
+
+  @override
+  String get planIssueNoBreak => '连续安排之间没有足够休息';
+
+  @override
+  String get planIssueAllDay => '今天有全天日程，请确认可用时间';
+
+  @override
+  String get planIssueUnscheduledDueSoon => '有任务临近截止但还未安排';
+
+  @override
+  String get planIssueCompletedFuture => '有任务已完成但对应日程仍在未来';
+
+  @override
+  String get planIssueDeadlineRisk => '安排可能超过任务截止时间';
+
+  @override
+  String get planIssueRepeatedPostpone => '任务已经多次延期';
+
+  @override
+  String get planIssueDetached => '已应用日程被删除，请重新安排';
+
+  @override
+  String get planNoProviderHint => '请先在设置里添加服务商；任务和日历功能仍然可用。';
+
+  @override
+  String get planUnscheduled => '未安排';
+
+  @override
+  String get planTaskCompleted => '已完成';
+
+  @override
+  String get planTaskOpen => '未完成';
+
+  @override
+  String get planNoDue => '无截止时间';
+
+  @override
+  String get planningPreferencesTitle => '规划偏好';
+
+  @override
+  String get planningPreferencesHint => '这些偏好会随备份恢复，只影响计划生成，不会修改已有日程。';
+
+  @override
+  String get planningWorkdayStart => '工作开始';
+
+  @override
+  String get planningWorkdayEnd => '工作结束';
+
+  @override
+  String get planningLunchStart => '午休开始';
+
+  @override
+  String get planningLunchEnd => '午休结束';
+
+  @override
+  String get planningFocusMinutes => '单次专注分钟';
+
+  @override
+  String get planningBreakMinutes => '休息间隔分钟';
+
+  @override
+  String get planningSlotMinutes => '时间粒度分钟';
+
+  @override
+  String get planningDefaultPriority => '默认优先级';
+
+  @override
+  String get planningWeekdaysOnly => '仅工作日使用默认时段';
+
+  @override
+  String get planningReset => '恢复默认';
+
+  @override
+  String get planningSaved => '规划偏好已保存';
+
+  @override
+  String get planningResetDone => '已恢复默认规划偏好';
+
+  @override
+  String reviewMetricsLine(int total, int completed, int open, int unknown) {
+    return '计划 $total · 完成 $completed · 未完成 $open · 状态未知日程 $unknown';
+  }
+
+  @override
+  String get reviewLocalOnly => '当前显示本地统计；AI 总结生成失败或尚未生成。';
+
+  @override
+  String get reviewGenerate => '生成晚间复盘';
+
+  @override
+  String get reviewRegenerate => '重新生成复盘';
+
+  @override
+  String get reviewGenerating => '正在整理今天的执行情况…';
+
+  @override
+  String get reviewFailed => '生成复盘失败，旧复盘已保留';
+
+  @override
+  String get reviewEdit => '编辑复盘';
+
+  @override
+  String get reviewEditTitle => '编辑今日复盘';
+
+  @override
+  String get reviewContent => '复盘正文';
+
+  @override
+  String get reviewFeedback => '今天遇到的困难 / 反馈';
+
+  @override
+  String get reviewSave => '保存复盘';
+
+  @override
+  String get reviewSaved => '复盘已保存';
+
+  @override
+  String get reviewNoTasks => '今天没有计划任务，只有本地统计可用。';
+
+  @override
   String get mockEventDefense => '毕业设计答辩';
 
   @override

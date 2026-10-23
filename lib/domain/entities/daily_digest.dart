@@ -21,6 +21,11 @@ class DailyDigest {
     required this.dayKey,
     required this.content,
     required this.createdAt,
+    this.planId,
+    this.feedback,
+    this.metricsJson,
+    this.updatedAt,
+    this.userEdited = false,
   });
 
   final String id;
@@ -32,6 +37,11 @@ class DailyDigest {
   /// Markdown 正文。
   final String content;
   final DateTime createdAt;
+  final String? planId;
+  final String? feedback;
+  final String? metricsJson;
+  final DateTime? updatedAt;
+  final bool userEdited;
 
   /// 把本地时间格式化成 `yyyy-MM-dd`。
   static String keyFor(DateTime time) {
@@ -47,9 +57,25 @@ class DailyDigest {
         other.kind == kind &&
         other.dayKey == dayKey &&
         other.content == content &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.planId == planId &&
+        other.feedback == feedback &&
+        other.metricsJson == metricsJson &&
+        other.updatedAt == updatedAt &&
+        other.userEdited == userEdited;
   }
 
   @override
-  int get hashCode => Object.hash(id, kind, dayKey, content, createdAt);
+  int get hashCode => Object.hash(
+        id,
+        kind,
+        dayKey,
+        content,
+        createdAt,
+        planId,
+        feedback,
+        metricsJson,
+        updatedAt,
+        userEdited,
+      );
 }

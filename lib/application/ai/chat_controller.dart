@@ -34,11 +34,13 @@ class PendingToolConfirmation {
     required this.toolName,
     required this.category,
     required this.arguments,
+    this.preview,
   });
 
   final String toolName;
   final AiToolCategory category;
   final Map<String, Object?> arguments;
+  final AiToolPreview? preview;
 }
 
 /// 聊天页的流式状态。
@@ -452,10 +454,14 @@ class ChatController extends Notifier<ChatStreamState> {
       );
     }
 
-    if (!permissions.allows(tool.category)) {
+    final missingPermissions = tool.requiredCategories
+        .where((AiToolCategory category) => !permissions.allows(category))
+        .toList(growable: false);
+    if (missingPermissions.isNotEmpty) {
       return _ToolOutcome(
         content: _errorPayload(
-          '用户未授权 AI 执行「${tool.category.name}」类操作，本次调用被拒绝。'
+          '用户未授权 AI 执行「${missingPermissions.map((e) => e.name).join('/')}」'
+          '类操作，本次调用被拒绝。'
           '请告知用户可以在设置里开启该权限。',
         ),
         isError: true,
@@ -500,11 +506,13 @@ class ChatController extends Notifier<ChatStreamState> {
   Future<bool> _askConfirmation(AiTool tool, AiToolCall call) async {
     final completer = Completer<bool>();
     _confirmation = completer;
+    final preview = await tool.preview(call.arguments);
     state = state.copyWith(
       pendingConfirmation: PendingToolConfirmation(
         toolName: tool.name,
         category: tool.category,
         arguments: call.arguments,
+        preview: preview,
       ),
     );
     // 卡片上的"确认/取消"由 UI 调用 resolveConfirmation。

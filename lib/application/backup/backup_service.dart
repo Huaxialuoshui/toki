@@ -24,7 +24,7 @@ class BackupExportResult {
 /// {
 ///   "format": "toki-backup",
 ///   "formatVersion": 1,
-///   "schemaVersion": 3,
+///   "schemaVersion": 8,
 ///   "exportedAt": "2026-10-06T21:30:00.000",
 ///   "appVersion": "0.1.0+1",
 ///   "includesApiKeys": false,
@@ -36,8 +36,8 @@ class BackupService {
   BackupService({
     required BackupStore store,
     required BackupFileStore files,
+    required int currentSchemaVersion,
     Clock clock = const SystemClock(),
-    int currentSchemaVersion = 3,
     String appVersion = AppConstants.appVersion,
   })  : _store = store,
         _files = files,

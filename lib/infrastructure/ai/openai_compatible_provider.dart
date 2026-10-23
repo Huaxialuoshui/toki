@@ -98,6 +98,7 @@ class OpenAiCompatibleProvider implements AiProvider {
         resolveChatCompletionsUrl(config.baseUrl),
         data: _body(request, stream: false),
         options: Options(headers: _headers()),
+        cancelToken: _cancelTokenFor(request.cancelToken),
       );
     } on DioException catch (error) {
       throw await _mapDioError(error);
@@ -159,6 +160,7 @@ class OpenAiCompatibleProvider implements AiProvider {
           headers: _headers(),
           responseType: ResponseType.stream,
         ),
+        cancelToken: _cancelTokenFor(request.cancelToken),
       );
     } on DioException catch (error) {
       throw await _mapDioError(error, streamed: true);
@@ -385,6 +387,17 @@ class OpenAiCompatibleProvider implements AiProvider {
     };
     // 注意：cause 里也不放 API Key（dio 的异常对象本身不含请求头）。
     return AppException(streamed ? '$message（流式）' : message);
+  }
+
+  static CancelToken? _cancelTokenFor(AiCancellationToken? token) {
+    if (token == null) return null;
+    final dioToken = CancelToken();
+    if (token.isCancelled) {
+      dioToken.cancel();
+    } else {
+      unawaited(token.whenCancelled.then((_) => dioToken.cancel()));
+    }
+    return dioToken;
   }
 
   /// 只取响应体的一小段作为错误提示，避免把大段内容塞进 UI。

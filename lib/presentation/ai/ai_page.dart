@@ -599,6 +599,15 @@ class _AiPageState extends ConsumerState<AiPage> {
             Text(
               l10n.aiToolConfirmBody(toolLabel(l10n, pending.toolName)),
             ),
+            if (pending.preview != null &&
+                pending.preview!.lines.isNotEmpty) ...<Widget>[
+              const SizedBox(height: 10),
+              for (final line in pending.preview!.lines)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text('• $line'),
+                ),
+            ],
             const SizedBox(height: 12),
             for (final entry in pending.arguments.entries)
               Padding(

@@ -4,8 +4,12 @@ import '../../domain/repositories/ai_repository.dart';
 import '../../domain/repositories/calendar_repository.dart';
 import '../../domain/repositories/countdown_repository.dart';
 import '../../domain/repositories/daily_digest_repository.dart';
+import '../../domain/repositories/daily_plan_repository.dart';
 import '../../domain/repositories/reminder_repository.dart';
+import '../../domain/repositories/task_repository.dart';
+import '../../domain/repositories/planning_preferences_repository.dart';
 import '../../domain/repositories/theme_repository.dart';
+import '../../domain/services/transaction_runner.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/database/app_database.dart';
 import '../../infrastructure/database/connection.dart';
@@ -13,8 +17,12 @@ import 'drift_ai_repository.dart';
 import 'drift_calendar_repository.dart';
 import 'drift_countdown_repository.dart';
 import 'drift_daily_digest_repository.dart';
+import 'drift_daily_plan_repository.dart';
 import 'drift_reminder_repository.dart';
+import 'drift_task_repository.dart';
+import 'drift_planning_preferences_repository.dart';
 import 'drift_theme_repository.dart';
+import 'drift_transaction_runner.dart';
 
 /// 应用数据库。
 ///
@@ -50,6 +58,29 @@ final reminderRepositoryProvider = Provider<ReminderRepository>(
 
 final dailyDigestRepositoryProvider = Provider<DailyDigestRepository>(
   (ref) => DriftDailyDigestRepository(ref.watch(appDatabaseProvider)),
+);
+
+final dailyPlanRepositoryProvider = Provider<DailyPlanRepository>(
+  (ref) => DriftDailyPlanRepository(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final transactionRunnerProvider = Provider<TransactionRunner>(
+  (ref) => DriftTransactionRunner(ref.watch(appDatabaseProvider)),
+);
+
+final taskRepositoryProvider = Provider<TaskRepository>(
+  (ref) => DriftTaskRepository(ref.watch(appDatabaseProvider)),
+);
+
+final planningPreferencesRepositoryProvider =
+    Provider<PlanningPreferencesRepository>(
+  (ref) => DriftPlanningPreferencesRepository(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
 );
 
 final themeRepositoryProvider = Provider<ThemeRepository>(
