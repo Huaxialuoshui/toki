@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/ai/ai_providers.dart';
 import '../../application/ai/persona_actions.dart';
+import '../../core/constants/brand_assets.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/id_generator.dart';
 import '../../domain/entities/ai_persona.dart';
@@ -203,6 +204,7 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
       context,
       initial: _avatarConfig,
       title: context.l10n.aiPersonaAvatar,
+      presets: assistantAvatarPresets(context.l10n),
     );
     if (result == null || !mounted) return;
     setState(() {
@@ -229,10 +231,17 @@ class _PersonaEditorDialogState extends ConsumerState<_PersonaEditorDialog> {
     _name = TextEditingController(text: persona?.name ?? '');
     _identity = TextEditingController(text: persona?.description ?? '');
     _avatar = TextEditingController(text: persona?.avatar ?? '');
-    _avatarConfig = AvatarConfig.fromLegacy(
+    final initialAvatar = AvatarConfig.fromLegacy(
       persona?.avatar,
       color: persona?.avatarColor,
     );
+    _avatarConfig = initialAvatar.isEmpty
+        ? AvatarConfig(
+            kind: AvatarKind.image,
+            value: BrandAssets.assetValue(BrandAssets.newAssistantAvatar1),
+            color: persona?.avatarColor,
+          )
+        : initialAvatar;
     _personality = TextEditingController(text: persona?.personality ?? '');
     _speakingStyle = TextEditingController(text: persona?.speakingStyle ?? '');
     _nickname = TextEditingController(text: persona?.userNickname ?? '');

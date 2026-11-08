@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/theme_config_scope.dart';
+import '../widgets/brand_icon.dart';
 import 'shell_destination.dart';
 
 /// 测试用：三档布局的根 Key。
@@ -39,8 +40,9 @@ class MobileShell extends StatelessWidget {
         destinations: <Widget>[
           for (final destination in destinations)
             NavigationDestination(
-              icon: Icon(destination.icon),
-              selectedIcon: Icon(destination.selectedIcon),
+              icon: _DestinationIcon(destination: destination, selected: false),
+              selectedIcon:
+                  _DestinationIcon(destination: destination, selected: true),
               label: destination.label,
             ),
         ],
@@ -80,8 +82,14 @@ class TabletShell extends StatelessWidget {
               destinations: <NavigationRailDestination>[
                 for (final destination in destinations)
                   NavigationRailDestination(
-                    icon: Icon(destination.icon),
-                    selectedIcon: Icon(destination.selectedIcon),
+                    icon: _DestinationIcon(
+                      destination: destination,
+                      selected: false,
+                    ),
+                    selectedIcon: _DestinationIcon(
+                      destination: destination,
+                      selected: true,
+                    ),
                     label: Text(destination.label),
                   ),
               ],
@@ -140,10 +148,7 @@ class DesktopShell extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 18, 12, 18),
                     child: Row(
                       children: <Widget>[
-                        Icon(
-                          Icons.event_available,
-                          color: theme.colorScheme.primary,
-                        ),
+                        const BrandAppIcon(size: 34, radius: 9),
                         if (!collapsed) ...<Widget>[
                           const SizedBox(width: 10),
                           Expanded(
@@ -248,8 +253,9 @@ class _SidebarTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Row(
               children: <Widget>[
-                Icon(
-                  selected ? destination.selectedIcon : destination.icon,
+                _DestinationIcon(
+                  destination: destination,
+                  selected: selected,
                   size: 20,
                   color: foreground,
                 ),
@@ -273,6 +279,33 @@ class _SidebarTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DestinationIcon extends StatelessWidget {
+  const _DestinationIcon({
+    required this.destination,
+    required this.selected,
+    this.size,
+    this.color,
+  });
+
+  final ShellDestination destination;
+  final bool selected;
+  final double? size;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = selected ? destination.selectedIcon : destination.icon;
+    return BrandNavigationIcon(
+      route: destination.route,
+      storedPath: destination.customIconPath,
+      fallbackIcon: icon,
+      size: size ?? 24,
+      color: color,
+      selected: selected,
     );
   }
 }

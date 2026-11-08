@@ -164,3 +164,21 @@ Future<void> pumpTokiApp(
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
 }
+
+/// Opens the settings tab and follows the visible menu hierarchy.
+Future<void> openSettingsPath(
+  WidgetTester tester,
+  List<String> keyNames,
+) async {
+  await tester.tap(
+    find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+  );
+  await tester.pumpAndSettle();
+  for (final keyName in keyNames) {
+    final target = find.byKey(ValueKey<String>(keyName));
+    await tester.ensureVisible(target);
+    await tester.pumpAndSettle();
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+  }
+}

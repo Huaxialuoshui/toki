@@ -39,20 +39,3 @@ class LocaleController extends Notifier<Locale?> {
 
 final localeControllerProvider =
     NotifierProvider<LocaleController, Locale?>(LocaleController.new);
-
-/// 是否展示首次启动的引导提示。
-class FirstLaunchController extends Notifier<bool> {
-  AppSettingsStore get _store => ref.read(appSettingsStoreProvider);
-
-  @override
-  bool build() => !ref.watch(appSettingsStoreProvider).readFirstLaunchSeen();
-
-  void dismiss() {
-    if (!state) return;
-    state = false;
-    unawaited(_store.markFirstLaunchSeen());
-  }
-}
-
-final firstLaunchProvider =
-    NotifierProvider<FirstLaunchController, bool>(FirstLaunchController.new);

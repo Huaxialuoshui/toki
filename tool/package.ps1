@@ -10,6 +10,16 @@
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
+# 同一时间只允许一个 package.bat 实例，避免第二个构建在 Gradle 锁上无限等待。
+$packagingMutex = [System.Threading.Mutex]::new(
+    $false,
+    'Local\TokiPackaging'
+)
+if (-not $packagingMutex.WaitOne(0)) {
+    Write-Host '[!] 另一个 Toki 打包任务正在运行。请等它结束，或先关闭那个窗口。' -ForegroundColor Yellow
+    exit 2
+}
+
 # 控制台按 UTF-8 输出（launcher 里已经 chcp 65001），这样中文在控制台、管道、
 # 日志三处都不会变乱码。
 try {
@@ -89,6 +99,23 @@ Write-Log '==========================================================='
 Write-Log '  Toki 打包脚本'
 Write-Log '==========================================================='
 Write-Log "[环境] PowerShell $($PSVersionTable.PSVersion)  项目目录：$Root"
+
+# Flutter 的 included Gradle build 会绕过项目的仓库顺序；把同一套镜像
+# 安装成仅本次打包生效的 init script，避免卡在 dl.google.com。
+$initSource = Join-Path $PSScriptRoot 'gradle-mirrors.init.gradle'
+$gradleHome = if ($env:GRADLE_USER_HOME) {
+    $env:GRADLE_USER_HOME
+} else {
+    Join-Path $env:USERPROFILE '.gradle'
+}
+$initDir = Join-Path $gradleHome 'init.d'
+$initTarget = Join-Path $initDir 'toki-gradle-mirrors.gradle'
+if (-not (Test-Path $initDir)) {
+    New-Item -ItemType Directory -Path $initDir -Force | Out-Null
+}
+Copy-Item -LiteralPath $initSource -Destination $initTarget -Force
+$env:TOKI_GRADLE_MIRRORS = '1'
+Write-Log "      Gradle 镜像：$initTarget"
 
 # --- 1. 找 Flutter --------------------------------------------------------
 $flutter = $null
@@ -244,10 +271,16 @@ if ($Mode -eq 'windows') {
     Write-Log '[4/6] 跳过 Android（只打 Windows）'
 } else {
     Write-Log '[4/6] 打包 Android APK（release，正式签名）...'
+    Write-Log '      Gradle 正在构建；首次补缓存或编译期间可能数分钟无新输出，属正常。'
     if (-not (Test-Path (Join-Path $Root 'android\key.properties'))) {
         Write-Log '      [!] 没有 android\key.properties，会用 debug 签名 —— 装到手机上会和正式签名版冲突。' 'Yellow'
     }
-    if ((Invoke-Tool $flutter @('build', 'apk', '--release')) -ne 0) { Fail 'flutter build apk --release 失败。' }
+    if ((Invoke-Tool $flutter @(
+                'build', 'apk', '--release',
+                '--android-skip-build-dependency-validation'
+            )) -ne 0) {
+        Fail 'flutter build apk --release 失败。'
+    }
     $apk = Join-Path $Root 'build\app\outputs\flutter-apk\app-release.apk'
     if (-not (Test-Path $apk)) { Fail "没找到 $apk。" }
     Copy-Item -LiteralPath $apk -Destination $ApkOut -Force

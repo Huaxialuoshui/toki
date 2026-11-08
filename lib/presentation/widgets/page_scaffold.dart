@@ -9,6 +9,7 @@ class PageScaffold extends StatelessWidget {
     required this.title,
     required this.child,
     this.subtitle,
+    this.leading,
     this.actions = const <Widget>[],
     this.scrollable = true,
     this.maxContentWidth = 1100,
@@ -16,6 +17,7 @@ class PageScaffold extends StatelessWidget {
 
   final String title;
   final String? subtitle;
+  final Widget? leading;
   final List<Widget> actions;
   final Widget child;
   final bool scrollable;
@@ -44,6 +46,10 @@ class PageScaffold extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  if (leading != null) ...<Widget>[
+                    leading!,
+                    const SizedBox(width: 8),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

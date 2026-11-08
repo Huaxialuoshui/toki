@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -28,4 +29,34 @@ Future<String> persistPickedImage(
   final file = File(p.join(target.path, fileName));
   await source.copy(file.path);
   return file.path;
+}
+
+/// Materializes a bundled `asset:` image into the app support directory.
+///
+/// Platform APIs such as the Windows taskbar icon and Android shortcut icon
+/// need a real local file. Bundled preset choices are copied into the support
+/// directory and remain available offline.
+Future<String> materializeBundledImage(
+  String value, {
+  String? name,
+}) async {
+  final text = value.trim();
+  if (!text.startsWith('asset:')) return text;
+
+  final assetPath = text.substring('asset:'.length);
+  final extension =
+      p.extension(assetPath).isEmpty ? '.png' : p.extension(assetPath);
+  final fileName = name?.trim().isNotEmpty == true
+      ? name!.trim()
+      : 'bundled_${assetPath.hashCode.abs()}$extension';
+  final root = await getApplicationSupportDirectory();
+  final target = Directory(p.join(root.path, 'bundled'));
+  if (!target.existsSync()) target.createSync(recursive: true);
+  final destination = File(p.join(target.path, fileName));
+  final data = await rootBundle.load(assetPath);
+  await destination.writeAsBytes(
+    data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+    flush: true,
+  );
+  return destination.path;
 }

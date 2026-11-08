@@ -28,9 +28,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navSettings => '设置';
 
   @override
-  String get commonComingSoon => '后续阶段提供';
-
-  @override
   String get commonViewAll => '查看全部';
 
   @override
@@ -131,6 +128,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appBackground => '应用背景';
 
   @override
+  String get settingsVisualSection => '界面与图标';
+
+  @override
   String get appBackgroundHint => '作用于所有页面；聊天页有自己独立的背景（见上面的区块）。';
 
   @override
@@ -149,10 +149,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get iconStyleFilled => '实心';
 
   @override
+  String get navIconSection => '导航图标';
+
+  @override
+  String get navIconHint => '默认使用新版角色图标；可一键切回原图标，也可以为每个页面选择自己的图片。';
+
+  @override
+  String get navIconPresetNew => '新版默认';
+
+  @override
+  String get navIconPresetClassic => '原版图标';
+
+  @override
+  String get navIconPick => '选择图标';
+
+  @override
+  String get navIconReset => '恢复默认';
+
+  @override
+  String get navIconResetAll => '全部恢复默认';
+
+  @override
   String get appIcon => '应用图标';
 
   @override
-  String get appIconHint => '用自己的图片做图标。Android：换掉「最近任务」里的图标，并生成一个带这张图的桌面快捷方式（系统会弹一次确认，点「添加」即可；桌面原图标由启动器绘制，改不了）。Windows：换掉窗口标题栏与任务栏图标，exe 自身的图标需要重新打包。';
+  String get appIconHint => '新版图标已是安装包默认。也可以切回原版，或用自己的图片；Android 与 Windows 的系统适用范围如下。';
+
+  @override
+  String get appIconPresetNew => '新版默认';
+
+  @override
+  String get appIconPresetClassic => '原版图标';
+
+  @override
+  String get appIconPresetCustom => '自定义';
 
   @override
   String get appIconPick => '选择图片';
@@ -239,7 +269,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncLocalTitle => '仅本机';
 
   @override
-  String get syncLocalSubtitle => '第一版是本地优先：数据都在本机数据库里。WebDAV / 自建服务器 / 云同步会复用同一个 SyncService 接口，属于后续阶段。';
+  String get syncLocalSubtitle => '数据默认保存在本机数据库。当前版本只提供本地同步检查，不会上传你的日程。';
 
   @override
   String get syncNow => '检查本地数据';
@@ -419,15 +449,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeOpenAi => '打开助手';
-
-  @override
-  String get homePhaseBannerTitle => 'Phase 2 · 本地数据库';
-
-  @override
-  String get homePhaseBannerBody => '日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。';
-
-  @override
-  String get homePhaseBannerDismiss => '知道了';
 
   @override
   String countdownTimeUntil(String title) {
@@ -698,9 +719,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get calendarAllDay => '全天';
 
   @override
-  String get calendarReadOnlyHint => '本阶段只读，创建与编辑日程在 Phase 3 提供';
-
-  @override
   String get calendarEventDetail => '日程详情';
 
   @override
@@ -721,6 +739,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get calendarNoReminder => '无';
 
   @override
+  String get calendarHolidaySection => '节日与二十四节气';
+
+  @override
+  String get calendarHolidayHint => '内置公历、农历节日、清明和完整二十四节气，离线可用；不包含每年临时发布的调休安排。';
+
+  @override
+  String get calendarHolidayShow => '在日历中显示节日与节气';
+
+  @override
+  String get calendarHolidayReminder => '节日与节气提醒';
+
+  @override
+  String get calendarHolidayReminderHint => '在当天 09:00 或按提前天数发送系统通知。';
+
+  @override
+  String get calendarHolidayReminderLead => '提醒时间';
+
+  @override
+  String get calendarHolidaySameDay => '节日当天 09:00';
+
+  @override
+  String calendarHolidayDaysAhead(int days) {
+    return '提前 $days 天 09:00';
+  }
+
+  @override
+  String get calendarHolidayPublic => '法定 / 公共节日';
+
+  @override
+  String get calendarHolidayTraditional => '传统节日';
+
+  @override
+  String get calendarSolarTerm => '二十四节气';
+
+  @override
+  String calendarNextHoliday(String name, String date) {
+    return '下一次：$name · $date';
+  }
+
+  @override
   String get aiPersona => '人设';
 
   @override
@@ -730,9 +788,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aiSend => '发送';
-
-  @override
-  String get aiMockNotice => '这是 mock 会话，本阶段尚未接入 AI Provider';
 
   @override
   String get aiToolCallLabel => '工具调用';
@@ -1003,6 +1058,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get avatarChange => '更换头像';
+
+  @override
+  String get avatarPresetTitle => '内置头像';
+
+  @override
+  String get avatarPresetNewDefault => '新版默认';
+
+  @override
+  String get avatarPresetNewAlternative => '新版头像 2';
+
+  @override
+  String get avatarPresetClassicDefault => '原版头像';
+
+  @override
+  String get avatarPresetClassicAlternative => '原版头像 2';
 
   @override
   String get aiPersonaDefaultPrompt => '你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。';
@@ -1347,9 +1417,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAiSection => 'AI 与服务商';
 
   @override
-  String get settingsAiSectionSubtitle => '服务商、人设与工具权限设置（Phase 6-8）';
-
-  @override
   String get settingsNotificationSection => '通知提醒';
 
   @override
@@ -1401,10 +1468,22 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settingsBackupSection => '备份与恢复';
+  String notificationHolidayToday(String name) {
+    return '今天是$name，记得提前安排今天的行程。';
+  }
 
   @override
-  String get settingsBackupSectionSubtitle => '带版本控制的 JSON 导入导出（Phase 12）';
+  String notificationHolidayTomorrow(String name) {
+    return '明天是$name，提前做好准备吧。';
+  }
+
+  @override
+  String notificationHolidayInDays(int days, String name) {
+    return '$days 天后是$name，提前做好准备吧。';
+  }
+
+  @override
+  String get settingsBackupSection => '备份与恢复';
 
   @override
   String get backupIntro => '把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。';
@@ -1502,16 +1581,121 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsVersion => '应用版本';
 
   @override
-  String get settingsFlutterVersion => 'Flutter';
+  String get settingsAboutDescription => '本地优先的日历、倒计时与 AI 日程助手';
 
   @override
-  String get settingsDartVersion => 'Dart';
+  String get settingsLocalDataNote => '日程、倒计时、提醒与设置默认保存在本机。';
 
   @override
-  String get settingsProjectPath => '项目路径';
+  String get settingsOpenSourceLicenses => '开源许可';
 
   @override
-  String get settingsPhaseNote => 'Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。';
+  String get settingsMenuSubtitle => '按类别进入设置，修改更集中，也更容易找到。';
+
+  @override
+  String get settingsMenuOpen => '打开设置';
+
+  @override
+  String get settingsGroupPersonalize => '个性化';
+
+  @override
+  String get settingsGroupSchedule => '日程与效率';
+
+  @override
+  String get settingsGroupSystem => '应用与数据';
+
+  @override
+  String get settingsAppearanceMenuHint => '主题、字体、背景、导航图标与语言';
+
+  @override
+  String get settingsAiMenuTitle => 'AI 与聊天';
+
+  @override
+  String get settingsAiMenuHint => '服务商、人设头像、工具权限与聊天外观';
+
+  @override
+  String get settingsScheduleMenuTitle => '日历与提醒';
+
+  @override
+  String get settingsScheduleMenuHint => '通知、日历分类、节日与二十四节气';
+
+  @override
+  String get settingsTimeMenuTitle => '天气与简报';
+
+  @override
+  String get settingsTimeMenuHint => '天气位置、早间计划与晚间总结';
+
+  @override
+  String get settingsDataMenuTitle => '数据与同步';
+
+  @override
+  String get settingsDataMenuHint => '备份恢复、本地数据检查与安装信息';
+
+  @override
+  String get settingsAppearanceSubtitle => '管理 Toki 的配色、图形和显示语言';
+
+  @override
+  String get settingsAiSubtitle => '配置助手能力、头像和对话呈现';
+
+  @override
+  String get settingsScheduleSubtitle => '管理提醒、分类与日期信息';
+
+  @override
+  String get settingsTimeSubtitle => '配置位置天气和每日简报';
+
+  @override
+  String get settingsDataSubtitle => '管理备份、同步和本机数据';
+
+  @override
+  String get settingsWidgetMenuHint => '桌面显示内容、刷新与外观';
+
+  @override
+  String get settingsAboutMenuHint => '版本、数据说明与开源许可';
+
+  @override
+  String get settingsThemeMenuHint => '预设、用户主题、字号与圆角';
+
+  @override
+  String get settingsBackgroundMenuHint => '应用背景、自动对比度与导航图标';
+
+  @override
+  String get settingsAppIconMenuHint => '新版默认、原版图标与自定义图片';
+
+  @override
+  String get settingsLanguageMenuHint => '跟随系统、中文或 English';
+
+  @override
+  String get settingsProviderMenuHint => 'Base URL、API Key、模型与连接测试';
+
+  @override
+  String get settingsPersonaMenuHint => '人设、内置头像与自定义头像';
+
+  @override
+  String get settingsPermissionMenuHint => '允许助手查询、创建、修改或删除';
+
+  @override
+  String get settingsChatAppearanceMenuHint => '背景、气泡、字号与动画';
+
+  @override
+  String get settingsNotificationMenuHint => '权限、精确提醒与测试通知';
+
+  @override
+  String get settingsCalendarCategoryMenuHint => '新增、编辑与删除日程分类';
+
+  @override
+  String get settingsHolidayMenuHint => '显示开关、提前提醒与二十四节气';
+
+  @override
+  String get settingsWeatherMenuHint => '城市、当前位置与历史位置';
+
+  @override
+  String get settingsDigestMenuHint => '早间计划与晚间总结';
+
+  @override
+  String get settingsBackupMenuHint => '导出、恢复与备份文件';
+
+  @override
+  String get settingsSyncMenuHint => '检查本机数据与同步状态';
 
   @override
   String get taskSection => '任务';

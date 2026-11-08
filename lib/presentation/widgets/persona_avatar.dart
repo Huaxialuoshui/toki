@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/constants/brand_assets.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/ai_persona.dart';
 import 'image_source.dart';
@@ -53,7 +54,11 @@ class PersonaAvatar extends StatelessWidget {
         : Color(persona.avatarColor!);
     final avatar = persona.avatar?.trim() ?? '';
 
-    final image = resolveImageProvider(avatar);
+    final image = resolveImageProvider(
+      avatar.isEmpty
+          ? BrandAssets.assetValue(BrandAssets.newAssistantAvatar1)
+          : avatar,
+    );
 
     if (image != null) {
       return CircleAvatar(

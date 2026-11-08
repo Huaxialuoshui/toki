@@ -68,7 +68,8 @@ class AvatarConfig {
     final value = raw?.trim() ?? '';
     if (value.isEmpty) return AvatarConfig(color: color);
     final lower = value.toLowerCase();
-    final looksLikeImage = lower.startsWith('http://') ||
+    final looksLikeImage = lower.startsWith('asset:') ||
+        lower.startsWith('http://') ||
         lower.startsWith('https://') ||
         value.contains('/') ||
         value.contains('\\') ||

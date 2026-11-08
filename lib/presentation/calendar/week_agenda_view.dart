@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
+import '../../domain/entities/calendar_holiday.dart';
 import '../../domain/entities/calendar_event.dart';
 import '../../domain/services/recurrence.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/event_tile.dart';
+import '../widgets/holiday_tile.dart';
 
 /// 周视图（议程式）。
 ///
@@ -16,6 +18,7 @@ class WeekAgendaView extends StatelessWidget {
     super.key,
     required this.weekStart,
     required this.events,
+    required this.holidays,
     required this.today,
     required this.onSelectEvent,
     required this.onAddForDay,
@@ -24,6 +27,7 @@ class WeekAgendaView extends StatelessWidget {
   /// 周一。
   final DateTime weekStart;
   final List<EventOccurrence> events;
+  final List<CalendarHoliday> holidays;
   final DateTime today;
   final ValueChanged<CalendarEvent> onSelectEvent;
   final ValueChanged<DateTime> onAddForDay;
@@ -47,6 +51,14 @@ class WeekAgendaView extends StatelessWidget {
                     ),
                   )
                   .toList(growable: false),
+              holidays: holidays
+                  .where(
+                    (CalendarHoliday holiday) => DateUtils.isSameDay(
+                      holiday.date,
+                      weekStart.add(Duration(days: index)),
+                    ),
+                  )
+                  .toList(growable: false),
               onSelectEvent: onSelectEvent,
               onAddForDay: onAddForDay,
             ),
@@ -61,6 +73,7 @@ class _DaySection extends StatelessWidget {
     required this.day,
     required this.today,
     required this.events,
+    required this.holidays,
     required this.onSelectEvent,
     required this.onAddForDay,
   });
@@ -68,6 +81,7 @@ class _DaySection extends StatelessWidget {
   final DateTime day;
   final DateTime today;
   final List<EventOccurrence> events;
+  final List<CalendarHoliday> holidays;
   final ValueChanged<CalendarEvent> onSelectEvent;
   final ValueChanged<DateTime> onAddForDay;
 
@@ -118,14 +132,19 @@ class _DaySection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          if (events.isEmpty)
+          if (events.isEmpty && holidays.isEmpty)
             Text(
               l10n.calendarNoEvents,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
               ),
             )
-          else
+          else ...<Widget>[
+            for (final holiday in holidays)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: HolidayTile(holiday: holiday, compact: true),
+              ),
             for (final occurrence in events)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
@@ -136,6 +155,7 @@ class _DaySection extends StatelessWidget {
                   onTap: () => onSelectEvent(occurrence.event),
                 ),
               ),
+          ],
         ],
       ),
     );

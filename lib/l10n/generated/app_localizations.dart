@@ -137,12 +137,6 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get navSettings;
 
-  /// No description provided for @commonComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Planned for a later phase'**
-  String get commonComingSoon;
-
   /// No description provided for @commonViewAll.
   ///
   /// In en, this message translates to:
@@ -335,6 +329,12 @@ abstract class AppLocalizations {
   /// **'App background'**
   String get appBackground;
 
+  /// No description provided for @settingsVisualSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface & icons'**
+  String get settingsVisualSection;
+
   /// No description provided for @appBackgroundHint.
   ///
   /// In en, this message translates to:
@@ -371,6 +371,48 @@ abstract class AppLocalizations {
   /// **'Filled'**
   String get iconStyleFilled;
 
+  /// No description provided for @navIconSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation icons'**
+  String get navIconSection;
+
+  /// No description provided for @navIconHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The new character icons are the default. Switch back to the original set or choose a custom image for each destination.'**
+  String get navIconHint;
+
+  /// No description provided for @navIconPresetNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New default'**
+  String get navIconPresetNew;
+
+  /// No description provided for @navIconPresetClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Original icons'**
+  String get navIconPresetClassic;
+
+  /// No description provided for @navIconPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose icon'**
+  String get navIconPick;
+
+  /// No description provided for @navIconReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore default'**
+  String get navIconReset;
+
+  /// No description provided for @navIconResetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore all defaults'**
+  String get navIconResetAll;
+
   /// No description provided for @appIcon.
   ///
   /// In en, this message translates to:
@@ -380,8 +422,26 @@ abstract class AppLocalizations {
   /// No description provided for @appIconHint.
   ///
   /// In en, this message translates to:
-  /// **'Use your own picture as the icon. Android: swaps the icon in Recents and creates a home-screen shortcut with this picture (the system asks for confirmation — tap Add; the launcher-drawn app icon itself cannot be changed from inside the app). Windows: swaps the window and taskbar icon; the exe\'s own icon needs a rebuild.'**
+  /// **'The new icon is the packaged default. You can switch back to the original or use your own image. System coverage varies between Android and Windows.'**
   String get appIconHint;
+
+  /// No description provided for @appIconPresetNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New default'**
+  String get appIconPresetNew;
+
+  /// No description provided for @appIconPresetClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Original icon'**
+  String get appIconPresetClassic;
+
+  /// No description provided for @appIconPresetCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get appIconPresetCustom;
 
   /// No description provided for @appIconPick.
   ///
@@ -554,7 +614,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncLocalSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.'**
+  /// **'Your data stays in the local database by default. This version only checks local data and never uploads your schedule.'**
   String get syncLocalSubtitle;
 
   /// No description provided for @syncNow.
@@ -874,24 +934,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open assistant'**
   String get homeOpenAi;
-
-  /// No description provided for @homePhaseBannerTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Phase 2 · local database'**
-  String get homePhaseBannerTitle;
-
-  /// No description provided for @homePhaseBannerBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.'**
-  String get homePhaseBannerBody;
-
-  /// No description provided for @homePhaseBannerDismiss.
-  ///
-  /// In en, this message translates to:
-  /// **'Got it'**
-  String get homePhaseBannerDismiss;
 
   /// No description provided for @countdownTimeUntil.
   ///
@@ -1397,12 +1439,6 @@ abstract class AppLocalizations {
   /// **'All day'**
   String get calendarAllDay;
 
-  /// No description provided for @calendarReadOnlyHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Read-only in this phase — creating and editing events arrives in Phase 3'**
-  String get calendarReadOnlyHint;
-
   /// No description provided for @calendarEventDetail.
   ///
   /// In en, this message translates to:
@@ -1439,6 +1475,78 @@ abstract class AppLocalizations {
   /// **'None'**
   String get calendarNoReminder;
 
+  /// No description provided for @calendarHolidaySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Holidays & 24 solar terms'**
+  String get calendarHolidaySection;
+
+  /// No description provided for @calendarHolidayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in Gregorian and lunar festivals, Qingming and all 24 solar terms are available offline. Year-specific government holiday adjustments are not included.'**
+  String get calendarHolidayHint;
+
+  /// No description provided for @calendarHolidayShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show holidays and solar terms'**
+  String get calendarHolidayShow;
+
+  /// No description provided for @calendarHolidayReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Holiday and solar-term reminders'**
+  String get calendarHolidayReminder;
+
+  /// No description provided for @calendarHolidayReminderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a system notification at 09:00 on the holiday or the selected number of days before it.'**
+  String get calendarHolidayReminderHint;
+
+  /// No description provided for @calendarHolidayReminderLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get calendarHolidayReminderLead;
+
+  /// No description provided for @calendarHolidaySameDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Holiday at 09:00'**
+  String get calendarHolidaySameDay;
+
+  /// No description provided for @calendarHolidayDaysAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} day(s) early at 09:00'**
+  String calendarHolidayDaysAhead(int days);
+
+  /// No description provided for @calendarHolidayPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public holiday'**
+  String get calendarHolidayPublic;
+
+  /// No description provided for @calendarHolidayTraditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional festival'**
+  String get calendarHolidayTraditional;
+
+  /// No description provided for @calendarSolarTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar term'**
+  String get calendarSolarTerm;
+
+  /// No description provided for @calendarNextHoliday.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {name} · {date}'**
+  String calendarNextHoliday(String name, String date);
+
   /// No description provided for @aiPersona.
   ///
   /// In en, this message translates to:
@@ -1456,12 +1564,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get aiSend;
-
-  /// No description provided for @aiMockNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'Mock conversation — the AI provider is not connected in this phase'**
-  String get aiMockNotice;
 
   /// No description provided for @aiToolCallLabel.
   ///
@@ -1978,6 +2080,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change avatar'**
   String get avatarChange;
+
+  /// No description provided for @avatarPresetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in avatars'**
+  String get avatarPresetTitle;
+
+  /// No description provided for @avatarPresetNewDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'New default'**
+  String get avatarPresetNewDefault;
+
+  /// No description provided for @avatarPresetNewAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'New avatar 2'**
+  String get avatarPresetNewAlternative;
+
+  /// No description provided for @avatarPresetClassicDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Original avatar'**
+  String get avatarPresetClassicDefault;
+
+  /// No description provided for @avatarPresetClassicAlternative.
+  ///
+  /// In en, this message translates to:
+  /// **'Original avatar 2'**
+  String get avatarPresetClassicAlternative;
 
   /// No description provided for @aiPersonaDefaultPrompt.
   ///
@@ -2639,12 +2771,6 @@ abstract class AppLocalizations {
   /// **'AI & providers'**
   String get settingsAiSection;
 
-  /// No description provided for @settingsAiSectionSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Provider, persona and tool permissions (Phase 6-8)'**
-  String get settingsAiSectionSubtitle;
-
   /// No description provided for @settingsNotificationSection.
   ///
   /// In en, this message translates to:
@@ -2735,17 +2861,29 @@ abstract class AppLocalizations {
   /// **'Starts in {days} d'**
   String notificationLeadDays(int days);
 
+  /// No description provided for @notificationHolidayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today is {name}. Remember to plan your day.'**
+  String notificationHolidayToday(String name);
+
+  /// No description provided for @notificationHolidayTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow is {name}. A little preparation will help.'**
+  String notificationHolidayTomorrow(String name);
+
+  /// No description provided for @notificationHolidayInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is in {days} days. A little preparation will help.'**
+  String notificationHolidayInDays(int days, String name);
+
   /// No description provided for @settingsBackupSection.
   ///
   /// In en, this message translates to:
   /// **'Backup & restore'**
   String get settingsBackupSection;
-
-  /// No description provided for @settingsBackupSectionSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Versioned JSON export and import (Phase 12)'**
-  String get settingsBackupSectionSubtitle;
 
   /// No description provided for @backupIntro.
   ///
@@ -2921,29 +3059,239 @@ abstract class AppLocalizations {
   /// **'App version'**
   String get settingsVersion;
 
-  /// No description provided for @settingsFlutterVersion.
+  /// No description provided for @settingsAboutDescription.
   ///
   /// In en, this message translates to:
-  /// **'Flutter'**
-  String get settingsFlutterVersion;
+  /// **'A local-first calendar, countdown and AI schedule assistant'**
+  String get settingsAboutDescription;
 
-  /// No description provided for @settingsDartVersion.
+  /// No description provided for @settingsLocalDataNote.
   ///
   /// In en, this message translates to:
-  /// **'Dart'**
-  String get settingsDartVersion;
+  /// **'Events, countdowns, reminders and settings are stored on this device by default.'**
+  String get settingsLocalDataNote;
 
-  /// No description provided for @settingsProjectPath.
+  /// No description provided for @settingsOpenSourceLicenses.
   ///
   /// In en, this message translates to:
-  /// **'Project path'**
-  String get settingsProjectPath;
+  /// **'Open-source licenses'**
+  String get settingsOpenSourceLicenses;
 
-  /// No description provided for @settingsPhaseNote.
+  /// No description provided for @settingsMenuSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.'**
-  String get settingsPhaseNote;
+  /// **'Browse settings by category to find related options faster.'**
+  String get settingsMenuSubtitle;
+
+  /// No description provided for @settingsMenuOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get settingsMenuOpen;
+
+  /// No description provided for @settingsGroupPersonalize.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalisation'**
+  String get settingsGroupPersonalize;
+
+  /// No description provided for @settingsGroupSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule & focus'**
+  String get settingsGroupSchedule;
+
+  /// No description provided for @settingsGroupSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'App & data'**
+  String get settingsGroupSystem;
+
+  /// No description provided for @settingsAppearanceMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Themes, typography, backgrounds, navigation icons and language'**
+  String get settingsAppearanceMenuHint;
+
+  /// No description provided for @settingsAiMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & chat'**
+  String get settingsAiMenuTitle;
+
+  /// No description provided for @settingsAiMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Providers, persona avatars, tool access and chat appearance'**
+  String get settingsAiMenuHint;
+
+  /// No description provided for @settingsScheduleMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar & reminders'**
+  String get settingsScheduleMenuTitle;
+
+  /// No description provided for @settingsScheduleMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications, calendar categories, holidays and solar terms'**
+  String get settingsScheduleMenuHint;
+
+  /// No description provided for @settingsTimeMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather & briefings'**
+  String get settingsTimeMenuTitle;
+
+  /// No description provided for @settingsTimeMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather locations, morning plans and evening reviews'**
+  String get settingsTimeMenuHint;
+
+  /// No description provided for @settingsDataMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & sync'**
+  String get settingsDataMenuTitle;
+
+  /// No description provided for @settingsDataMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup, restore, local data checks and app information'**
+  String get settingsDataMenuHint;
+
+  /// No description provided for @settingsAppearanceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Toki\'s colours, artwork and display language'**
+  String get settingsAppearanceSubtitle;
+
+  /// No description provided for @settingsAiSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure assistant capabilities, avatars and chat presentation'**
+  String get settingsAiSubtitle;
+
+  /// No description provided for @settingsScheduleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage reminders, categories and date information'**
+  String get settingsScheduleSubtitle;
+
+  /// No description provided for @settingsTimeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure local weather and daily briefings'**
+  String get settingsTimeSubtitle;
+
+  /// No description provided for @settingsDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage backups, sync and on-device data'**
+  String get settingsDataSubtitle;
+
+  /// No description provided for @settingsWidgetMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Home-screen content, refresh and appearance'**
+  String get settingsWidgetMenuHint;
+
+  /// No description provided for @settingsAboutMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Version, data notes and open-source licences'**
+  String get settingsAboutMenuHint;
+
+  /// No description provided for @settingsThemeMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Presets, user themes, font size and corner radius'**
+  String get settingsThemeMenuHint;
+
+  /// No description provided for @settingsBackgroundMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Application background, contrast and navigation icons'**
+  String get settingsBackgroundMenuHint;
+
+  /// No description provided for @settingsAppIconMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New default, original icon or a custom image'**
+  String get settingsAppIconMenuHint;
+
+  /// No description provided for @settingsLanguageMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the system, Chinese or English'**
+  String get settingsLanguageMenuHint;
+
+  /// No description provided for @settingsProviderMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Base URL, API key, model and connection test'**
+  String get settingsProviderMenuHint;
+
+  /// No description provided for @settingsPersonaMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Personas, built-in avatars and custom avatars'**
+  String get settingsPersonaMenuHint;
+
+  /// No description provided for @settingsPermissionMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow the assistant to read, create, update or delete'**
+  String get settingsPermissionMenuHint;
+
+  /// No description provided for @settingsChatAppearanceMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Background, bubbles, text size and animation'**
+  String get settingsChatAppearanceMenuHint;
+
+  /// No description provided for @settingsNotificationMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission, precise reminders and test notification'**
+  String get settingsNotificationMenuHint;
+
+  /// No description provided for @settingsCalendarCategoryMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add, edit and delete event categories'**
+  String get settingsCalendarCategoryMenuHint;
+
+  /// No description provided for @settingsHolidayMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility, advance reminders and all 24 solar terms'**
+  String get settingsHolidayMenuHint;
+
+  /// No description provided for @settingsWeatherMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'City, current location and saved locations'**
+  String get settingsWeatherMenuHint;
+
+  /// No description provided for @settingsDigestMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning plans and evening reviews'**
+  String get settingsDigestMenuHint;
+
+  /// No description provided for @settingsBackupMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Export, restore and backup files'**
+  String get settingsBackupMenuHint;
+
+  /// No description provided for @settingsSyncMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check on-device data and sync state'**
+  String get settingsSyncMenuHint;
 
   /// No description provided for @taskSection.
   ///

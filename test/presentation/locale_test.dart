@@ -38,11 +38,14 @@ void main() {
     await pumpTokiApp(tester, size: const Size(1280, 900));
     expect(find.text('Home'), findsOneWidget);
 
-    await tester
-        .tap(find.byKey(const ValueKey<String>('sidebar-tile-/settings')));
-    await tester.pumpAndSettle();
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-appearance',
+        'settings-appearance-language',
+      ],
+    );
 
-    // 设置页越来越长，语言区块在测试视口外，先滚动到可见位置再点。
     final chineseChip = find.widgetWithText(ChoiceChip, '中文');
     await tester.ensureVisible(chineseChip);
     await tester.pumpAndSettle();
@@ -50,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('设置'), findsWidgets);
-    expect(find.text('外观'), findsOneWidget);
+    expect(find.text('语言'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey<String>('sidebar-tile-/home')));
     await tester.pumpAndSettle();

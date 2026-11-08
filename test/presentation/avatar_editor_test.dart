@@ -12,10 +12,10 @@ void main() {
   const Size surface = Size(1400, 2600);
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-chat'],
     );
-    await tester.pumpAndSettle();
   }
 
   Future<void> openAvatarEditor(WidgetTester tester) async {
@@ -72,7 +72,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(inDialog(find.byKey(const ValueKey<String>('avatar-save'))));
+    await tester
+        .tap(inDialog(find.byKey(const ValueKey<String>('avatar-save'))));
     await tester.pumpAndSettle();
 
     // 预览区（弹窗外）已经换成新头像
@@ -106,9 +107,8 @@ void main() {
     await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();
-    final json =
-        jsonDecode(preferences.getString('settings.chatAppearance')!)
-            as Map<String, Object?>;
+    final json = jsonDecode(preferences.getString('settings.chatAppearance')!)
+        as Map<String, Object?>;
     expect(json['userAvatar'], isNull);
   });
 }

@@ -5,10 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../application/appearance/app_appearance_providers.dart';
+import '../../core/constants/brand_assets.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../infrastructure/storage/local_image_store.dart';
 import '../../shared/widgets/glass_card.dart';
+import '../widgets/brand_icon.dart';
 import '../widgets/image_edit_button.dart';
+import '../widgets/image_source.dart';
 
 /// 设置页的「应用图标」区块：用自己的图片做应用图标。
 ///
@@ -66,12 +69,20 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
     messenger?.showSnackBar(SnackBar(content: Text(l10n.appIconResetDone)));
   }
 
+  Future<void> _useClassic() async {
+    await ref
+        .read(appIconProvider.notifier)
+        .setPath(BrandAssets.assetValue(BrandAssets.classicAppIcon));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final path = ref.watch(appIconProvider);
-    final hasIcon = path != null && File(path).existsSync();
+    final hasCustomIcon =
+        path != null && !path.startsWith('asset:') && File(path).existsSync();
+    final hasIcon = path != null;
 
     return GlassCard(
       child: Column(
@@ -80,7 +91,7 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _AppIconPreview(path: hasIcon ? path : null),
+              _AppIconPreview(path: path),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -96,8 +107,8 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
                     Text(
                       l10n.appIconHint,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.68),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.68),
                       ),
                     ),
                   ],
@@ -106,6 +117,34 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
             ],
           ),
           const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: <Widget>[
+              ChoiceChip(
+                key: const ValueKey<String>('app-icon-preset-new'),
+                label: Text(l10n.appIconPresetNew),
+                selected: path == null,
+                onSelected: (_) => _reset(),
+              ),
+              ChoiceChip(
+                key: const ValueKey<String>('app-icon-preset-classic'),
+                label: Text(l10n.appIconPresetClassic),
+                selected: path ==
+                    BrandAssets.assetValue(
+                      BrandAssets.classicAppIcon,
+                    ),
+                onSelected: (_) => _useClassic(),
+              ),
+              if (hasCustomIcon)
+                ChoiceChip(
+                  label: Text(l10n.appIconPresetCustom),
+                  selected: true,
+                  onSelected: (_) {},
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             runSpacing: 8,
@@ -118,7 +157,7 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
               ),
               ImageEditButton(
                 keyPrefix: 'app-icon',
-                path: hasIcon ? path : null,
+                path: hasCustomIcon ? path : null,
                 onEdited: (String edited) =>
                     ref.read(appIconProvider.notifier).setPath(edited),
               ),
@@ -136,7 +175,7 @@ class _AppIconSectionState extends ConsumerState<AppIconSection> {
                 ),
             ],
           ),
-          if (hasIcon)
+          if (hasCustomIcon)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
@@ -164,6 +203,7 @@ class _AppIconPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(18);
+    final image = resolveImageProvider(path);
     final placeholder = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -185,10 +225,10 @@ class _AppIconPreview extends StatelessWidget {
       height: 68,
       child: ClipRRect(
         borderRadius: radius,
-        child: path == null
-            ? placeholder
-            : Image.file(
-                File(path!),
+        child: image == null
+            ? const BrandAppIcon(size: 68, radius: 0)
+            : Image(
+                image: image,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => placeholder,
               ),

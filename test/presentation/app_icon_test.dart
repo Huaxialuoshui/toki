@@ -79,11 +79,15 @@ void main() {
         ),
       ];
 
-  Future<void> openSettingsAndScrollTo(WidgetTester tester, Finder target) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+  Future<void> openSettingsAndScrollTo(
+      WidgetTester tester, Finder target) async {
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-appearance',
+        'settings-appearance-app-icon',
+      ],
     );
-    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       target,
       240,

@@ -38,10 +38,10 @@ void main() {
       ];
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-data', 'settings-data-backup'],
     );
-    await tester.pumpAndSettle();
   }
 
   Future<void> tapText(WidgetTester tester, String text) async {

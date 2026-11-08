@@ -8,6 +8,7 @@ import '../../domain/repositories/calendar_repository.dart';
 import '../../domain/repositories/reminder_repository.dart';
 import '../../domain/services/notification_service.dart';
 import '../../domain/services/recurrence.dart';
+import '../../domain/services/holiday_service.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../infrastructure/storage/app_settings_store.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -31,12 +32,14 @@ class ReminderScheduler {
     required AppSettingsStore settings,
     required Clock clock,
     required Locale Function() locale,
+    HolidayService? holidays,
   })  : _notifications = notifications,
         _reminders = reminders,
         _events = events,
         _settings = settings,
         _clock = clock,
-        _locale = locale;
+        _locale = locale,
+        _holidays = holidays;
 
   final NotificationService _notifications;
   final ReminderRepository _reminders;
@@ -44,6 +47,7 @@ class ReminderScheduler {
   final AppSettingsStore _settings;
   final Clock _clock;
   final Locale Function() _locale;
+  final HolidayService? _holidays;
 
   /// 只把未来这段时间内的提醒排进系统（重复日程按次展开）。
   static const Duration horizon = Duration(days: 30);
@@ -79,6 +83,7 @@ class ReminderScheduler {
         desired[planned.id] = planned;
       }
     }
+    _addHolidayNotifications(desired, now, l10n);
 
     final previouslyScheduled = _settings.readScheduledNotificationIds();
     for (final id in previouslyScheduled) {
@@ -106,6 +111,57 @@ class ReminderScheduler {
     await _settings.writeScheduledNotificationIds(
       desired.keys.toList(growable: false),
     );
+  }
+
+  void _addHolidayNotifications(
+    Map<int, _PlannedNotification> desired,
+    DateTime now,
+    AppLocalizations l10n,
+  ) {
+    final holidays = _holidays;
+    if (holidays == null || !_settings.readHolidayReminders()) return;
+
+    final today = DateTime(now.year, now.month, now.day);
+    final horizonEnd = today.add(const Duration(days: 366));
+    final leadDays = _settings.readHolidayReminderDays().clamp(0, 7).toInt();
+    final chinese = l10n.localeName.startsWith('zh');
+
+    for (final holiday in holidays.occurrencesInRange(today, horizonEnd)) {
+      final holidayDay = DateTime(
+        holiday.date.year,
+        holiday.date.month,
+        holiday.date.day,
+      );
+      var reminderDay = holidayDay.subtract(Duration(days: leadDays));
+      var trigger = DateTime(
+        reminderDay.year,
+        reminderDay.month,
+        reminderDay.day,
+        9,
+      );
+      if (!trigger.isAfter(now) && leadDays > 0) {
+        reminderDay = holidayDay;
+        trigger =
+            DateTime(holidayDay.year, holidayDay.month, holidayDay.day, 9);
+      }
+      if (!trigger.isAfter(now) || trigger.isAfter(horizonEnd)) continue;
+
+      final daysAhead = holidayDay.difference(reminderDay).inDays;
+      final name = holiday.name(chinese: chinese);
+      final body = daysAhead <= 0
+          ? l10n.notificationHolidayToday(name)
+          : daysAhead == 1
+              ? l10n.notificationHolidayTomorrow(name)
+              : l10n.notificationHolidayInDays(daysAhead, name);
+      final key = 'holiday:${holiday.id}:${holiday.date.year}';
+      desired[notificationIdFor(key)] = _PlannedNotification(
+        id: notificationIdFor(key),
+        title: name,
+        body: body,
+        trigger: trigger,
+        payload: key,
+      );
+    }
   }
 
   /// 把一条提醒摊平成未来会触发的若干条通知。
@@ -258,5 +314,6 @@ final reminderSchedulerProvider = Provider<ReminderScheduler>((ref) {
         systemLocale: system,
       );
     },
+    holidays: const HolidayService(),
   );
 });

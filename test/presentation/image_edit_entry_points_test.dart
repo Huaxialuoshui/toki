@@ -11,13 +11,6 @@ import '../helpers/test_app.dart';
 void main() {
   const Size surface = Size(1400, 2800);
 
-  Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
-    );
-    await tester.pumpAndSettle();
-  }
-
   Future<void> scrollTo(WidgetTester tester, Finder target) async {
     await tester.scrollUntilVisible(
       target,
@@ -45,8 +38,12 @@ void main() {
         }),
       },
     );
-    await openSettings(tester);
-    await scrollTo(tester, find.byKey(const ValueKey<String>('user-avatar-edit-image')));
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-chat'],
+    );
+    await scrollTo(
+        tester, find.byKey(const ValueKey<String>('user-avatar-edit-image')));
 
     expect(isEnabled(tester, 'user-avatar-edit-image'), isTrue);
   });
@@ -62,15 +59,25 @@ void main() {
         }),
       },
     );
-    await openSettings(tester);
-    await scrollTo(tester, find.byKey(const ValueKey<String>('user-avatar-edit-image')));
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-chat'],
+    );
+    await scrollTo(
+        tester, find.byKey(const ValueKey<String>('user-avatar-edit-image')));
 
     expect(isEnabled(tester, 'user-avatar-edit-image'), isFalse);
   });
 
   tokiWidgetTest('应用背景：图片档里始终有「用系统工具编辑」', (tester) async {
     await pumpTokiApp(tester, size: surface, seedDatabase: false);
-    await openSettings(tester);
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-appearance',
+        'settings-appearance-background',
+      ],
+    );
 
     final imageTab = find.byKey(const ValueKey<String>('app-bg-type-image'));
     await scrollTo(tester, imageTab);
@@ -78,7 +85,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // 还没选图：按钮在，但不可点。
-    expect(find.byKey(const ValueKey<String>('app-bg-edit-image')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('app-bg-edit-image')),
+        findsOneWidget);
     expect(isEnabled(tester, 'app-bg-edit-image'), isFalse);
   });
 
@@ -89,7 +97,10 @@ void main() {
       seedDatabase: false,
       initialPreferences: <String, Object>{'settings.locale': 'zh'},
     );
-    await openSettings(tester);
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-chat'],
+    );
 
     // 聊天外观区块有自己的分段按钮（key = chat-background-type）。
     final imageTab = find.descendant(
@@ -100,7 +111,8 @@ void main() {
     await tester.tap(imageTab);
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey<String>('chat-bg-edit-image')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('chat-bg-edit-image')),
+        findsOneWidget);
     expect(isEnabled(tester, 'chat-bg-edit-image'), isFalse);
   });
 
@@ -109,7 +121,8 @@ void main() {
     addTearDown(() {
       if (directory.existsSync()) directory.deleteSync(recursive: true);
     });
-    final icon = File('${directory.path}/icon.png')..writeAsBytesSync(<int>[1, 2]);
+    final icon = File('${directory.path}/icon.png')
+      ..writeAsBytesSync(<int>[1, 2]);
 
     await pumpTokiApp(
       tester,
@@ -119,7 +132,13 @@ void main() {
         'settings.appIcon': icon.path,
       },
     );
-    await openSettings(tester);
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-appearance',
+        'settings-appearance-app-icon',
+      ],
+    );
     await scrollTo(
       tester,
       find.byKey(const ValueKey<String>('app-icon-edit-image')),
@@ -154,6 +173,7 @@ void main() {
       find.byKey(const ValueKey<String>('avatar-kind-image')),
     );
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey<String>('avatar-edit-image')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('avatar-edit-image')),
+        findsOneWidget);
   });
 }

@@ -7,6 +7,7 @@ import 'package:toki/data/repositories/drift_calendar_repository.dart';
 import 'package:toki/data/repositories/drift_reminder_repository.dart';
 import 'package:toki/domain/entities/calendar_event.dart';
 import 'package:toki/domain/entities/reminder.dart';
+import 'package:toki/domain/services/holiday_service.dart';
 import 'package:toki/infrastructure/database/app_database.dart';
 import 'package:toki/infrastructure/storage/app_settings_store.dart';
 
@@ -216,6 +217,47 @@ void main() {
 
     expect(notifications.scheduled, hasLength(1));
     expect(settings.readScheduledNotificationIds(), hasLength(1));
+  });
+
+  test('节日提醒使用稳定通知 id，并可在设置中关闭', () async {
+    final holidayScheduler = ReminderScheduler(
+      notifications: notifications,
+      reminders: reminders,
+      events: events,
+      settings: settings,
+      clock: clock,
+      locale: () => const Locale('en'),
+      holidays: const HolidayService(),
+    );
+
+    await holidayScheduler.sync();
+
+    final holidayNotifications = notifications.scheduled
+        .where(
+          (ScheduledNotification item) =>
+              item.payload?.startsWith('holiday:') ?? false,
+        )
+        .toList(growable: false);
+    expect(holidayNotifications, isNotEmpty);
+    expect(
+      holidayNotifications.first.title,
+      'Cold Dew',
+    );
+    expect(
+      holidayNotifications.first.scheduledTime,
+      DateTime(2026, 10, 7, 9),
+    );
+
+    await settings.writeHolidayReminders(false);
+    await holidayScheduler.sync();
+
+    expect(
+      notifications.scheduled.where(
+        (ScheduledNotification item) =>
+            item.payload?.startsWith('holiday:') ?? false,
+      ),
+      isEmpty,
+    );
   });
 
   test('通知 id 稳定、非负，且不同提醒不冲突', () {

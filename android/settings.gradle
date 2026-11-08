@@ -10,7 +10,11 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
-        google()
+        // dl.google.com 在部分国内网络下会建立连接后长期无下载进度，
+        // 先把请求交给阿里云镜像；镜像缺失时仍会回落到官方仓库。
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
         mavenCentral()
         gradlePluginPortal()
     }

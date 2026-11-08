@@ -31,10 +31,13 @@ void main() {
   }
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-schedule',
+        'settings-schedule-categories',
+      ],
     );
-    await tester.pumpAndSettle();
   }
 
   /// 编辑器弹窗的字段比可视区域长，操作下半部分前先把弹窗内容往上拖。

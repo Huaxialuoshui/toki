@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/calendar/calendar_providers.dart';
+import '../../application/calendar/holiday_providers.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
+import '../../domain/entities/calendar_holiday.dart';
 import '../../domain/entities/calendar_event.dart';
 import '../../domain/services/recurrence.dart';
 import '../../infrastructure/clock_provider.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/async_hint.dart';
 import '../widgets/event_tile.dart';
+import '../widgets/holiday_tile.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 import 'day_agenda_view.dart';
@@ -110,10 +113,22 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
 
     final eventsAsync = ref.watch(eventsForRangeProvider(_range));
     final events = eventsAsync.valueOrNull ?? const <EventOccurrence>[];
+    final holidayPreferences = ref.watch(holidayPreferencesProvider);
+    final holidays = holidayPreferences.showInCalendar
+        ? ref
+            .watch(holidayServiceProvider)
+            .occurrencesInRange(_range.start, _range.end)
+        : const <CalendarHoliday>[];
     final dayEvents = events
         .where(
           (EventOccurrence occurrence) =>
               DateUtils.isSameDay(occurrence.start, _selectedDay),
+        )
+        .toList(growable: false);
+    final dayHolidays = holidays
+        .where(
+          (CalendarHoliday holiday) =>
+              DateUtils.isSameDay(holiday.date, _selectedDay),
         )
         .toList(growable: false);
 
@@ -165,6 +180,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               selectedDay: _selectedDay,
               today: now,
               events: events,
+              holidays: holidays,
               onSelectDay: (DateTime day) => setState(() => _selectedDay = day),
             ),
             const SizedBox(height: 24),
@@ -181,12 +197,17 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             ),
             if (eventsAsync.isLoading && events.isEmpty)
               const LoadingHint()
-            else if (dayEvents.isEmpty)
+            else if (dayEvents.isEmpty && dayHolidays.isEmpty)
               EmptyHint(
                 text: l10n.calendarNoEvents,
                 icon: Icons.event_busy_outlined,
               )
-            else
+            else ...<Widget>[
+              for (final holiday in dayHolidays)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: HolidayTile(holiday: holiday),
+                ),
               for (final occurrence in dayEvents)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -197,6 +218,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     onTap: () => _openDetail(occurrence.event),
                   ),
                 ),
+            ],
           ] else if (_mode == CalendarViewMode.week) ...<Widget>[
             SectionHeader(
               title: l10n.calendarEventsThisWeek,
@@ -204,7 +226,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             ),
             if (eventsAsync.isLoading && events.isEmpty)
               const LoadingHint()
-            else if (events.isEmpty)
+            else if (events.isEmpty && holidays.isEmpty)
               EmptyHint(
                 text: l10n.calendarNoEventsThisWeek,
                 icon: Icons.event_busy_outlined,
@@ -213,6 +235,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               WeekAgendaView(
                 weekStart: _weekStart,
                 events: events,
+                holidays: holidays,
                 today: now,
                 onSelectEvent: _openDetail,
                 onAddForDay: (DateTime day) => _openEditor(day: day),
@@ -224,6 +247,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               DayAgendaView(
                 day: _selectedDay,
                 events: dayEvents,
+                holidays: dayHolidays,
                 onSelectEvent: _openDetail,
                 onAddForDay: (DateTime day) => _openEditor(day: day),
               ),
@@ -266,6 +290,7 @@ class _MonthGrid extends StatelessWidget {
     required this.selectedDay,
     required this.today,
     required this.events,
+    required this.holidays,
     required this.onSelectDay,
   });
 
@@ -273,6 +298,7 @@ class _MonthGrid extends StatelessWidget {
   final DateTime selectedDay;
   final DateTime today;
   final List<EventOccurrence> events;
+  final List<CalendarHoliday> holidays;
   final ValueChanged<DateTime> onSelectDay;
 
   @override
@@ -334,12 +360,19 @@ class _MonthGrid extends StatelessWidget {
                       if (DateUtils.isSameDay(occurrence.start, date))
                         occurrence.event.color ?? theme.colorScheme.primary,
                   ];
+                  final dayHolidays = holidays
+                      .where(
+                        (CalendarHoliday holiday) =>
+                            DateUtils.isSameDay(holiday.date, date),
+                      )
+                      .toList(growable: false);
 
                   return _DayCell(
                     date: date,
                     isSelected: isSelected,
                     isToday: isToday,
                     eventColors: colors,
+                    holidays: dayHolidays,
                     onTap: () => onSelectDay(date),
                   );
                 },
@@ -358,6 +391,7 @@ class _DayCell extends StatelessWidget {
     required this.isSelected,
     required this.isToday,
     required this.eventColors,
+    required this.holidays,
     required this.onTap,
   });
 
@@ -365,6 +399,7 @@ class _DayCell extends StatelessWidget {
   final bool isSelected;
   final bool isToday;
   final List<Color> eventColors;
+  final List<CalendarHoliday> holidays;
   final VoidCallback onTap;
 
   @override
@@ -398,6 +433,34 @@ class _DayCell extends StatelessWidget {
                       isSelected || isToday ? FontWeight.w700 : FontWeight.w400,
                 ),
               ),
+              if (holidays.isNotEmpty)
+                Text(
+                  holidays
+                      .take(2)
+                      .map(
+                        (CalendarHoliday holiday) => holiday.shortName(
+                          chinese:
+                              Localizations.localeOf(context).languageCode ==
+                                  'zh',
+                        ),
+                      )
+                      .join('·'),
+                  maxLines: 1,
+                  overflow: TextOverflow.clip,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    height: 1.05,
+                    fontSize: 8.5,
+                    color: isSelected
+                        ? foreground
+                        : holidays.any(
+                            (CalendarHoliday holiday) =>
+                                holiday.kind == HolidayKind.solarTerm,
+                          )
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.tertiary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               const SizedBox(height: 3),
               SizedBox(
                 height: 6,

@@ -103,10 +103,10 @@ void main() {
   tokiWidgetTest('设置页可以切换背景类型并实时预览', (tester) async {
     await pumpTokiApp(tester,
         size: const Size(1400, 2400), seedDatabase: false);
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-chat'],
     );
-    await tester.pumpAndSettle();
 
     // 设置页里有两个"Gradient"（应用级背景 + 聊天外观），所以精确定位聊天那一组。
     final gradient = find.descendant(

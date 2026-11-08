@@ -1,12 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/constants/brand_assets.dart';
 import '../../core/constants/calendar_options.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../domain/entities/avatar_config.dart';
 import '../../infrastructure/storage/local_image_store.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'image_edit_button.dart';
 import 'image_source.dart';
+
+class AvatarPreset {
+  const AvatarPreset({
+    required this.label,
+    required this.assetPath,
+  });
+
+  final String label;
+  final String assetPath;
+
+  AvatarConfig get config => AvatarConfig(
+        kind: AvatarKind.image,
+        value: BrandAssets.assetValue(assetPath),
+      );
+}
+
+List<AvatarPreset> assistantAvatarPresets(AppLocalizations l10n) =>
+    <AvatarPreset>[
+      AvatarPreset(
+        label: l10n.avatarPresetNewDefault,
+        assetPath: BrandAssets.newAssistantAvatar1,
+      ),
+      AvatarPreset(
+        label: l10n.avatarPresetNewAlternative,
+        assetPath: BrandAssets.newAssistantAvatar2,
+      ),
+      AvatarPreset(
+        label: l10n.avatarPresetClassicDefault,
+        assetPath: BrandAssets.classicAssistantAvatar1,
+      ),
+      AvatarPreset(
+        label: l10n.avatarPresetClassicAlternative,
+        assetPath: BrandAssets.classicAssistantAvatar2,
+      ),
+    ];
 
 /// 打开头像编辑器；取消时返回 null。
 ///
@@ -16,11 +53,15 @@ Future<AvatarConfig?> showAvatarEditor(
   BuildContext context, {
   required AvatarConfig initial,
   String? title,
+  List<AvatarPreset> presets = const <AvatarPreset>[],
 }) {
   return showDialog<AvatarConfig>(
     context: context,
-    builder: (BuildContext dialogContext) =>
-        _AvatarEditorDialog(initial: initial, title: title),
+    builder: (BuildContext dialogContext) => _AvatarEditorDialog(
+      initial: initial,
+      title: title,
+      presets: presets,
+    ),
   );
 }
 
@@ -74,9 +115,14 @@ class AvatarPreview extends StatelessWidget {
 }
 
 class _AvatarEditorDialog extends StatefulWidget {
-  const _AvatarEditorDialog({required this.initial, this.title});
+  const _AvatarEditorDialog({
+    required this.initial,
+    required this.presets,
+    this.title,
+  });
 
   final AvatarConfig initial;
+  final List<AvatarPreset> presets;
   final String? title;
 
   @override
@@ -139,6 +185,14 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
     }
   }
 
+  void _selectPreset(AvatarPreset preset) {
+    final config = preset.config;
+    setState(() {
+      _draft = config.copyWith(color: _draft.color);
+      _image.text = config.value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -155,6 +209,28 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
             children: <Widget>[
               Center(child: AvatarPreview(config: _draft, radius: 32)),
               const SizedBox(height: 14),
+              if (widget.presets.isNotEmpty) ...<Widget>[
+                Text(
+                  l10n.avatarPresetTitle,
+                  style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: <Widget>[
+                    for (var index = 0; index < widget.presets.length; index++)
+                      _AvatarPresetButton(
+                        index: index,
+                        preset: widget.presets[index],
+                        selected:
+                            _draft.value == widget.presets[index].config.value,
+                        onTap: () => _selectPreset(widget.presets[index]),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+              ],
               SegmentedButton<AvatarKind>(
                 key: const ValueKey<String>('avatar-kind'),
                 segments: <ButtonSegment<AvatarKind>>[
@@ -339,4 +415,64 @@ class _AvatarEditorDialogState extends State<_AvatarEditorDialog> {
       ((color.r * 255).round() << 16) |
       ((color.g * 255).round() << 8) |
       (color.b * 255).round();
+}
+
+class _AvatarPresetButton extends StatelessWidget {
+  const _AvatarPresetButton({
+    required this.index,
+    required this.preset,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final int index;
+  final AvatarPreset preset;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      key: ValueKey<String>('avatar-preset-$index'),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        width: 92,
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outlineVariant,
+            width: selected ? 2 : 1,
+          ),
+          color: selected
+              ? theme.colorScheme.primary.withValues(alpha: 0.08)
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            CircleAvatar(
+              radius: 24,
+              foregroundImage: AssetImage(preset.assetPath),
+              backgroundColor:
+                  theme.colorScheme.primary.withValues(alpha: 0.12),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              preset.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -6,7 +6,6 @@ import '../../application/ai/chat_controller.dart';
 import '../../application/weather/weather_providers.dart';
 import '../../application/calendar/calendar_providers.dart';
 import '../../application/countdown/countdown_providers.dart';
-import '../../application/settings/settings_controller.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/ai_persona.dart';
@@ -44,8 +43,6 @@ class HomePage extends ConsumerWidget {
     final todayAsync = ref.watch(eventsForDayProvider(today));
     final upcomingAsync = ref.watch(upcomingEventsProvider);
     final countdownsAsync = ref.watch(pinnedCountdownsProvider);
-    final showPhaseBanner = ref.watch(firstLaunchProvider);
-
     final todayEvents = todayAsync.valueOrNull ?? const <EventOccurrence>[];
     final upcoming = upcomingAsync.valueOrNull ?? const <EventOccurrence>[];
     final pinned = countdownsAsync.valueOrNull ?? const <CountdownItem>[];
@@ -58,14 +55,6 @@ class HomePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          if (showPhaseBanner)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _PhaseBanner(
-                onDismiss: () =>
-                    ref.read(firstLaunchProvider.notifier).dismiss(),
-              ),
-            ),
           const _WeatherCard(),
           const TaskSummaryCard(),
           const TodayPlanCard(),
@@ -128,52 +117,6 @@ class HomePage extends ConsumerWidget {
               ),
           const SizedBox(height: 24),
           _AiShortcut(persona: persona),
-        ],
-      ),
-    );
-  }
-}
-
-class _PhaseBanner extends StatelessWidget {
-  const _PhaseBanner({required this.onDismiss});
-
-  final VoidCallback onDismiss;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final theme = Theme.of(context);
-
-    return GlassCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(Icons.construction_outlined, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  l10n.homePhaseBannerTitle,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.homePhaseBannerBody,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: onDismiss,
-            child: Text(l10n.homePhaseBannerDismiss),
-          ),
         ],
       ),
     );

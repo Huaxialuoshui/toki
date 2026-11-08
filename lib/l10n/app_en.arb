@@ -8,7 +8,6 @@
   "navCountdown": "Countdown",
   "navAi": "AI Assistant",
   "navSettings": "Settings",
-  "commonComingSoon": "Planned for a later phase",
   "commonViewAll": "View all",
 
   "homeGreeting": "Welcome back",
@@ -62,14 +61,25 @@
   "weatherToday": "Today",
   "weatherNoForecast": "No forecast data",
   "appBackground": "App background",
+  "settingsVisualSection": "Interface & icons",
   "appBackgroundHint": "Applies behind every page. Chat has its own background in the section above.",
   "appAutoContrast": "Adapt text colour automatically",
   "appAutoContrastHint": "Switches between light and dark text based on the background, and adds a subtle scrim when the image mixes light and dark areas.",
   "iconStyle": "Icon style",
   "iconStyleOutlined": "Outlined",
   "iconStyleFilled": "Filled",
+  "navIconSection": "Navigation icons",
+  "navIconHint": "The new character icons are the default. Switch back to the original set or choose a custom image for each destination.",
+  "navIconPresetNew": "New default",
+  "navIconPresetClassic": "Original icons",
+  "navIconPick": "Choose icon",
+  "navIconReset": "Restore default",
+  "navIconResetAll": "Restore all defaults",
   "appIcon": "App icon",
-  "appIconHint": "Use your own picture as the icon. Android: swaps the icon in Recents and creates a home-screen shortcut with this picture (the system asks for confirmation — tap Add; the launcher-drawn app icon itself cannot be changed from inside the app). Windows: swaps the window and taskbar icon; the exe's own icon needs a rebuild.",
+  "appIconHint": "The new icon is the packaged default. You can switch back to the original or use your own image. System coverage varies between Android and Windows.",
+  "appIconPresetNew": "New default",
+  "appIconPresetClassic": "Original icon",
+  "appIconPresetCustom": "Custom",
   "appIconPick": "Choose image",
   "appIconApply": "Apply to system",
   "appIconReset": "Restore default",
@@ -98,7 +108,7 @@
   "digestFailed": "Could not generate",
   "syncSection": "Data sync",
   "syncLocalTitle": "This device only",
-  "syncLocalSubtitle": "Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.",
+  "syncLocalSubtitle": "Your data stays in the local database by default. This version only checks local data and never uploads your schedule.",
   "syncNow": "Check local data",
   "syncLocalDone": "Local data is ready ({message})",
   "widgetSection": "Home-screen widget",
@@ -224,10 +234,6 @@
   },
   "homeAskAiHint": "Chat, query your schedule, create reminders",
   "homeOpenAi": "Open assistant",
-  "homePhaseBannerTitle": "Phase 2 · local database",
-  "homePhaseBannerBody": "Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.",
-  "homePhaseBannerDismiss": "Got it",
-
   "countdownTimeUntil": "Time until {title}",
   "@countdownTimeUntil": {
     "placeholders": {
@@ -369,7 +375,6 @@
   },
   "calendarNoEvents": "No events on this day",
   "calendarAllDay": "All day",
-  "calendarReadOnlyHint": "Read-only in this phase — creating and editing events arrives in Phase 3",
   "calendarEventDetail": "Event detail",
   "calendarClose": "Close",
   "calendarLocation": "Location",
@@ -383,6 +388,35 @@
     }
   },
   "calendarNoReminder": "None",
+  "calendarHolidaySection": "Holidays & 24 solar terms",
+  "calendarHolidayHint": "Built-in Gregorian and lunar festivals, Qingming and all 24 solar terms are available offline. Year-specific government holiday adjustments are not included.",
+  "calendarHolidayShow": "Show holidays and solar terms",
+  "calendarHolidayReminder": "Holiday and solar-term reminders",
+  "calendarHolidayReminderHint": "Send a system notification at 09:00 on the holiday or the selected number of days before it.",
+  "calendarHolidayReminderLead": "Reminder time",
+  "calendarHolidaySameDay": "Holiday at 09:00",
+  "calendarHolidayDaysAhead": "{days} day(s) early at 09:00",
+  "@calendarHolidayDaysAhead": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarHolidayPublic": "Public holiday",
+  "calendarHolidayTraditional": "Traditional festival",
+  "calendarSolarTerm": "Solar term",
+  "calendarNextHoliday": "Next: {name} · {date}",
+  "@calendarNextHoliday": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
 
   "aiPersona": "Persona",
   "aiComposerHint": "Message {personaName}…",
@@ -394,7 +428,6 @@
     }
   },
   "aiSend": "Send",
-  "aiMockNotice": "Mock conversation — the AI provider is not connected in this phase",
   "aiToolCallLabel": "Tool call",
   "aiToolRunning": "Looking up your schedule…",
   "aiToolDone": "Done",
@@ -516,6 +549,11 @@
   "avatarColor": "Background colour",
   "avatarClear": "Remove",
   "avatarChange": "Change avatar",
+  "avatarPresetTitle": "Built-in avatars",
+  "avatarPresetNewDefault": "New default",
+  "avatarPresetNewAlternative": "New avatar 2",
+  "avatarPresetClassicDefault": "Original avatar",
+  "avatarPresetClassicAlternative": "Original avatar 2",
   "aiPersonaDefaultPrompt": "You are the user's personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.",
   "aiPersonaCalendarAssistant": "Acting as a calendar assistant",
   "aiPersonaCalendarAssistantHint": "On: today's events and countdowns are sent to the AI as context, and it may add, edit or delete them with tools. Off: pure chat / roleplay — no schedule data is sent, no tools are offered, and schedule talk stays conversation and reminders.",
@@ -677,7 +715,6 @@
   "settingsLanguageChinese": "中文",
   "settingsLanguageEnglish": "English",
   "settingsAiSection": "AI & providers",
-  "settingsAiSectionSubtitle": "Provider, persona and tool permissions (Phase 6-8)",
   "settingsNotificationSection": "Notifications",
   "settingsNotificationSectionSubtitle": "System notifications on Android, toasts on Windows",
   "settingsNotificationPermission": "Permission",
@@ -714,8 +751,34 @@
       }
     }
   },
+  "notificationHolidayToday": "Today is {name}. Remember to plan your day.",
+  "@notificationHolidayToday": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationHolidayTomorrow": "Tomorrow is {name}. A little preparation will help.",
+  "@notificationHolidayTomorrow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationHolidayInDays": "{name} is in {days} days. A little preparation will help.",
+  "@notificationHolidayInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "settingsBackupSection": "Backup & restore",
-  "settingsBackupSectionSubtitle": "Versioned JSON export and import (Phase 12)",
   "backupIntro": "Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.",
   "backupIncludeApiKeys": "Include API keys",
   "backupIncludeApiKeysHint": "Off by default. The file is plain text — only turn this on if you will keep it somewhere safe.",
@@ -779,10 +842,45 @@
   "backupErrorCorrupted": "This backup is damaged and cannot be restored.",
   "settingsAbout": "About",
   "settingsVersion": "App version",
-  "settingsFlutterVersion": "Flutter",
-  "settingsDartVersion": "Dart",
-  "settingsProjectPath": "Project path",
-  "settingsPhaseNote": "Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.",
+  "settingsAboutDescription": "A local-first calendar, countdown and AI schedule assistant",
+  "settingsLocalDataNote": "Events, countdowns, reminders and settings are stored on this device by default.",
+  "settingsOpenSourceLicenses": "Open-source licenses",
+  "settingsMenuSubtitle": "Browse settings by category to find related options faster.",
+  "settingsMenuOpen": "Open settings",
+  "settingsGroupPersonalize": "Personalisation",
+  "settingsGroupSchedule": "Schedule & focus",
+  "settingsGroupSystem": "App & data",
+  "settingsAppearanceMenuHint": "Themes, typography, backgrounds, navigation icons and language",
+  "settingsAiMenuTitle": "AI & chat",
+  "settingsAiMenuHint": "Providers, persona avatars, tool access and chat appearance",
+  "settingsScheduleMenuTitle": "Calendar & reminders",
+  "settingsScheduleMenuHint": "Notifications, calendar categories, holidays and solar terms",
+  "settingsTimeMenuTitle": "Weather & briefings",
+  "settingsTimeMenuHint": "Weather locations, morning plans and evening reviews",
+  "settingsDataMenuTitle": "Data & sync",
+  "settingsDataMenuHint": "Backup, restore, local data checks and app information",
+  "settingsAppearanceSubtitle": "Manage Toki's colours, artwork and display language",
+  "settingsAiSubtitle": "Configure assistant capabilities, avatars and chat presentation",
+  "settingsScheduleSubtitle": "Manage reminders, categories and date information",
+  "settingsTimeSubtitle": "Configure local weather and daily briefings",
+  "settingsDataSubtitle": "Manage backups, sync and on-device data",
+  "settingsWidgetMenuHint": "Home-screen content, refresh and appearance",
+  "settingsAboutMenuHint": "Version, data notes and open-source licences",
+  "settingsThemeMenuHint": "Presets, user themes, font size and corner radius",
+  "settingsBackgroundMenuHint": "Application background, contrast and navigation icons",
+  "settingsAppIconMenuHint": "New default, original icon or a custom image",
+  "settingsLanguageMenuHint": "Follow the system, Chinese or English",
+  "settingsProviderMenuHint": "Base URL, API key, model and connection test",
+  "settingsPersonaMenuHint": "Personas, built-in avatars and custom avatars",
+  "settingsPermissionMenuHint": "Allow the assistant to read, create, update or delete",
+  "settingsChatAppearanceMenuHint": "Background, bubbles, text size and animation",
+  "settingsNotificationMenuHint": "Permission, precise reminders and test notification",
+  "settingsCalendarCategoryMenuHint": "Add, edit and delete event categories",
+  "settingsHolidayMenuHint": "Visibility, advance reminders and all 24 solar terms",
+  "settingsWeatherMenuHint": "City, current location and saved locations",
+  "settingsDigestMenuHint": "Morning plans and evening reviews",
+  "settingsBackupMenuHint": "Export, restore and backup files",
+  "settingsSyncMenuHint": "Check on-device data and sync state",
 
   "taskSection": "Tasks",
   "taskPageSubtitle": "Tasks do not need a time, and completing or archiving one never deletes linked events.",

@@ -36,6 +36,7 @@ class _ImageEditButtonState extends ConsumerState<ImageEditButton> {
   bool get _enabled {
     final value = widget.path?.trim() ?? '';
     if (value.isEmpty) return false;
+    if (value.startsWith('asset:')) return false;
     if (value.startsWith('http://') || value.startsWith('https://')) {
       return false;
     }

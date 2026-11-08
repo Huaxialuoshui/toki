@@ -22,7 +22,7 @@ import '../../shared/widgets/glass_card.dart';
 import '../widgets/page_scaffold.dart';
 import '../widgets/section_header.dart';
 
-/// 主题编辑器（规格 §11 / Phase 11）。
+/// 主题编辑器。
 ///
 /// 打开期间用 [themeDraftProvider] 让**整个应用**实时跟随草稿预览；
 /// 保存后写入 `theme_configs`（用户主题）并选中它。退出时清除草稿。

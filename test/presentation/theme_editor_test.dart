@@ -21,10 +21,10 @@ void main() {
   const Size surface = Size(1400, 1600);
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-appearance', 'settings-appearance-theme'],
     );
-    await tester.pumpAndSettle();
   }
 
   Future<void> tapText(WidgetTester tester, String text) async {

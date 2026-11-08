@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/nav_icon_config.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// 一个导航目的地（手机底栏 / 平板 Rail / 桌面 Sidebar 共用同一份定义）。
@@ -9,17 +10,20 @@ class ShellDestination {
     required this.icon,
     required this.selectedIcon,
     required this.label,
+    this.customIconPath,
   });
 
   final String route;
   final IconData icon;
   final IconData selectedIcon;
   final String label;
+  final String? customIconPath;
 }
 
 List<ShellDestination> buildShellDestinations(
   AppLocalizations l10n, {
   bool filledIcons = false,
+  NavIconConfig navIcons = const NavIconConfig(),
 }) {
   ShellDestination of(
     String route,
@@ -33,6 +37,7 @@ List<ShellDestination> buildShellDestinations(
         icon: filledIcons ? filled : outlined,
         selectedIcon: filled,
         label: label,
+        customIconPath: navIcons.pathFor(route),
       );
 
   return <ShellDestination>[

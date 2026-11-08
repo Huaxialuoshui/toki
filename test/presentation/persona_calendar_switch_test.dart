@@ -23,10 +23,10 @@ void main() {
       );
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>['settings-menu-ai', 'settings-ai-personas'],
     );
-    await tester.pumpAndSettle();
   }
 
   Future<void> openAi(WidgetTester tester) async {

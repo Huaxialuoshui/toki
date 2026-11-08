@@ -8,10 +8,13 @@ void main() {
   const Size surface = Size(1400, 1400);
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-schedule',
+        'settings-schedule-notifications',
+      ],
     );
-    await tester.pumpAndSettle();
   }
 
   /// 设置页很长，先把目标控件滚进可视区域再操作。

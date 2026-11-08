@@ -9,6 +9,7 @@ import '../../application/ai/chat_controller.dart';
 import '../../application/ai/ai_providers.dart';
 import '../../application/ai/chat_appearance_controller.dart';
 import '../../application/ai/persona_actions.dart';
+import '../../core/constants/brand_assets.dart';
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
 import '../../domain/entities/avatar_config.dart';
@@ -561,11 +562,9 @@ class _AiPageState extends ConsumerState<AiPage> {
     }
     final result = await showAvatarEditor(
       context,
-      initial: AvatarConfig.fromLegacy(
-        persona.avatar,
-        color: persona.avatarColor,
-      ),
+      initial: _assistantAvatarConfig(persona),
       title: l10n.aiAvatarAssistant,
+      presets: assistantAvatarPresets(l10n),
     );
     if (result == null || !mounted) return;
     await ref.read(personaActionsProvider).save(
@@ -579,6 +578,19 @@ class _AiPageState extends ConsumerState<AiPage> {
         );
     if (!mounted) return;
     messenger?.showSnackBar(SnackBar(content: Text(l10n.aiAvatarSaved)));
+  }
+
+  AvatarConfig _assistantAvatarConfig(AiPersona persona) {
+    final current = AvatarConfig.fromLegacy(
+      persona.avatar,
+      color: persona.avatarColor,
+    );
+    if (!current.isEmpty) return current;
+    return AvatarConfig(
+      kind: AvatarKind.image,
+      value: BrandAssets.assetValue(BrandAssets.newAssistantAvatar1),
+      color: persona.avatarColor,
+    );
   }
 
   /// 危险操作的二次确认。

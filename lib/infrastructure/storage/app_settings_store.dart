@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 应用级轻量设置存储。
 ///
 /// 边界（重要）：这里**只**放应用级轻量设置——语言、当前主题 id、是否跟随系统、
-/// 字号 / 圆角微调、首次启动标记。
+/// 字号 / 圆角微调。
 ///
 /// 领域数据（日程、倒计时、提醒、人设、会话）以及**用户自建 / 导入导出的主题**
 /// 归数据库负责；Phase 2 建库时不会迁移这里的任何键，两类数据互不承担。
@@ -18,7 +18,6 @@ class AppSettingsStore {
   static const String _followSystemKey = 'settings.followSystem';
   static const String _fontScaleKey = 'settings.fontScale';
   static const String _borderRadiusKey = 'settings.borderRadius';
-  static const String _firstLaunchSeenKey = 'settings.firstLaunchSeen';
   static const String _scheduledNotificationIdsKey =
       'settings.scheduledNotificationIds';
   static const String _aiAllowReadKey = 'settings.ai.allowRead';
@@ -34,7 +33,11 @@ class AppSettingsStore {
   static const String _appBackgroundKey = 'settings.appBackground';
   static const String _appAutoContrastKey = 'settings.appAutoContrast';
   static const String _iconStyleKey = 'settings.iconStyle';
+  static const String _navIconsKey = 'settings.navIcons';
   static const String _appIconKey = 'settings.appIcon';
+  static const String _calendarHolidaysKey = 'settings.calendarHolidays';
+  static const String _holidayRemindersKey = 'settings.holidayReminders';
+  static const String _holidayReminderDaysKey = 'settings.holidayReminderDays';
   static const String _digestMorningKey = 'settings.digest.morning';
   static const String _digestEveningKey = 'settings.digest.evening';
 
@@ -78,12 +81,6 @@ class AppSettingsStore {
       await _preferences.setDouble(_borderRadiusKey, value);
     }
   }
-
-  bool readFirstLaunchSeen() =>
-      _preferences.getBool(_firstLaunchSeenKey) ?? false;
-
-  Future<void> markFirstLaunchSeen() =>
-      _preferences.setBool(_firstLaunchSeenKey, true);
 
   /// 最近一次已排期的通知 id（用于取消已删除/已停用提醒留下的排期）。
   List<int> readScheduledNotificationIds() {
@@ -184,12 +181,39 @@ class AppSettingsStore {
   Future<void> writeIconStyle(String value) =>
       _preferences.setString(_iconStyleKey, value);
 
+  /// 一级导航自定义图标：JSON 对象，键为路由，值为本机图片路径。
+  String? readNavIcons() => _preferences.getString(_navIconsKey);
+
+  Future<void> writeNavIcons(String json) =>
+      _preferences.setString(_navIconsKey, json);
+
   /// 自定义应用图标的图片路径（本机文件；空表示用默认图标）。
   String? readAppIcon() => _preferences.getString(_appIconKey);
 
   Future<void> writeAppIcon(String? path) => path == null
       ? _preferences.remove(_appIconKey)
       : _preferences.setString(_appIconKey, path);
+
+  /// 是否在日历里显示节日，默认开启。
+  bool readCalendarHolidays() =>
+      _preferences.getBool(_calendarHolidaysKey) ?? true;
+
+  Future<void> writeCalendarHolidays(bool value) =>
+      _preferences.setBool(_calendarHolidaysKey, value);
+
+  /// 是否发送节日提醒，默认开启。
+  bool readHolidayReminders() =>
+      _preferences.getBool(_holidayRemindersKey) ?? true;
+
+  Future<void> writeHolidayReminders(bool value) =>
+      _preferences.setBool(_holidayRemindersKey, value);
+
+  /// 节日提前量，默认提前 1 天；0 表示当天提醒。
+  int readHolidayReminderDays() =>
+      _preferences.getInt(_holidayReminderDaysKey) ?? 1;
+
+  Future<void> writeHolidayReminderDays(int value) =>
+      _preferences.setInt(_holidayReminderDaysKey, value);
 
   /// AI 每日计划 / 每日总结开关（规格 §14），默认都关闭。
   bool readMorningDigestEnabled() =>

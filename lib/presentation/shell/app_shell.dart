@@ -35,6 +35,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final destinations = buildShellDestinations(
       context.l10n,
       filledIcons: ref.watch(appIconStyleProvider) == AppIconStyle.filled,
+      navIcons: ref.watch(navIconProvider),
     );
     final currentIndex = widget.navigationShell.currentIndex;
     final body = widget.navigationShell;

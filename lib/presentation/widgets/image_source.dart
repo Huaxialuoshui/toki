@@ -3,12 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 /// 把用户填的字符串解析成图片源：
+/// * `asset:assets/...` → 应用内置图片
 /// * `http(s)://...` → 网络图片
 /// * 含路径分隔符或图片后缀 → 本地文件
 /// * 其它 → null（调用方回落到文字 / 纯色）
 ImageProvider? resolveImageProvider(String? value) {
   final text = value?.trim() ?? '';
   if (text.isEmpty) return null;
+  if (text.startsWith('asset:')) {
+    final assetPath = text.substring('asset:'.length).trim();
+    return assetPath.isEmpty ? null : AssetImage(assetPath);
+  }
   if (text.startsWith('http://') || text.startsWith('https://')) {
     return NetworkImage(text);
   }

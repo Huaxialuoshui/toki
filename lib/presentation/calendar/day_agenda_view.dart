@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/extensions/l10n_extension.dart';
 import '../../core/utils/date_formats.dart';
+import '../../domain/entities/calendar_holiday.dart';
 import '../../domain/entities/calendar_event.dart';
 import '../../domain/services/recurrence.dart';
 import '../../shared/widgets/glass_card.dart';
 import '../widgets/event_tile.dart';
+import '../widgets/holiday_tile.dart';
 
 /// 日视图（议程式）：只显示选中的那一天。
 class DayAgendaView extends StatelessWidget {
@@ -13,12 +15,14 @@ class DayAgendaView extends StatelessWidget {
     super.key,
     required this.day,
     required this.events,
+    required this.holidays,
     required this.onSelectEvent,
     required this.onAddForDay,
   });
 
   final DateTime day;
   final List<EventOccurrence> events;
+  final List<CalendarHoliday> holidays;
   final ValueChanged<CalendarEvent> onSelectEvent;
   final ValueChanged<DateTime> onAddForDay;
 
@@ -54,14 +58,19 @@ class DayAgendaView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              if (events.isEmpty)
+              if (events.isEmpty && holidays.isEmpty)
                 Text(
                   l10n.calendarNoEvents,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 )
-              else
+              else ...<Widget>[
+                for (final holiday in holidays)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: HolidayTile(holiday: holiday, compact: true),
+                  ),
                 for (final occurrence in events)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
@@ -72,6 +81,7 @@ class DayAgendaView extends StatelessWidget {
                       onTap: () => onSelectEvent(occurrence.event),
                     ),
                   ),
+              ],
             ],
           ),
         ),

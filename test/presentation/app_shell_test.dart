@@ -81,7 +81,12 @@ void main() {
       await pumpTokiApp(tester, size: const Size(420, 900));
       expect(find.text("Today's schedule"), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text('Calendar'),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Month'), findsOneWidget);
     });

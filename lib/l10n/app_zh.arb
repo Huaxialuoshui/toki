@@ -8,7 +8,6 @@
   "navCountdown": "倒计时",
   "navAi": "AI 助手",
   "navSettings": "设置",
-  "commonComingSoon": "后续阶段提供",
   "commonViewAll": "查看全部",
 
   "homeGreeting": "欢迎回来",
@@ -49,14 +48,25 @@
   "weatherToday": "今天",
   "weatherNoForecast": "暂无预报数据",
   "appBackground": "应用背景",
+  "settingsVisualSection": "界面与图标",
   "appBackgroundHint": "作用于所有页面；聊天页有自己独立的背景（见上面的区块）。",
   "appAutoContrast": "自动适配文字颜色",
   "appAutoContrastHint": "根据背景明暗自动切换深浅文字；背景明暗混杂时会加一层轻遮罩，避免局部深色像素压住黑色文字。",
   "iconStyle": "图标风格",
   "iconStyleOutlined": "描边",
   "iconStyleFilled": "实心",
+  "navIconSection": "导航图标",
+  "navIconHint": "默认使用新版角色图标；可一键切回原图标，也可以为每个页面选择自己的图片。",
+  "navIconPresetNew": "新版默认",
+  "navIconPresetClassic": "原版图标",
+  "navIconPick": "选择图标",
+  "navIconReset": "恢复默认",
+  "navIconResetAll": "全部恢复默认",
   "appIcon": "应用图标",
-  "appIconHint": "用自己的图片做图标。Android：换掉「最近任务」里的图标，并生成一个带这张图的桌面快捷方式（系统会弹一次确认，点「添加」即可；桌面原图标由启动器绘制，改不了）。Windows：换掉窗口标题栏与任务栏图标，exe 自身的图标需要重新打包。",
+  "appIconHint": "新版图标已是安装包默认。也可以切回原版，或用自己的图片；Android 与 Windows 的系统适用范围如下。",
+  "appIconPresetNew": "新版默认",
+  "appIconPresetClassic": "原版图标",
+  "appIconPresetCustom": "自定义",
   "appIconPick": "选择图片",
   "appIconApply": "应用到系统",
   "appIconReset": "恢复默认",
@@ -85,7 +95,7 @@
   "digestFailed": "生成失败",
   "syncSection": "数据同步",
   "syncLocalTitle": "仅本机",
-  "syncLocalSubtitle": "第一版是本地优先：数据都在本机数据库里。WebDAV / 自建服务器 / 云同步会复用同一个 SyncService 接口，属于后续阶段。",
+  "syncLocalSubtitle": "数据默认保存在本机数据库。当前版本只提供本地同步检查，不会上传你的日程。",
   "syncNow": "检查本地数据",
   "syncLocalDone": "本地数据正常（{message}）",
   "widgetSection": "桌面小组件",
@@ -160,10 +170,6 @@
   "homeAskAi": "问问{personaName}",
   "homeAskAiHint": "聊天、查询日程、创建提醒",
   "homeOpenAi": "打开助手",
-  "homePhaseBannerTitle": "Phase 2 · 本地数据库",
-  "homePhaseBannerBody": "日程、倒计时与提醒现在都存在本机的 SQLite 数据库里；示例数据只会在 debug 构建写入。",
-  "homePhaseBannerDismiss": "知道了",
-
   "countdownTimeUntil": "距离「{title}」还有",
   "countdownTimeSince": "「{title}」已经过去",
   "countdownTargetAt": "目标时间 {time}",
@@ -249,18 +255,45 @@
   "calendarEventsOn": "{date} 的日程",
   "calendarNoEvents": "这一天没有日程",
   "calendarAllDay": "全天",
-  "calendarReadOnlyHint": "本阶段只读，创建与编辑日程在 Phase 3 提供",
   "calendarEventDetail": "日程详情",
   "calendarClose": "关闭",
   "calendarLocation": "地点",
   "calendarReminder": "提醒",
   "calendarReminderMinutes": "提前 {minutes} 分钟",
   "calendarNoReminder": "无",
+  "calendarHolidaySection": "节日与二十四节气",
+  "calendarHolidayHint": "内置公历、农历节日、清明和完整二十四节气，离线可用；不包含每年临时发布的调休安排。",
+  "calendarHolidayShow": "在日历中显示节日与节气",
+  "calendarHolidayReminder": "节日与节气提醒",
+  "calendarHolidayReminderHint": "在当天 09:00 或按提前天数发送系统通知。",
+  "calendarHolidayReminderLead": "提醒时间",
+  "calendarHolidaySameDay": "节日当天 09:00",
+  "calendarHolidayDaysAhead": "提前 {days} 天 09:00",
+  "@calendarHolidayDaysAhead": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarHolidayPublic": "法定 / 公共节日",
+  "calendarHolidayTraditional": "传统节日",
+  "calendarSolarTerm": "二十四节气",
+  "calendarNextHoliday": "下一次：{name} · {date}",
+  "@calendarNextHoliday": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
 
   "aiPersona": "人设",
   "aiComposerHint": "给{personaName}发消息…",
   "aiSend": "发送",
-  "aiMockNotice": "这是 mock 会话，本阶段尚未接入 AI Provider",
   "aiToolCallLabel": "工具调用",
   "aiToolRunning": "正在查询日程…",
   "aiToolDone": "已完成",
@@ -347,6 +380,11 @@
   "avatarColor": "底色",
   "avatarClear": "移除",
   "avatarChange": "更换头像",
+  "avatarPresetTitle": "内置头像",
+  "avatarPresetNewDefault": "新版默认",
+  "avatarPresetNewAlternative": "新版头像 2",
+  "avatarPresetClassicDefault": "原版头像",
+  "avatarPresetClassicAlternative": "原版头像 2",
   "aiPersonaDefaultPrompt": "你是用户的私人日程助手。回答自然简洁。修改日程时必须使用工具，不要虚构已经完成的操作。",
   "aiPersonaCalendarAssistant": "作为日历助手",
   "aiPersonaCalendarAssistantHint": "打开：把今天的日程 / 倒计时作为上下文发给 AI，并允许它用工具增删改日程。关闭：纯聊天 / 扮演，不注入任何日程数据、也不给工具，提到日程只当聊天与提醒。",
@@ -459,7 +497,6 @@
   "settingsLanguageChinese": "中文",
   "settingsLanguageEnglish": "English",
   "settingsAiSection": "AI 与服务商",
-  "settingsAiSectionSubtitle": "服务商、人设与工具权限设置（Phase 6-8）",
   "settingsNotificationSection": "通知提醒",
   "settingsNotificationSectionSubtitle": "Android 用系统本地通知，Windows 用系统 Toast",
   "settingsNotificationPermission": "通知权限",
@@ -475,8 +512,34 @@
   "notificationLeadMinutes": "{minutes} 分钟后开始",
   "notificationLeadHours": "{hours} 小时后开始",
   "notificationLeadDays": "{days} 天后开始",
+  "notificationHolidayToday": "今天是{name}，记得提前安排今天的行程。",
+  "@notificationHolidayToday": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationHolidayTomorrow": "明天是{name}，提前做好准备吧。",
+  "@notificationHolidayTomorrow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationHolidayInDays": "{days} 天后是{name}，提前做好准备吧。",
+  "@notificationHolidayInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "settingsBackupSection": "备份与恢复",
-  "settingsBackupSectionSubtitle": "带版本控制的 JSON 导入导出（Phase 12）",
   "backupIntro": "把全部数据导出成一个 JSON 文件：日程、倒计时、提醒、人设、服务商、聊天记录与主题。恢复时可选择覆盖或合并。",
   "backupIncludeApiKeys": "导出时包含 API Key",
   "backupIncludeApiKeysHint": "默认关闭。备份文件是明文，只有你确认能妥善保管时再打开。",
@@ -506,10 +569,45 @@
   "backupErrorCorrupted": "这份备份已损坏，无法恢复。",
   "settingsAbout": "关于",
   "settingsVersion": "应用版本",
-  "settingsFlutterVersion": "Flutter",
-  "settingsDartVersion": "Dart",
-  "settingsProjectPath": "项目路径",
-  "settingsPhaseNote": "Phase 12 — 日历、倒计时、系统通知、AI 助手（含工具调用）、主题编辑器与备份恢复均已可用。",
+  "settingsAboutDescription": "本地优先的日历、倒计时与 AI 日程助手",
+  "settingsLocalDataNote": "日程、倒计时、提醒与设置默认保存在本机。",
+  "settingsOpenSourceLicenses": "开源许可",
+  "settingsMenuSubtitle": "按类别进入设置，修改更集中，也更容易找到。",
+  "settingsMenuOpen": "打开设置",
+  "settingsGroupPersonalize": "个性化",
+  "settingsGroupSchedule": "日程与效率",
+  "settingsGroupSystem": "应用与数据",
+  "settingsAppearanceMenuHint": "主题、字体、背景、导航图标与语言",
+  "settingsAiMenuTitle": "AI 与聊天",
+  "settingsAiMenuHint": "服务商、人设头像、工具权限与聊天外观",
+  "settingsScheduleMenuTitle": "日历与提醒",
+  "settingsScheduleMenuHint": "通知、日历分类、节日与二十四节气",
+  "settingsTimeMenuTitle": "天气与简报",
+  "settingsTimeMenuHint": "天气位置、早间计划与晚间总结",
+  "settingsDataMenuTitle": "数据与同步",
+  "settingsDataMenuHint": "备份恢复、本地数据检查与安装信息",
+  "settingsAppearanceSubtitle": "管理 Toki 的配色、图形和显示语言",
+  "settingsAiSubtitle": "配置助手能力、头像和对话呈现",
+  "settingsScheduleSubtitle": "管理提醒、分类与日期信息",
+  "settingsTimeSubtitle": "配置位置天气和每日简报",
+  "settingsDataSubtitle": "管理备份、同步和本机数据",
+  "settingsWidgetMenuHint": "桌面显示内容、刷新与外观",
+  "settingsAboutMenuHint": "版本、数据说明与开源许可",
+  "settingsThemeMenuHint": "预设、用户主题、字号与圆角",
+  "settingsBackgroundMenuHint": "应用背景、自动对比度与导航图标",
+  "settingsAppIconMenuHint": "新版默认、原版图标与自定义图片",
+  "settingsLanguageMenuHint": "跟随系统、中文或 English",
+  "settingsProviderMenuHint": "Base URL、API Key、模型与连接测试",
+  "settingsPersonaMenuHint": "人设、内置头像与自定义头像",
+  "settingsPermissionMenuHint": "允许助手查询、创建、修改或删除",
+  "settingsChatAppearanceMenuHint": "背景、气泡、字号与动画",
+  "settingsNotificationMenuHint": "权限、精确提醒与测试通知",
+  "settingsCalendarCategoryMenuHint": "新增、编辑与删除日程分类",
+  "settingsHolidayMenuHint": "显示开关、提前提醒与二十四节气",
+  "settingsWeatherMenuHint": "城市、当前位置与历史位置",
+  "settingsDigestMenuHint": "早间计划与晚间总结",
+  "settingsBackupMenuHint": "导出、恢复与备份文件",
+  "settingsSyncMenuHint": "检查本机数据与同步状态",
 
   "taskSection": "任务",
   "taskPageSubtitle": "任务可以没有时间，完成或归档都不会删除关联日程。",

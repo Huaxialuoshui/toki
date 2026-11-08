@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toki/domain/entities/chat_appearance.dart';
+import 'package:toki/presentation/widgets/brand_icon.dart';
 import 'package:toki/presentation/widgets/chat_background.dart';
 import 'package:toki/presentation/widgets/page_scaffold.dart';
 
@@ -21,10 +22,13 @@ void main() {
       );
 
   Future<void> openSettings(WidgetTester tester) async {
-    await tester.tap(
-      find.byKey(const ValueKey<String>('sidebar-tile-/settings')),
+    await openSettingsPath(
+      tester,
+      <String>[
+        'settings-menu-appearance',
+        'settings-appearance-background',
+      ],
     );
-    await tester.pumpAndSettle();
   }
 
   Future<void> scrollTo(WidgetTester tester, Finder target) async {
@@ -133,22 +137,22 @@ void main() {
     );
   });
 
-  tokiWidgetTest('设置页切换图标风格后导航图标变实心并持久化', (tester) async {
+  tokiWidgetTest('设置页切换图标风格，并可切回原版导航图标', (tester) async {
     await pumpTokiApp(tester, size: surface, seedDatabase: false);
     await openSettings(tester);
 
-    Icon homeIcon() => tester.widget<Icon>(
+    BrandNavigationIcon homeIcon() => tester.widget<BrandNavigationIcon>(
           find
               .descendant(
                 of: find.byKey(
                   const ValueKey<String>('sidebar-tile-/home'),
                 ),
-                matching: find.byType(Icon),
+                matching: find.byType(BrandNavigationIcon),
               )
               .first,
         );
 
-    expect(homeIcon().icon, Icons.dashboard_outlined);
+    expect(homeIcon().storedPath, isNull);
 
     final filled = find.descendant(
       of: find.byKey(const ValueKey<String>('icon-style')),
@@ -158,8 +162,15 @@ void main() {
     await tester.tap(filled);
     await tester.pumpAndSettle();
 
-    expect(homeIcon().icon, Icons.dashboard);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('settings.iconStyle'), 'filled');
+
+    final classic = find.byKey(
+      const ValueKey<String>('nav-icon-preset-classic'),
+    );
+    await scrollTo(tester, classic);
+    await tester.tap(classic);
+    await tester.pumpAndSettle();
+    expect(homeIcon().storedPath, contains('/classic/'));
   });
 }

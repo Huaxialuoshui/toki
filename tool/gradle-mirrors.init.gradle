@@ -1,0 +1,46 @@
+// Toki packaging-only Gradle mirror.
+//
+// Flutter 自带的 Gradle 插件是一个 included build，它自己的 settings.gradle.kts
+// 会把 google() 放在仓库列表最前面。只在项目 settings.gradle 里换源无法覆盖
+// 这个 included build，所以打包脚本会临时启用这个 init script。
+//
+// 仅当 TOKI_GRADLE_MIRRORS=1 时生效，不影响这台机器上的其它 Gradle 项目。
+
+def tokiMirrorsEnabled = System.getenv('TOKI_GRADLE_MIRRORS') == '1'
+
+def addMirrors = { repositories ->
+    repositories.maven {
+        name = 'TokiAliyunGoogle'
+        url = uri('https://maven.aliyun.com/repository/google')
+    }
+    repositories.maven {
+        name = 'TokiAliyunCentral'
+        url = uri('https://maven.aliyun.com/repository/central')
+    }
+    repositories.maven {
+        name = 'TokiAliyunGradlePlugin'
+        url = uri('https://maven.aliyun.com/repository/gradle-plugin')
+    }
+    repositories.mavenCentral()
+    repositories.gradlePluginPortal()
+}
+
+if (tokiMirrorsEnabled) {
+    beforeSettings { settings ->
+        addMirrors(settings.pluginManagement.repositories)
+    }
+
+    settingsEvaluated { settings ->
+        // included build 会声明 FAIL_ON_PROJECT_REPOS，从 settings 层替换仓库最可靠。
+        // Flutter 的 included build 只需要 Google Maven 与 Maven Central，两者都有镜像。
+        def repositories = settings.dependencyResolutionManagement.repositories
+        repositories.clear()
+        addMirrors(repositories)
+    }
+
+    allprojects { project ->
+        // dependency_version_checker.gradle.kts 自己声明了 buildscript 仓库，
+        // 这里也先插入镜像，避免它绕回 dl.google.com。
+        addMirrors(project.buildscript.repositories)
+    }
+}

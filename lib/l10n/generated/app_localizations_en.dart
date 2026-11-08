@@ -28,9 +28,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
-  String get commonComingSoon => 'Planned for a later phase';
-
-  @override
   String get commonViewAll => 'View all';
 
   @override
@@ -131,6 +128,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appBackground => 'App background';
 
   @override
+  String get settingsVisualSection => 'Interface & icons';
+
+  @override
   String get appBackgroundHint => 'Applies behind every page. Chat has its own background in the section above.';
 
   @override
@@ -149,10 +149,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get iconStyleFilled => 'Filled';
 
   @override
+  String get navIconSection => 'Navigation icons';
+
+  @override
+  String get navIconHint => 'The new character icons are the default. Switch back to the original set or choose a custom image for each destination.';
+
+  @override
+  String get navIconPresetNew => 'New default';
+
+  @override
+  String get navIconPresetClassic => 'Original icons';
+
+  @override
+  String get navIconPick => 'Choose icon';
+
+  @override
+  String get navIconReset => 'Restore default';
+
+  @override
+  String get navIconResetAll => 'Restore all defaults';
+
+  @override
   String get appIcon => 'App icon';
 
   @override
-  String get appIconHint => 'Use your own picture as the icon. Android: swaps the icon in Recents and creates a home-screen shortcut with this picture (the system asks for confirmation — tap Add; the launcher-drawn app icon itself cannot be changed from inside the app). Windows: swaps the window and taskbar icon; the exe\'s own icon needs a rebuild.';
+  String get appIconHint => 'The new icon is the packaged default. You can switch back to the original or use your own image. System coverage varies between Android and Windows.';
+
+  @override
+  String get appIconPresetNew => 'New default';
+
+  @override
+  String get appIconPresetClassic => 'Original icon';
+
+  @override
+  String get appIconPresetCustom => 'Custom';
 
   @override
   String get appIconPick => 'Choose image';
@@ -239,7 +269,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncLocalTitle => 'This device only';
 
   @override
-  String get syncLocalSubtitle => 'Version 1 is local-first: everything lives in the local database. WebDAV / self-hosted / cloud sync is planned behind the same SyncService interface.';
+  String get syncLocalSubtitle => 'Your data stays in the local database by default. This version only checks local data and never uploads your schedule.';
 
   @override
   String get syncNow => 'Check local data';
@@ -419,15 +449,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeOpenAi => 'Open assistant';
-
-  @override
-  String get homePhaseBannerTitle => 'Phase 2 · local database';
-
-  @override
-  String get homePhaseBannerBody => 'Events, countdowns and reminders are now stored in a local SQLite database on this device. Sample rows are only written in debug builds.';
-
-  @override
-  String get homePhaseBannerDismiss => 'Got it';
 
   @override
   String countdownTimeUntil(String title) {
@@ -698,9 +719,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarAllDay => 'All day';
 
   @override
-  String get calendarReadOnlyHint => 'Read-only in this phase — creating and editing events arrives in Phase 3';
-
-  @override
   String get calendarEventDetail => 'Event detail';
 
   @override
@@ -721,6 +739,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarNoReminder => 'None';
 
   @override
+  String get calendarHolidaySection => 'Holidays & 24 solar terms';
+
+  @override
+  String get calendarHolidayHint => 'Built-in Gregorian and lunar festivals, Qingming and all 24 solar terms are available offline. Year-specific government holiday adjustments are not included.';
+
+  @override
+  String get calendarHolidayShow => 'Show holidays and solar terms';
+
+  @override
+  String get calendarHolidayReminder => 'Holiday and solar-term reminders';
+
+  @override
+  String get calendarHolidayReminderHint => 'Send a system notification at 09:00 on the holiday or the selected number of days before it.';
+
+  @override
+  String get calendarHolidayReminderLead => 'Reminder time';
+
+  @override
+  String get calendarHolidaySameDay => 'Holiday at 09:00';
+
+  @override
+  String calendarHolidayDaysAhead(int days) {
+    return '$days day(s) early at 09:00';
+  }
+
+  @override
+  String get calendarHolidayPublic => 'Public holiday';
+
+  @override
+  String get calendarHolidayTraditional => 'Traditional festival';
+
+  @override
+  String get calendarSolarTerm => 'Solar term';
+
+  @override
+  String calendarNextHoliday(String name, String date) {
+    return 'Next: $name · $date';
+  }
+
+  @override
   String get aiPersona => 'Persona';
 
   @override
@@ -730,9 +788,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiSend => 'Send';
-
-  @override
-  String get aiMockNotice => 'Mock conversation — the AI provider is not connected in this phase';
 
   @override
   String get aiToolCallLabel => 'Tool call';
@@ -1003,6 +1058,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarChange => 'Change avatar';
+
+  @override
+  String get avatarPresetTitle => 'Built-in avatars';
+
+  @override
+  String get avatarPresetNewDefault => 'New default';
+
+  @override
+  String get avatarPresetNewAlternative => 'New avatar 2';
+
+  @override
+  String get avatarPresetClassicDefault => 'Original avatar';
+
+  @override
+  String get avatarPresetClassicAlternative => 'Original avatar 2';
 
   @override
   String get aiPersonaDefaultPrompt => 'You are the user\'s personal schedule assistant. Keep answers short and natural. Always use tools when changing the calendar, and never claim an action you did not perform.';
@@ -1347,9 +1417,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAiSection => 'AI & providers';
 
   @override
-  String get settingsAiSectionSubtitle => 'Provider, persona and tool permissions (Phase 6-8)';
-
-  @override
   String get settingsNotificationSection => 'Notifications';
 
   @override
@@ -1401,10 +1468,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsBackupSection => 'Backup & restore';
+  String notificationHolidayToday(String name) {
+    return 'Today is $name. Remember to plan your day.';
+  }
 
   @override
-  String get settingsBackupSectionSubtitle => 'Versioned JSON export and import (Phase 12)';
+  String notificationHolidayTomorrow(String name) {
+    return 'Tomorrow is $name. A little preparation will help.';
+  }
+
+  @override
+  String notificationHolidayInDays(int days, String name) {
+    return '$name is in $days days. A little preparation will help.';
+  }
+
+  @override
+  String get settingsBackupSection => 'Backup & restore';
 
   @override
   String get backupIntro => 'Exports every table as one JSON file: events, countdowns, reminders, personas, providers, chats and themes. Restoring replaces or merges the local data.';
@@ -1502,16 +1581,121 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVersion => 'App version';
 
   @override
-  String get settingsFlutterVersion => 'Flutter';
+  String get settingsAboutDescription => 'A local-first calendar, countdown and AI schedule assistant';
 
   @override
-  String get settingsDartVersion => 'Dart';
+  String get settingsLocalDataNote => 'Events, countdowns, reminders and settings are stored on this device by default.';
 
   @override
-  String get settingsProjectPath => 'Project path';
+  String get settingsOpenSourceLicenses => 'Open-source licenses';
 
   @override
-  String get settingsPhaseNote => 'Phase 12 — calendar, countdowns, notifications, the AI assistant (with tool calling), theme editing and backup/restore are working.';
+  String get settingsMenuSubtitle => 'Browse settings by category to find related options faster.';
+
+  @override
+  String get settingsMenuOpen => 'Open settings';
+
+  @override
+  String get settingsGroupPersonalize => 'Personalisation';
+
+  @override
+  String get settingsGroupSchedule => 'Schedule & focus';
+
+  @override
+  String get settingsGroupSystem => 'App & data';
+
+  @override
+  String get settingsAppearanceMenuHint => 'Themes, typography, backgrounds, navigation icons and language';
+
+  @override
+  String get settingsAiMenuTitle => 'AI & chat';
+
+  @override
+  String get settingsAiMenuHint => 'Providers, persona avatars, tool access and chat appearance';
+
+  @override
+  String get settingsScheduleMenuTitle => 'Calendar & reminders';
+
+  @override
+  String get settingsScheduleMenuHint => 'Notifications, calendar categories, holidays and solar terms';
+
+  @override
+  String get settingsTimeMenuTitle => 'Weather & briefings';
+
+  @override
+  String get settingsTimeMenuHint => 'Weather locations, morning plans and evening reviews';
+
+  @override
+  String get settingsDataMenuTitle => 'Data & sync';
+
+  @override
+  String get settingsDataMenuHint => 'Backup, restore, local data checks and app information';
+
+  @override
+  String get settingsAppearanceSubtitle => 'Manage Toki\'s colours, artwork and display language';
+
+  @override
+  String get settingsAiSubtitle => 'Configure assistant capabilities, avatars and chat presentation';
+
+  @override
+  String get settingsScheduleSubtitle => 'Manage reminders, categories and date information';
+
+  @override
+  String get settingsTimeSubtitle => 'Configure local weather and daily briefings';
+
+  @override
+  String get settingsDataSubtitle => 'Manage backups, sync and on-device data';
+
+  @override
+  String get settingsWidgetMenuHint => 'Home-screen content, refresh and appearance';
+
+  @override
+  String get settingsAboutMenuHint => 'Version, data notes and open-source licences';
+
+  @override
+  String get settingsThemeMenuHint => 'Presets, user themes, font size and corner radius';
+
+  @override
+  String get settingsBackgroundMenuHint => 'Application background, contrast and navigation icons';
+
+  @override
+  String get settingsAppIconMenuHint => 'New default, original icon or a custom image';
+
+  @override
+  String get settingsLanguageMenuHint => 'Follow the system, Chinese or English';
+
+  @override
+  String get settingsProviderMenuHint => 'Base URL, API key, model and connection test';
+
+  @override
+  String get settingsPersonaMenuHint => 'Personas, built-in avatars and custom avatars';
+
+  @override
+  String get settingsPermissionMenuHint => 'Allow the assistant to read, create, update or delete';
+
+  @override
+  String get settingsChatAppearanceMenuHint => 'Background, bubbles, text size and animation';
+
+  @override
+  String get settingsNotificationMenuHint => 'Permission, precise reminders and test notification';
+
+  @override
+  String get settingsCalendarCategoryMenuHint => 'Add, edit and delete event categories';
+
+  @override
+  String get settingsHolidayMenuHint => 'Visibility, advance reminders and all 24 solar terms';
+
+  @override
+  String get settingsWeatherMenuHint => 'City, current location and saved locations';
+
+  @override
+  String get settingsDigestMenuHint => 'Morning plans and evening reviews';
+
+  @override
+  String get settingsBackupMenuHint => 'Export, restore and backup files';
+
+  @override
+  String get settingsSyncMenuHint => 'Check on-device data and sync state';
 
   @override
   String get taskSection => 'Tasks';

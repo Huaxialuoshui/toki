@@ -4,8 +4,11 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../infrastructure/device/app_icon_service.dart';
+import '../../core/constants/brand_assets.dart';
 import '../../domain/entities/chat_appearance.dart';
+import '../../domain/entities/nav_icon_config.dart';
 import '../device/device_providers.dart';
+import '../../infrastructure/storage/local_image_store.dart';
 import '../../infrastructure/storage/app_settings_store.dart';
 
 /// 图标风格：描边 / 实心（规格 §9「图标风格」）。
@@ -87,6 +90,43 @@ final appIconStyleProvider =
   AppIconStyleController.new,
 );
 
+/// 五个一级导航目的地各自的自定义图标。
+class NavIconController extends Notifier<NavIconConfig> {
+  @override
+  NavIconConfig build() => NavIconConfig.fromJson(
+        ref.watch(appSettingsStoreProvider).readNavIcons(),
+      );
+
+  Future<void> setPath(String route, String? path) async {
+    if (!NavIconConfig.routes.contains(route)) return;
+    final next = state.withPath(route, path);
+    state = next;
+    await ref.read(appSettingsStoreProvider).writeNavIcons(next.toJson());
+  }
+
+  Future<void> clearAll() async {
+    const next = NavIconConfig();
+    state = next;
+    await ref.read(appSettingsStoreProvider).writeNavIcons(next.toJson());
+  }
+
+  Future<void> useClassicPack() async {
+    final next = NavIconConfig(
+      paths: Map<String, String>.unmodifiable(
+        BrandAssets.classicNavigationIcons.map(
+          (String route, String path) =>
+              MapEntry<String, String>(route, BrandAssets.assetValue(path)),
+        ),
+      ),
+    );
+    state = next;
+    await ref.read(appSettingsStoreProvider).writeNavIcons(next.toJson());
+  }
+}
+
+final navIconProvider =
+    NotifierProvider<NavIconController, NavIconConfig>(NavIconController.new);
+
 /// 自定义应用图标：存的是本机图片路径。
 ///
 /// 「换图标」分两步走——先选/改图片（只记路径），再点「应用到系统」。
@@ -110,7 +150,11 @@ class AppIconController extends Notifier<String?> {
     if (path == null) {
       return const AppIconOutcome(error: '先选一张图片');
     }
-    return ref.read(appIconServiceProvider).apply(path);
+    final localPath = await materializeBundledImage(
+      path,
+      name: 'app_icon_preset.png',
+    );
+    return ref.read(appIconServiceProvider).apply(localPath);
   }
 
   /// 恢复默认图标。
@@ -137,7 +181,11 @@ final appIconStartupProvider = FutureProvider<void>((ref) async {
   final path = ref.watch(appIconProvider);
   if (path == null) return;
   try {
-    await ref.read(appIconServiceProvider).apply(path);
+    final localPath = await materializeBundledImage(
+      path,
+      name: 'app_icon_preset.png',
+    );
+    await ref.read(appIconServiceProvider).apply(localPath);
   } on Object {
     // 启动期的图标问题不该影响启动。
   }

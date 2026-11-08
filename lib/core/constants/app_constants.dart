@@ -6,9 +6,6 @@ abstract final class AppConstants {
   /// 应用版本（与 pubspec.yaml 保持一致）。
   static const String appVersion = '0.1.0+1';
 
-  /// 构建本项目所用的 Flutter SDK 版本（与 `flutter --version` 保持一致）。
-  static const String flutterSdkVersion = '3.27.2 (stable)';
-
   /// 响应式断点：`< 600` 手机，`600 - 1000` 平板，`> 1000` 桌面。
   static const double tabletBreakpoint = 600;
   static const double desktopBreakpoint = 1000;

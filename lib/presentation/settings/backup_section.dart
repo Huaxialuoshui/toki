@@ -11,7 +11,7 @@ import '../../infrastructure/backup/backup_file_store.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/glass_card.dart';
 
-/// 设置页的「备份与恢复」区块（规格 §12 / Phase 12）。
+/// 设置页的「备份与恢复」区块。
 ///
 /// * 导出：整库 → 一个 JSON 文件（同时复制到剪贴板，方便手机端取出）；
 /// * 恢复：从备份文件或粘贴的 JSON，可选「覆盖」或「合并」；
